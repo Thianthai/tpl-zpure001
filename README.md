@@ -25,16 +25,16 @@ RAP UI + Form Data Provider (FDP) สำหรับพิมพ์ใบสั�
    (`ZPURF001`) โดยผ่าน `cl_fp_fdp_services` → `read_to_xml_v2()` → `cl_fp_ads_util=>render_pdf()`
 
 ```
-Fiori List Report (ZSB_PURE001)
+Fiori List Report (ZUI_PURE001_O4)
         │
         ├── ปุ่ม Print PO Form ──► RAP action PrintPOForm ──┐
         │                                                   │
         └── column Preview/Download URL ──► ZHS_PURE001 ────┤
                                             (HTTP service)  │
                                                             ▼
-                                            cl_fp_fdp_services( 'ZSD_PURE001_FDP' )
+                                            cl_fp_fdp_services( 'ZAPI_PURE001_FDP' )
                                                             │
-                                            ZI_PURE001_FDP ─┼─ ZI_PURE001_FDP_ITEM
+                                            ZR_PURE001_FDP ─┼─ ZI_PURE001_FDP_ITEM
                                             (custom entity) │        │
                                                             │        └─ ZI_PURE001_FDP_ITXT
                                                             ▼

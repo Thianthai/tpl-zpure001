@@ -31,21 +31,31 @@
 
 ## Phase 1 — RAP UI (list report)
 
-**เป้าหมาย** ได้หน้าจอ Fiori list report ที่ filter หา PO ได้ครบ 14 ช่อง แสดง 9 คอลัมน์
+**เป้าหมาย** ได้หน้าจอ Fiori list report ที่ filter หา PO ได้ครบ 13 ช่อง แสดง 9 คอลัมน์
 (ยังไม่มีปุ่มพิมพ์)
 
 | # | งาน | Object |
 |---|---|---|
-| 1.1 | สร้าง custom entity ของ list report | `ZI_PURE001` |
+| 1.1 | สร้าง custom entity ของ list report | `ZR_PURE001` |
 | 1.2 | สร้าง query class + implement `if_rap_query_provider` | `ZCL_PURE001_QUERY` |
-| 1.3 | สร้าง service definition + service binding (OData V4) | `ZSD_PURE001` / `ZSB_PURE001` |
+| 1.3 | สร้าง service definition + service binding (OData V4) | `ZUI_PURE001` / `ZUI_PURE001_O4` |
 | 1.4 | Preview จาก service binding → เช็ค filter/column/sort/paging | — |
 
-**สิ่งที่ต้องยืนยันบน tenant ก่อน** — ชื่อ CDS มาตรฐานของ PO ที่ released C1 ให้ใช้ได้
-(คาดว่า `I_PurchaseOrderAPI01` / `I_PurchaseOrderItemAPI01`) และชื่อ field ที่ตรงกับ
-"Editing Status" / "Status (Approval)" ใน Manage PO — ดู [03-data-interface.md §5](03-data-interface.md)
+> ชื่อ object ของเฟสนี้ **ผู้ใช้ confirm แล้ว 2026-09-10**
 
-**เสร็จเมื่อ** — preview แล้ว filter ครบ 14 ช่อง, กด Go แล้วได้ข้อมูล PO ถูกต้อง,
+**ยืนยันบน tenant แล้ว (2026-09-10)**
+
+| ต้องการ | ใช้ |
+|---|---|
+| PO header | `I_PurchaseOrderAPI01` — released C1 |
+| PO item | `I_PurchaseOrderItemAPI01` — released C1 |
+| Our Reference / Your Reference | `CorrespncInternalReference` / `CorrespncExternalReference` |
+| Status (คอลัมน์ 7) | Approval Status |
+| Editing Status (filter ที่ 2) | **ตัดออก** — เป็น draft filter ของ Fiori ไม่ใช่ field ใน CDS |
+
+ดู [03-data-interface.md §5](03-data-interface.md) และ [05-open-questions.md](05-open-questions.md)
+
+**เสร็จเมื่อ** — preview แล้ว filter ครบ 13 ช่อง, กด Go แล้วได้ข้อมูล PO ถูกต้อง,
 `$count` / `$skip` / `$top` / sort ทำงานถูก
 
 ---
@@ -57,10 +67,10 @@
 
 | # | งาน | Object |
 |---|---|---|
-| 2.1 | สร้าง custom entity 3 ชั้น (header / item / item text) | `ZI_PURE001_FDP`, `..._ITEM`, `..._ITXT` |
+| 2.1 | สร้าง custom entity 3 ชั้น (header / item / item text) | `ZR_PURE001_FDP`, `..._ITEM`, `..._ITXT` |
 | 2.2 | สร้าง query class เติมข้อมูลทั้ง 3 node | `ZCL_PURE001_FDP` |
-| 2.3 | สร้าง service definition สำหรับ FDP | `ZSD_PURE001_FDP` |
-| 2.4 | ทดสอบด้วย `cl_fp_fdp_services=>get_instance( 'ZSD_PURE001_FDP' )->read_to_xml_v2( )` แล้ว dump XML ออกมาดู | — |
+| 2.3 | สร้าง service definition สำหรับ FDP | `ZAPI_PURE001_FDP` |
+| 2.4 | ทดสอบด้วย `cl_fp_fdp_services=>get_instance( 'ZAPI_PURE001_FDP' )->read_to_xml_v2( )` แล้ว dump XML ออกมาดู | — |
 | 2.5 | ส่ง XML schema ให้ผู้ใช้เอาไป bind ใน LiveCycle Designer | Claude → ผู้ใช้ |
 | 2.6 | ผู้ใช้สร้าง form object `ZPURF001` + upload XDP | ผู้ใช้ |
 
@@ -80,11 +90,11 @@
 | # | งาน | Object |
 |---|---|---|
 | 3.1 | แยก logic render PDF เป็นคลาสกลาง (ใช้ร่วมกัน 2 ทาง) | `ZCL_PURE001_PRINT` |
-| 3.2 | สร้าง abstract entity สำหรับผลลัพธ์ action | `ZI_PURE001_FILE` |
-| 3.3 | สร้าง behavior definition (`unmanaged`) + action `PrintPOForm` | `ZI_PURE001` bdef |
-| 3.4 | implement behavior pool — วน key, render, merge, base64 | `ZBP_I_PURE001` |
+| 3.2 | สร้าง abstract entity สำหรับผลลัพธ์ action | `ZA_PURE001_FILE` |
+| 3.3 | สร้าง behavior definition (`unmanaged`) + action `PrintPOForm` | `ZR_PURE001` bdef |
+| 3.4 | implement behavior pool — วน key, render, merge, base64 | `ZBP_R_PURE001` |
 | 3.5 | สร้าง HTTP service + handler (`Mode=P` preview / `Mode=D` download) | `ZHS_PURE001` / `ZCL_PURE001_HTTP` |
-| 3.6 | เติม `PrintUrl` / `DownloadUrl` ใน `ZCL_PURE001_QUERY` + คอลัมน์ `#WITH_URL` | `ZI_PURE001` |
+| 3.6 | เติม `PrintUrl` / `DownloadUrl` ใน `ZCL_PURE001_QUERY` + คอลัมน์ `#WITH_URL` | `ZR_PURE001` |
 
 **จุดที่ demo ทำพลาดแล้วเราจะไม่ทำตาม** — `%tky = keys[ 1 ]-%tky` ตายตัว,
 `CATCH cx_root` แล้วเงียบ, ชื่อไฟล์ hardcode (ดู [04-fdp-pattern.md §7](04-fdp-pattern.md))

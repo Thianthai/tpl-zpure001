@@ -20,7 +20,7 @@
 ## 1. โครงสร้าง node ทั้งหมด
 
 ```
-ZI_PURE001_FDP                        (root, key: PurchaseOrder)
+ZR_PURE001_FDP                        (root, key: PurchaseOrder)
 │   ├─ company block   — โลโก้ / ที่อยู่ / เลขผู้เสียภาษี Thappline
 │   ├─ PO block        — เลขที่ วันที่ อ้างอิง เงื่อนไขชำระเงิน
 │   ├─ supplier block  — ผู้ขาย + ผู้ติดต่อ
@@ -46,7 +46,7 @@ ZI_PURE001_FDP                        (root, key: PurchaseOrder)
 
 ---
 
-## 2. `ZI_PURE001_FDP` — root (header)
+## 2. `ZR_PURE001_FDP` — root (header)
 
 ### 2.1 Key
 
@@ -173,28 +173,34 @@ ZI_PURE001_FDP                        (root, key: PurchaseOrder)
 
 ---
 
-## 5. `ZI_PURE001` — entity ของ RAP UI (list report)
+## 5. `ZR_PURE001` — entity ของ RAP UI (list report)
 
 **คนละตัวกับ FDP entity** — ตัวนี้เบา ไม่มีรูป ไม่มี text ใช้แสดงผลบนหน้าจออย่างเดียว
 
-### 5.1 Selection field (14 ช่อง ตาม spec §2.4 Header)
+### 5.1 Selection field (13 ช่อง)
 
-| # | Label | Node | หมายเหตุ |
+spec §2.4 ลอกรายการ filter มาจากหน้าจอ standard "Manage Purchase Orders" ทั้งชุด 14 ช่อง
+แต่ช่องที่ 2 **Editing Status ถูกตัดออก** (ผู้ใช้ confirm แล้ว 2026-09-10) เหลือ 13 ช่อง
+— เหตุผลอยู่ที่ [05-open-questions.md ข้อ 5](05-open-questions.md)
+
+| # | Label | Node | ที่มา / หมายเหตุ |
 |---|---|---|---|
-| 1 | Search | `SearchTerm` | ❓ custom entity ไม่รองรับ free-text search ของ Fiori → ทำเป็น filter ธรรมดาที่ค้นเลข PO / ชื่อผู้ขาย |
-| 2 | Editing Status | `EditingStatus` | ❓ |
-| 3 | Supplier | `Supplier` | value help `I_SupplierVH` |
-| 4 | Purchase Order | `PurchaseOrder` | |
-| 5 | Purchasing Group | `PurchasingGroup` | |
-| 6 | Company Code | `CompanyCode` | mandatory + default `Thai Petroleum` ตาม mockup |
-| 7 | Status | `ApprovalStatus` | ❓ overall release status |
-| 8 | Material | `Material` | filter ระดับ item |
-| 9 | Plant | `Plant` | filter ระดับ item |
-| 10 | Purchase Order Date | `PurchaseOrderDate` | `#INTERVAL` |
-| 11 | Our Reference | `InternalReference` | |
-| 12 | Your Reference | `ExternalReference` | |
-| 13 | Purchasing Doc. Type | `PurchaseOrderType` | |
-| 14 | Created On | `CreationDate` | `#INTERVAL` |
+| 1 | Search | `SearchTerm` | 🔧 Fiori free-text search ใช้กับ custom entity ตรง ๆ ไม่ได้ → ทำเป็น filter ธรรมดาที่ค้นเลข PO / ชื่อผู้ขาย |
+| 2 | Supplier | `Supplier` | ✅ value help `I_SupplierVH` ❓ |
+| 3 | Purchase Order | `PurchaseOrder` | ✅ |
+| 4 | Purchasing Group | `PurchasingGroup` | ✅ |
+| 5 | Company Code | `CompanyCode` | ✅ mandatory + default ตาม mockup |
+| 6 | Status | `ApprovalStatus` | ✅ Approval Status |
+| 7 | Material | `Material` | ✅ filter ระดับ item |
+| 8 | Plant | `Plant` | ✅ filter ระดับ item |
+| 9 | Purchase Order Date | `PurchaseOrderDate` | ✅ `#INTERVAL` |
+| 10 | Our Reference | `InternalReference` | ✅ `CorrespncInternalReference` |
+| 11 | Your Reference | `ExternalReference` | ✅ `CorrespncExternalReference` |
+| 12 | Purchasing Doc. Type | `PurchaseOrderType` | ✅ |
+| 13 | Created On | `CreationDate` | ✅ `#INTERVAL` |
+
+**CDS ต้นทาง (ยืนยันบน tenant แล้ว 2026-09-10)** — `I_PurchaseOrderAPI01` (released C1)
+สำหรับ header และ `I_PurchaseOrderItemAPI01` (released C1) สำหรับ item
 
 ### 5.2 Column (9 คอลัมน์ + ปุ่ม ตาม spec §2.4 Line)
 

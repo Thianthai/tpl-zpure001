@@ -192,7 +192,7 @@ ZPURE001 จะใช้แนวเดียวกัน (ตาราง `ZPUR
 
 | demo | ปัญหา | ของเรา |
 |---|---|---|
-| entity เดียวเสิร์ฟทั้ง list report และ FDP | query ตอน list ดึง logo/text หนัก ๆ มาโดยไม่จำเป็น | แยก `ZI_PURE001` (UI) กับ `ZI_PURE001_FDP` (form) |
+| entity เดียวเสิร์ฟทั้ง list report และ FDP | query ตอน list ดึง logo/text หนัก ๆ มาโดยไม่จำเป็น | แยก `ZR_PURE001` (UI) กับ `ZR_PURE001_FDP` (form) |
 | `handle_paging` ตัดเฉพาะ `gt_output` | item ไม่ถูกตัดตาม / ตัวเลข count เพี้ยน | แยก paging ต่อ entity |
 | `CATCH cx_root` แล้วเงียบ | error หายไปเฉย ๆ ไม่ถึง user | ส่งกลับเป็น `reported` message ทุกครั้ง |
 | `FileName = 'Journal_TEST.pdf'` hardcode | ชื่อไฟล์ไม่สื่อ | ตั้งชื่อจากเลข PO จริง |

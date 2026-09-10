@@ -16,21 +16,37 @@ prefix parameter (`iv_`/`ev_`/`rv_`), pattern ของ RAP object — **ยั�
 
 `<APP>` ของโปรเจกต์นี้คือ **`PURE001`** — object ทุกตัวใช้รูป `Z<TYPE>_PURE001[_<SUFFIX>]`
 
-| Object | ชื่อ |
-|---|---|
-| Package | `ZPURE001` |
-| Custom entity (UI) | `ZI_PURE001` |
-| Custom entity (FDP) | `ZI_PURE001_FDP`, `ZI_PURE001_FDP_ITEM`, `ZI_PURE001_FDP_ITXT` |
-| Abstract entity | `ZI_PURE001_FILE` |
-| Query class | `ZCL_PURE001_QUERY`, `ZCL_PURE001_FDP` |
-| Behavior pool | `ZBP_I_PURE001` |
-| Service definition | `ZSD_PURE001` (UI), `ZSD_PURE001_FDP` (form data) |
-| Service binding | `ZSB_PURE001` (OData V4, UI) |
-| HTTP service | `ZHS_PURE001` + handler `ZCL_PURE001_HTTP` |
-| Adobe Form object | `ZPURF001` |
-| Utility class | `ZCL_PURE001_UTIL` |
+| Object | ชื่อ | กฎที่ใช้ |
+|---|---|---|
+| Package | `ZPURE001` | `Y<APP>` |
+| Custom entity — root | `ZR_PURE001` (UI), `ZR_PURE001_FDP` (form) | `YR_<APP>` |
+| Custom entity — child | `ZI_PURE001_FDP_ITEM`, `ZI_PURE001_FDP_ITXT` | `YI_<APP>_<ENT>` |
+| Abstract entity | `ZA_PURE001_FILE` | `YA_<...>` |
+| Behavior definition | `ZR_PURE001` (= ชื่อ root entity) | = ชื่อ root view |
+| Behavior pool | `ZBP_R_PURE001` | `YBP_R_<APP>` |
+| Service definition | `ZUI_PURE001` (UI), `ZAPI_PURE001_FDP` (form data) | `YUI_<APP>` / `YAPI_<APP>` |
+| Service binding | `ZUI_PURE001_O4` | `YUI_<APP>_O4` |
+| Global class | `ZCL_PURE001_QUERY`, `ZCL_PURE001_FDP`, `ZCL_PURE001_PRINT`, `ZCL_PURE001_HTTP`, `ZCL_PURE001_UTIL` | `YCL_<APP>_<PURPOSE>` |
+| Database table | `ZPURE001_GRPH`, `ZPURE001_CFG` | `Y<APP>_<SUFFIX>` |
+| Data element | `ZE_PURE001_GRAPHIC_NAME` | `YE_<name>` |
+| HTTP service | `ZHS_PURE001` | *(กฎยังไม่ครอบคลุม — ตกลงกันเป็น case)* |
+| Adobe Form object | `ZPURF001` | *(ตาม spec §2.5)* |
 
 ดูรายการเต็มที่ [docs/02-object-list.md](docs/02-object-list.md)
+
+### หมายเหตุเรื่อง custom entity
+
+custom entity **ไม่ใช่ view** (ไม่มี data source ข้างหลัง) กฎ global มี category
+`YQ_<...>` สำหรับ custom entity (unmanaged query) อยู่ แต่ผู้ใช้ตัดสินใจแล้วว่า
+**โปรเจกต์นี้ไม่ใช้ `ZQ_`** — ให้มองตามบทบาทแทน คือ root ใช้ `ZR_` และ child ใช้ `ZI_`
+เหมือน view ปกติ
+
+### case ที่กฎ global ยังไม่ครอบคลุม (ตกลงกันแล้วในโปรเจกต์นี้)
+
+| กรณี | ที่ตกลง |
+|---|---|
+| Service definition ของ FDP (ไม่มี binding ไม่ใช่ทั้ง UI และ OData API) | ใช้ `ZAPI_<APP>_FDP` |
+| Behavior pool ของ custom entity | ใช้ `ZBP_R_<APP>` ตามกฎ root ปกติ (ไม่แยกตัวอักษรตามชนิด entity) |
 
 ## วิธีทำงาน (ตกลงกับผู้ใช้ไว้แล้ว)
 
@@ -46,11 +62,20 @@ prefix parameter (`iv_`/`ev_`/`rv_`), pattern ของ RAP object — **ยั�
    ตรวจความถูกต้องและ sync code ในเอกสารให้ตรงกับของจริงบน tenant
 7. **ห้ามเขียน `.abapgit.xml` หรือ `src/**/package.devc.xml` เอง** — ปล่อยให้ SAP serialize
    ขึ้นมาเป็น baseline ตอนผู้ใช้ push ครั้งแรกจาก ADT
+
+### 3 ข้อที่ผู้ใช้ย้ำว่าซีเรียสที่สุด
+
+ยกระดับเป็นกฎ global แล้วใน `~/.claude/CLAUDE.md` หัวข้อ "จังหวะการทำงาน" — ห้ามข้าม
+
 8. **ก่อนเริ่มทุกเฟส ต้องสรุปชื่อ object ทั้งหมดของเฟสนั้นให้ผู้ใช้รีวิวก่อน**
-   แล้ว **รอจนผู้ใช้ confirm** ถึงจะเริ่ม implement ได้ — ห้ามเริ่มเขียนโค้ดของเฟสใด ๆ
-   ก่อนได้รับ confirm ชื่อ object ของเฟสนั้น
-   (ชื่อใน [docs/02-object-list.md](docs/02-object-list.md) เป็นแค่ข้อเสนอ ยังไม่ถือว่า confirm
-   จนกว่าผู้ใช้จะยืนยันเป็นรายเฟส — คอลัมน์ `Confirmed` ในเอกสารนั้นคือตัวชี้ขาด)
+   แล้ว **รอจนผู้ใช้ confirm** ถึงจะเริ่ม implement ได้
+   ถึงจะเคย confirm ชื่อรวม ๆ ไว้ตอนวางแผนแล้วก็ยังต้องสรุปซ้ำทุกเฟสอยู่ดี
+   (คอลัมน์ `Confirmed` ใน [docs/02-object-list.md](docs/02-object-list.md) คือตัวชี้ขาด)
+9. **ถามก่อนส่ง code เสมอ** — ห้ามส่ง code block มาขัดจังหวะระหว่างที่ยังคุยกันไม่จบ
+   ให้ถามว่าพร้อมรับ code แล้วหรือยัง แล้วหยุดรอคำตอบ
+   ตอบคำถาม อธิบาย เสนอทางเลือก ทำได้ตามปกติ — แค่อย่าเพิ่งส่งตัว code
+10. **ไม่แน่ใจ ให้ถามก่อนเสมอ** — อย่าเดาแล้วลุยต่อ อย่าเลือกทางใดทางหนึ่งเงียบ ๆ
+   แล้วค่อยมาบอกทีหลัง
 
 ## ข้อควรระวังเฉพาะงาน Adobe Form บน Public Cloud
 

@@ -12,35 +12,38 @@
 
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
-| `ZPURE001` | Package | package หลักของโปรเจกต์ | ⬜ | ⬜ |
+| `ZPURE001` | Package | package หลัก · SW component `ZLOCAL` · ABAP for Cloud Development | ✅ 2026-09-10 | ⬜ |
 
 ## Phase 1 — RAP UI (list report)
 
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
-| `ZI_PURE001` | Custom entity (root) | entity ของ list report — 14 filter / 9 column | ⬜ | ⬜ |
-| `ZCL_PURE001_QUERY` | Class | `if_rap_query_provider` ของ `ZI_PURE001` | ⬜ | ⬜ |
-| `ZSD_PURE001` | Service definition | expose `ZI_PURE001` | ⬜ | ⬜ |
-| `ZSB_PURE001` | Service binding | OData V4 — UI | ⬜ | ⬜ |
+| `ZR_PURE001` | Custom entity (root) | entity ของ list report — **13 filter** / 9 column | ✅ 2026-09-10 | ⬜ |
+| `ZCL_PURE001_QUERY` | Class | `if_rap_query_provider` ของ `ZR_PURE001` | ✅ 2026-09-10 | ⬜ |
+| `ZUI_PURE001` | Service definition | expose `ZR_PURE001` as `PurchaseOrder` | ✅ 2026-09-10 | ⬜ |
+| `ZUI_PURE001_O4` | Service binding | OData V4 — UI | ✅ 2026-09-10 | ⬜ |
+
+> ⚠️ ชื่อของ **Phase 2 เป็นต้นไปยังเป็นแค่ข้อเสนอ** — ต้องสรุปให้ผู้ใช้รีวิวและ confirm
+> ตอนขึ้นเฟสนั้นจริง ๆ อีกครั้ง ตาม `CLAUDE.md` ข้อ 8
 
 ## Phase 2 — FDP data interface
 
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
-| `ZI_PURE001_FDP` | Custom entity (root) | form header | ⬜ | ⬜ |
+| `ZR_PURE001_FDP` | Custom entity (root) | form header | ⬜ | ⬜ |
 | `ZI_PURE001_FDP_ITEM` | Custom entity | form item | ⬜ | ⬜ |
 | `ZI_PURE001_FDP_ITXT` | Custom entity | บรรทัดข้อความใต้รายการ | ⬜ | ⬜ |
 | `ZCL_PURE001_FDP` | Class | `if_rap_query_provider` ของ 3 entity ข้างบน | ⬜ | ⬜ |
-| `ZSD_PURE001_FDP` | Service definition | **ชื่อที่ส่งให้ `cl_fp_fdp_services=>get_instance( )`** | ⬜ | ⬜ |
+| `ZAPI_PURE001_FDP` | Service definition | **ชื่อที่ส่งให้ `cl_fp_fdp_services=>get_instance( )`** | ⬜ | ⬜ |
 | `ZPURF001` | Form object | layout XDP — **ผู้ใช้ทำเองจาก LiveCycle Designer** | ⬜ | ⬜ |
 
 ## Phase 3 — Print output
 
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
-| `ZI_PURE001_FILE` | Abstract entity | โครงผลลัพธ์ของ action (base64 PDF) | ⬜ | ⬜ |
-| `ZI_PURE001` (bdef) | Behavior definition | `unmanaged` + `action PrintPOForm result[1] ZI_PURE001_FILE` | ⬜ | ⬜ |
-| `ZBP_I_PURE001` | Behavior pool | `lhc_ZI_PURE001` — implement action | ⬜ | ⬜ |
+| `ZA_PURE001_FILE` | Abstract entity | โครงผลลัพธ์ของ action (base64 PDF) | ⬜ | ⬜ |
+| `ZR_PURE001` (bdef) | Behavior definition | `unmanaged` + `action PrintPOForm result[1] ZA_PURE001_FILE` | ⬜ | ⬜ |
+| `ZBP_R_PURE001` | Behavior pool | `lhc_ZR_PURE001` — implement action | ⬜ | ⬜ |
 | `ZCL_PURE001_PRINT` | Class | logic render PDF ที่ใช้ร่วมกันระหว่าง action กับ HTTP service | ⬜ | ⬜ |
 | `ZCL_PURE001_HTTP` | Class | `if_http_service_extension` — preview/download | ⬜ | ⬜ |
 | `ZHS_PURE001` | HTTP service | endpoint `/sap/bc/http/sap/ZHS_PURE001` | ⬜ | ⬜ |
@@ -73,6 +76,8 @@
 ## หมายเหตุเรื่องชื่อ
 
 - **ทุก object ใช้ prefix `Z`** ตามที่ผู้ใช้สั่ง (override global rule ที่บังคับ `Y`)
+- custom entity ใช้ `ZR_` (root) / `ZI_` (child) ตามบทบาท **ไม่ใช้ `ZQ_`**
+  ถึงกฎ global จะมี category `YQ_` สำหรับ custom entity อยู่ก็ตาม — ผู้ใช้ตัดสินใจแล้ว
 - ชื่อ table ต้อง ≤ 16 ตัวอักษร → `ZPURE001_GRPH` (13) และ `ZPURE001_CFG` (12) ผ่าน
 - ชื่อ CDS / class / data element ต้อง ≤ 30 ตัวอักษร → ยาวสุดคือ
   `ZE_PURE001_GRAPHIC_NAME` (23) ผ่าน
