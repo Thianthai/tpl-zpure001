@@ -1,0 +1,4 @@
+@EndUserText.label: 'Print Purchase Order - UI'
+define service ZUI_PURE001 {
+  expose ZR_PURE001 as PurchaseOrder;
+}
