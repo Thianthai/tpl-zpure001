@@ -12,16 +12,29 @@
 
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
-| `ZPURE001` | Package | package หลัก · SW component `ZLOCAL` · ABAP for Cloud Development | ✅ 2026-09-10 | ⬜ |
+| `ZPURE001` | Package | package หลัก · SW component `ZLOCAL` · ABAP for Cloud Development | ✅ 2026-09-10 | ✅ 2be05ab |
 
 ## Phase 1 — RAP UI (list report)
 
+สถาปัตยกรรม: **hybrid** — data logic ทั้งหมดอยู่ใน CDS view entity, custom entity ครอบชั้นบนสุด
+เฉพาะเพื่อสิ่งที่ CDS ทำไม่ได้ (semi-join filter ระดับ item + string aggregation)
+ดูเหตุผลที่ [06-decisions.md](06-decisions.md)
+
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
-| `ZR_PURE001` | Custom entity (root) | entity ของ list report — **13 filter** / 9 column | ✅ 2026-09-10 | ⬜ |
-| `ZCL_PURE001_QUERY` | Class | `if_rap_query_provider` ของ `ZR_PURE001` | ✅ 2026-09-10 | ⬜ |
-| `ZUI_PURE001` | Service definition | expose `ZR_PURE001` as `PurchaseOrder` | ✅ 2026-09-10 | ⬜ |
-| `ZUI_PURE001_O4` | Service binding | OData V4 — UI | ✅ 2026-09-10 | ⬜ |
+| `ZI_PURE001_TOTAL` | CDS view entity | `sum( NetAmount )` group by PurchaseOrder — ยอดรวมต่อใบ | ✅ 2026-09-11 | ✅ 2be05ab |
+| `ZI_PURE001_HEADER` | CDS view entity | header + `_TOTAL` + text (supplier / PG / doc type) + `case` approval status | ✅ 2026-09-11 | ✅ 2be05ab |
+| `ZR_PURE001` | Custom entity (root) | สิ่งที่ UI เห็น — 13 filter / 9 column + `MaterialList` / `PlantList` | ✅ 2026-09-11 | ✅ 2be05ab |
+| `ZCL_PURE001_QUERY` | Class | `if_rap_query_provider` — EXISTS + sort/paging/count push-down + ต่อ string item | ✅ 2026-09-11 | ✅ 2be05ab |
+| `ZUI_PURE001` | Service definition | expose `ZR_PURE001` as `PurchaseOrder` | ✅ 2026-09-11 | ✅ 2be05ab |
+| `ZUI_PURE001_O4` | Service binding | OData V4 — UI · published | ✅ 2026-09-11 | ✅ 2be05ab |
+
+**External dependency** — `ZR_PURE001` ใช้ data element **`ZE_BSART`** (สำหรับ `PurchaseOrderType`)
+ซึ่งมีอยู่บน tenant ก่อนแล้วนอก package นี้ เพราะ `ESART` มาตรฐานไม่ released
+→ ถ้าย้าย package ไป tenant อื่น ต้องมี `ZE_BSART` ก่อน
+
+**Object ที่ SAP สร้างให้เอง** — `997e86285e590b8e7841262ae639b7ht.sush.xml`
+= authorization default values (`S_START`) ของ service binding เกิดตอน publish
 
 > ⚠️ ชื่อของ **Phase 2 เป็นต้นไปยังเป็นแค่ข้อเสนอ** — ต้องสรุปให้ผู้ใช้รีวิวและ confirm
 > ตอนขึ้นเฟสนั้นจริง ๆ อีกครั้ง ตาม `CLAUDE.md` ข้อ 8
@@ -42,7 +55,7 @@
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
 | `ZA_PURE001_FILE` | Abstract entity | โครงผลลัพธ์ของ action (base64 PDF) | ⬜ | ⬜ |
-| `ZR_PURE001` (bdef) | Behavior definition | `unmanaged` + `action PrintPOForm result[1] ZA_PURE001_FILE` | ⬜ | ⬜ |
+| `ZR_PURE001` (bdef) | Behavior definition | `unmanaged` บน custom entity + `action PrintPOForm result[1] ZA_PURE001_FILE` | ⬜ | ⬜ |
 | `ZBP_R_PURE001` | Behavior pool | `lhc_ZR_PURE001` — implement action | ⬜ | ⬜ |
 | `ZCL_PURE001_PRINT` | Class | logic render PDF ที่ใช้ร่วมกันระหว่าง action กับ HTTP service | ⬜ | ⬜ |
 | `ZCL_PURE001_HTTP` | Class | `if_http_service_extension` — preview/download | ⬜ | ⬜ |
@@ -78,6 +91,7 @@
 - **ทุก object ใช้ prefix `Z`** ตามที่ผู้ใช้สั่ง (override global rule ที่บังคับ `Y`)
 - custom entity ใช้ `ZR_` (root) / `ZI_` (child) ตามบทบาท **ไม่ใช้ `ZQ_`**
   ถึงกฎ global จะมี category `YQ_` สำหรับ custom entity อยู่ก็ตาม — ผู้ใช้ตัดสินใจแล้ว
+- CDS view entity ที่เป็น reuse/helper (ไม่ expose ตรง) ใช้ `ZI_<APP>_<ENT>` → `ZI_PURE001_TOTAL`, `ZI_PURE001_HEADER`
 - ชื่อ table ต้อง ≤ 16 ตัวอักษร → `ZPURE001_GRPH` (13) และ `ZPURE001_CFG` (12) ผ่าน
 - ชื่อ CDS / class / data element ต้อง ≤ 30 ตัวอักษร → ยาวสุดคือ
   `ZE_PURE001_GRAPHIC_NAME` (23) ผ่าน

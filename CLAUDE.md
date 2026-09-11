@@ -21,6 +21,7 @@ prefix parameter (`iv_`/`ev_`/`rv_`), pattern ของ RAP object — **ยั�
 | Package | `ZPURE001` | `Y<APP>` |
 | Custom entity — root | `ZR_PURE001` (UI), `ZR_PURE001_FDP` (form) | `YR_<APP>` |
 | Custom entity — child | `ZI_PURE001_FDP_ITEM`, `ZI_PURE001_FDP_ITXT` | `YI_<APP>_<ENT>` |
+| CDS view entity (reuse / helper) | `ZI_PURE001_HEADER`, `ZI_PURE001_TOTAL` | `YI_<APP>_<ENT>` |
 | Abstract entity | `ZA_PURE001_FILE` | `YA_<...>` |
 | Behavior definition | `ZR_PURE001` (= ชื่อ root entity) | = ชื่อ root view |
 | Behavior pool | `ZBP_R_PURE001` | `YBP_R_<APP>` |
@@ -47,6 +48,19 @@ custom entity **ไม่ใช่ view** (ไม่มี data source ข้า
 |---|---|
 | Service definition ของ FDP (ไม่มี binding ไม่ใช่ทั้ง UI และ OData API) | ใช้ `ZAPI_<APP>_FDP` |
 | Behavior pool ของ custom entity | ใช้ `ZBP_R_<APP>` ตามกฎ root ปกติ (ไม่แยกตัวอักษรตามชนิด entity) |
+
+## สถาปัตยกรรมที่ตัดสินใจแล้ว — อย่ากลับไปคิดใหม่
+
+รายละเอียดและเหตุผลอยู่ใน [docs/06-decisions.md](docs/06-decisions.md) สรุปสั้น ๆ
+
+- **Phase 1 เป็น hybrid**: `ZI_PURE001_HEADER` (view entity, data logic ทั้งหมด) → `ZR_PURE001`
+  (custom entity) → `ZCL_PURE001_QUERY` ทำเฉพาะ EXISTS / ต่อ string / push-down sort-paging-count
+  · CDS view entity ล้วนทำไม่ได้เพราะไม่มี `EXISTS` + `STRING_AGG` และ
+  `IF_SADL_EXIT_FILTER_TRANSFORM` **ไม่ released** บน tenant นี้
+- **Phase 2 (FDP) ต้องเป็น custom entity** — SAP บังคับ ไม่ใช่ทางเลือก
+- **แยก service UI (`ZUI_`) กับ FDP (`ZAPI_`)** คนละ entity
+- **`ESART` ไม่ released** → ใช้ `ZE_BSART` ที่มีบน tenant อยู่ก่อน (external dependency)
+- **`@Semantics.currencyCode: true` ห้ามใส่ใน view entity** ใส่ได้เฉพาะ custom entity
 
 ## วิธีทำงาน (ตกลงกับผู้ใช้ไว้แล้ว)
 

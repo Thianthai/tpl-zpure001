@@ -22,6 +22,9 @@
 | 0.4 | push จาก ADT → ให้ SAP serialize `.abapgit.xml` + `src/package.devc.xml` เป็น baseline | ผู้ใช้ |
 | 0.5 | อ่าน baseline ที่ SAP สร้าง แล้วอัปเดต path ในเอกสารให้ตรง | Claude |
 
+✅ **เสร็จ 2026-09-11** (commit `2be05ab`) — `FOLDER_LOGIC = FULL`, `STARTING_FOLDER = /src/`
+object ทุกตัวอยู่ใต้ `src/` ไม่มี subfolder
+
 > ⚠️ **ห้าม Claude เขียน `.abapgit.xml` หรือ `package.devc.xml` เองล่วงหน้า** —
 > เคยเจอปัญหาจริงที่ ZARI002: link wizard พังด้วย HTTP 500 เพราะ `FOLDER_LOGIC` ไม่ตรงกัน
 
@@ -29,36 +32,47 @@
 
 ---
 
-## Phase 1 — RAP UI (list report)
+## Phase 1 — RAP UI (list report) ✅ เสร็จ 2026-09-11
 
 **เป้าหมาย** ได้หน้าจอ Fiori list report ที่ filter หา PO ได้ครบ 13 ช่อง แสดง 9 คอลัมน์
 (ยังไม่มีปุ่มพิมพ์)
 
-| # | งาน | Object |
-|---|---|---|
-| 1.1 | สร้าง custom entity ของ list report | `ZR_PURE001` |
-| 1.2 | สร้าง query class + implement `if_rap_query_provider` | `ZCL_PURE001_QUERY` |
-| 1.3 | สร้าง service definition + service binding (OData V4) | `ZUI_PURE001` / `ZUI_PURE001_O4` |
-| 1.4 | Preview จาก service binding → เช็ค filter/column/sort/paging | — |
+**สถาปัตยกรรมที่เลือก — hybrid** (ดู [06-decisions.md](06-decisions.md) ข้อ D1–D3)
 
-> ชื่อ object ของเฟสนี้ **ผู้ใช้ confirm แล้ว 2026-09-10**
+```
+ZUI_PURE001_O4 (binding)
+  └─ ZUI_PURE001 (service def)
+       └─ ZR_PURE001 (custom entity)  ←  ZCL_PURE001_QUERY
+                                             │  EXISTS (Material/Plant) · sort/paging/count push-down
+                                             │  ต่อ string MaterialList / PlantList
+                                             ▼
+                                        ZI_PURE001_HEADER (view entity)  ← data logic ทั้งหมด
+                                             └─ ZI_PURE001_TOTAL (sum ต่อ PO)
+```
 
-**ยืนยันบน tenant แล้ว (2026-09-10)**
+| # | งาน | Object | สถานะ |
+|---|---|---|---|
+| 1.1 | view ยอดรวมต่อ PO | `ZI_PURE001_TOTAL` | ✅ |
+| 1.2 | view header + text + derived status | `ZI_PURE001_HEADER` | ✅ |
+| 1.3 | custom entity ของ list report | `ZR_PURE001` | ✅ |
+| 1.4 | query provider | `ZCL_PURE001_QUERY` | ✅ |
+| 1.5 | service definition + binding (OData V4) | `ZUI_PURE001` / `ZUI_PURE001_O4` | ✅ published |
+| 1.6 | Preview → เช็ค filter / column / sort / paging / search | — | ⏳ รอทดสอบ |
 
-| ต้องการ | ใช้ |
+**ยืนยันบน tenant แล้ว (2026-09-11) — activate ผ่านทั้งหมดโดยไม่ต้องแก้**
+
+| สิ่งที่เดาไว้ | ผล |
 |---|---|
-| PO header | `I_PurchaseOrderAPI01` — released C1 |
-| PO item | `I_PurchaseOrderItemAPI01` — released C1 |
-| Our Reference / Your Reference | `CorrespncInternalReference` / `CorrespncExternalReference` |
-| Status (คอลัมน์ 7) | Approval Status |
+| `I_PurchaseOrderAPI01` / `I_PurchaseOrderItemAPI01` | released C1 |
+| `I_Supplier` / `I_PurchasingGroup` / `I_PurchasingDocumentTypeText` / `I_Plant` | ใช้ได้ |
+| `NetAmount`, `DocumentCurrency` บน item view · `ReleaseIsNotCompleted` บน header | มีจริง |
+| `@Search.searchable` บน custom entity + `get_search_expression( )` | activate ผ่าน (ผลจริงรอทดสอบ 1.6) |
+| `cx_rap_query_filter_no_range` propagate จาก `select` | compile ผ่าน |
+| `esart` | **ใช้ไม่ได้** → ใช้ `ZE_BSART` (external) แทน |
 | Editing Status (filter ที่ 2) | **ตัดออก** — เป็น draft filter ของ Fiori ไม่ใช่ field ใน CDS |
 
-ดู [03-data-interface.md §5](03-data-interface.md) และ [05-open-questions.md](05-open-questions.md)
-
-**เสร็จเมื่อ** — preview แล้ว filter ครบ 13 ช่อง, กด Go แล้วได้ข้อมูล PO ถูกต้อง,
-`$count` / `$skip` / `$top` / sort ทำงานถูก
-
----
+**เสร็จเมื่อ** — preview แล้ว filter ครบ 13 ช่อง, กรอง Material/Plant แล้วได้ PO ที่มี item ตรง,
+`$count` / `$skip` / `$top` / sort / Search ทำงานถูก
 
 ## Phase 2 — FDP data interface
 

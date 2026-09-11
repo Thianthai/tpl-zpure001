@@ -27,6 +27,11 @@ RAP UI + Form Data Provider (FDP) สำหรับพิมพ์ใบสั�
 ```
 Fiori List Report (ZUI_PURE001_O4)
         │
+        ▼
+ZR_PURE001 (custom entity) ◄── ZCL_PURE001_QUERY ◄── ZI_PURE001_HEADER ◄── ZI_PURE001_TOTAL
+        │                        EXISTS · sort/paging       (view entity,        (sum ต่อ PO)
+        │                        push-down · ต่อ string      data logic)
+        │
         ├── ปุ่ม Print PO Form ──► RAP action PrintPOForm ──┐
         │                                                   │
         └── column Preview/Download URL ──► ZHS_PURE001 ────┤
@@ -44,6 +49,8 @@ Fiori List Report (ZUI_PURE001_O4)
                                                           PDF
 ```
 
+**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (2026-09-11, รอทดสอบ preview) · Phase 2 ⬜
+
 ## เอกสาร
 
 | ไฟล์ | เนื้อหา |
@@ -53,6 +60,7 @@ Fiori List Report (ZUI_PURE001_O4)
 | [docs/03-data-interface.md](docs/03-data-interface.md) | โครงสร้าง FDP node + field mapping กับฟอร์ม |
 | [docs/04-fdp-pattern.md](docs/04-fdp-pattern.md) | pattern การ implement FDP + call form (สรุปจาก demo) |
 | [docs/05-open-questions.md](docs/05-open-questions.md) | ประเด็นที่ยังรอ functional สรุป |
+| [docs/06-decisions.md](docs/06-decisions.md) | บันทึกการตัดสินใจเชิงสถาปัตยกรรม + ข้อจำกัดของ tenant ที่ค้นพบ |
 
 ## การแบ่งงาน push
 
