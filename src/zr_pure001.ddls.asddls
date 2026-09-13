@@ -11,7 +11,7 @@ define root custom entity ZR_PURE001
       @UI.selectionField               : [{ position: 30 }]
       @UI.lineItem                     : [{ position: 30, importance: #HIGH }]
       @Search.defaultSearchElement     : true
-      @Consumption.valueHelpDefinition : [{ entity: { name: 'ZI_PURE001_HEADER', element: 'PurchaseOrder' } }]
+      @Consumption.valueHelpDefinition : [{ entity: { name: 'I_PurchaseOrderAPI01', element: 'PurchaseOrder' } }]
   key PurchaseOrder                    : ebeln;
 
       //=== Document type =====================================================
