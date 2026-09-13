@@ -10,6 +10,8 @@ define view entity ZI_PURE001_TOTAL
 
       DocumentCurrency                            // TODO verify: มี field นี้บน item view ไหม
 }
+where
+  PurchasingDocumentDeletionCode <> 'L'   // ไม่นับ item ที่ลบ — ตรง Net Order Value ของ standard
 group by
   PurchaseOrder,
   DocumentCurrency

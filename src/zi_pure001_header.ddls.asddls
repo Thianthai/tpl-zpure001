@@ -7,8 +7,15 @@ define view entity ZI_PURE001_HEADER
     left outer to one join ZI_PURE001_TOTAL as Total
       on Total.PurchaseOrder = Header.PurchaseOrder
 
-    // TODO verify: ชื่อ text view ทั้ง 3 ตัวข้างล่าง — ถ้าตัวไหน activate ไม่ผ่าน
-    // ให้ comment join นั้นกับ field ที่ใช้ออกก่อน คอลัมน์จะแสดงแค่รหัส ไม่กระทบอย่างอื่น
+    left outer to one join ZI_PURE001_FOLLOWON as FollowOn
+      on FollowOn.PurchaseOrder = Header.PurchaseOrder
+
+    left outer to one join ZI_PURE001_WORKFLOW as Workflow
+      on Workflow.PurchaseOrder = Header.PurchaseOrder
+
+    left outer to one join I_WorkflowStatusOverview as WorkflowStatus
+      on WorkflowStatus.WorkflowInternalID = Workflow.WorkflowInternalID
+
     left outer to one join I_Supplier as Supplier
       on Supplier.Supplier = Header.Supplier
 
@@ -44,15 +51,87 @@ define view entity ZI_PURE001_HEADER
 
       Header.DocumentCurrency,
 
-      // TODO verify: ที่มาของสถานะอนุมัติ — ตอนนี้ derive จาก ReleaseIsNotCompleted
-      // ถ้าเจอ field/view ที่ถูกต้อง แก้แค่ 2 case นี้ ที่อื่นไม่ต้องแตะ
-      case Header.ReleaseIsNotCompleted
-        when 'X' then 'I'
-        else          'A'
+      //=== Status (filter "Status") — รหัสของ I_PurchasingDocumentStatus =============
+      // ลำดับ case สำคัญ ตัวบน Priority สูงกว่าตัวล่าง · text มา join ใน ZCL_PURE001_QUERY
+      // ข้อจำกัด: Sent / Not Yet Sent / Output Error รวมเป็น 08 Released
+      // (source ของ output status ไม่ released — ดู docs/06-decisions.md)
+      case
+        when Header.PurchasingDocumentDeletionCode = 'L'
+          then '10'                                           // Deleted
+        when Header.PurchasingCompletenessStatus = 'X'
+          then '01'                                           // Draft (ยังไม่ Order)
+        when Header.PurchasingProcessingStatus = '08'
+          then '38'                                           // Rejected
+        when Header.PurchasingProcessingStatus = '03'
+          or Header.PurchasingProcessingStatus = '04'
+          or Header.PurchasingProcessingStatus = '26'
+          then '02'                                           // In Approval
+        when ( Header.PurchasingProcessingStatus = '02'
+            or Header.PurchasingProcessingStatus = '05' )
+          and FollowOn.PurchaseOrder is not null
+          then '05'                                           // Follow-On Documents
+        when Header.PurchasingProcessingStatus = '02'
+          or Header.PurchasingProcessingStatus = '05'
+          then '08'                                           // Released 
+        else   '27'                                           // Created (01, 11-14)
+      end                                  as PurchaseOrderStatus,
+
+      //=== Approval Status (column "Approval Status") — ผลอนุมัติจาก PROCSTAT + flexible workflow ========
+      // A = Approved · B = Approved automatically · I = In Approval · R = Rejected · '' = ไม่มี
+      case
+        when Header.PurchasingCompletenessStatus = 'X'
+          then ''
+        when Header.PurchasingProcessingStatus = '08'
+          then 'R'
+        when Header.PurchasingProcessingStatus = '03'
+          or Header.PurchasingProcessingStatus = '04'
+          or Header.PurchasingProcessingStatus = '26'
+          then 'I'
+        when WorkflowStatus.WorkflowExternalStatus = 'COMPLETED'
+          and WorkflowStatus.NmbrOfCmpltdWrkflwDialogTasks = 0
+          then 'B'
+        when WorkflowStatus.WorkflowExternalStatus = 'COMPLETED'
+          then 'A'
+        else ''
       end                                  as ApprovalStatus,
 
-      case Header.ReleaseIsNotCompleted
-        when 'X' then 'In Approval'
-        else          'Approved'
-      end                                  as ApprovalStatusText
+      case
+        when Header.PurchasingCompletenessStatus = 'X'
+          then ''
+        when Header.PurchasingProcessingStatus = '08'
+          then 'Rejected'
+        when Header.PurchasingProcessingStatus = '03'
+          or Header.PurchasingProcessingStatus = '04'
+          or Header.PurchasingProcessingStatus = '26'
+          then 'In Approval'
+        when WorkflowStatus.WorkflowExternalStatus = 'COMPLETED'
+          and WorkflowStatus.NmbrOfCmpltdWrkflwDialogTasks = 0
+          then 'Approved automatically'
+        when WorkflowStatus.WorkflowExternalStatus = 'COMPLETED'
+          then 'Approved'
+        else ''
+      end                                  as ApprovalStatusText,
+      
+      //=== Criticality สำหรับ icon/สีบน Fiori: 0 ไม่มี · 1 แดง · 2 เหลือง · 3 เขียว =====
+      case
+        when Header.PurchasingDocumentDeletionCode = 'L'  then 1   // Deleted
+        when Header.PurchasingCompletenessStatus   = 'X'  then 0   // Draft
+        when Header.PurchasingProcessingStatus     = '08' then 1   // Rejected
+        when Header.PurchasingProcessingStatus     = '03'
+          or Header.PurchasingProcessingStatus     = '04'
+          or Header.PurchasingProcessingStatus     = '26' then 0   // In Approval
+        when Header.PurchasingProcessingStatus     = '02'
+          or Header.PurchasingProcessingStatus     = '05' then 3   // Follow-On / Released
+        else 0                                                    // Created
+      end                                  as PurchaseOrderStatusCriticality,
+
+      case
+        when Header.PurchasingCompletenessStatus = 'X'          then 0
+        when Header.PurchasingProcessingStatus   = '08'         then 1   // Rejected
+        when Header.PurchasingProcessingStatus   = '03'
+          or Header.PurchasingProcessingStatus   = '04'
+          or Header.PurchasingProcessingStatus   = '26'         then 0   // In Approval
+        when WorkflowStatus.WorkflowExternalStatus = 'COMPLETED' then 3  // Approved / automatically
+        else 0
+      end                                  as ApprovalStatusCriticality
 }

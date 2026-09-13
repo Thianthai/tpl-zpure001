@@ -11,6 +11,7 @@ define root custom entity ZR_PURE001
       @UI.selectionField               : [{ position: 30 }]
       @UI.lineItem                     : [{ position: 30, importance: #HIGH }]
       @Search.defaultSearchElement     : true
+      @Consumption.valueHelpDefinition : [{ entity: { name: 'ZI_PURE001_HEADER', element: 'PurchaseOrder' } }]
   key PurchaseOrder                    : ebeln;
 
       //=== Document type =====================================================
@@ -19,6 +20,7 @@ define root custom entity ZR_PURE001
       @UI.lineItem                     : [{ position: 10, importance: #HIGH }]
       @UI.textArrangement              : #TEXT_FIRST
       @ObjectModel.text.element        : ['PurchaseOrderTypeName']
+      @Consumption.valueHelpDefinition : [{ entity: { name: 'ZI_PURE001_POTYPE_VH', element: 'PurchasingDocumentType' } }]
       PurchaseOrderType                : ze_bsart;
 
       @UI.hidden                       : true
@@ -34,7 +36,6 @@ define root custom entity ZR_PURE001
 
       @EndUserText.label               : 'Your Reference'
       @UI.selectionField               : [{ position: 110 }]
-      @UI.hidden                       : true
       @Search.defaultSearchElement     : true
       ExternalReference                : abap.char(12);
 
@@ -44,6 +45,7 @@ define root custom entity ZR_PURE001
       @UI.lineItem                     : [{ position: 40, importance: #HIGH }]
       @UI.textArrangement              : #TEXT_FIRST
       @ObjectModel.text.element        : ['SupplierName']
+      @Consumption.valueHelpDefinition : [{ entity: { name: 'I_Supplier', element: 'Supplier' } }]
       Supplier                         : lifnr;
 
       @UI.hidden                       : true
@@ -55,8 +57,8 @@ define root custom entity ZR_PURE001
       @EndUserText.label               : 'Company Code'
       @UI.selectionField               : [{ position: 50 }]
       @Consumption.filter.mandatory    : true
+      @Consumption.filter.defaultValue : 'TL01'
       @Consumption.valueHelpDefinition : [{ entity: { name: 'I_CompanyCodeVH', element: 'CompanyCode' } }]
-      @UI.hidden                       : true
       CompanyCode                      : bukrs;
 
       @EndUserText.label               : 'Purchasing Group'
@@ -64,31 +66,34 @@ define root custom entity ZR_PURE001
       @UI.lineItem                     : [{ position: 80 }]
       @UI.textArrangement              : #TEXT_FIRST
       @ObjectModel.text.element        : ['PurchasingGroupName']
+      @Consumption.valueHelpDefinition : [{ entity: { name: 'I_PurchasingGroup', element: 'PurchasingGroup' } }]
       PurchasingGroup                  : ekgrp;
 
       @UI.hidden                       : true
       @Semantics.text                  : true
       PurchasingGroupName              : abap.char(18);
 
-      //=== Item-level filter (filter อย่างเดียว ไม่แสดงในตาราง) ================
-      // query class ใช้ EXISTS: "PO ใบนี้มี item ที่ตรงเงื่อนไขอย่างน้อย 1 รายการ"
+      //=== Item-level filter (filter อย่างเดียว) ==============================
+      // query class: EXISTS "PO มี item ที่ material ตรง หรือ item text มีคำนี้ (ไม่สนตัวพิมพ์)"
       @EndUserText.label               : 'Material'
       @UI.selectionField               : [{ position: 70 }]
-      @UI.hidden                       : true
+      @Consumption.valueHelpDefinition : [{ entity: { name: 'I_Product', element: 'Product' } }]
       Material                         : matnr;
 
       @EndUserText.label               : 'Plant'
       @UI.selectionField               : [{ position: 80 }]
-      @UI.hidden                       : true
+      @Consumption.valueHelpDefinition : [{ entity: { name: 'I_Plant', element: 'Plant' } }]
       Plant                            : werks_d;
 
-      //=== Item-level display (ประกอบใน ABAP จากทุก item ของใบ) ===============
+      //=== Item-level display (ประกอบใน ABAP) =================================
       @EndUserText.label               : 'Material'
       @UI.lineItem                     : [{ position: 100, importance: #LOW }]
+      @Consumption.filter.hidden       : true
       MaterialList                     : abap.char(1000);
 
       @EndUserText.label               : 'Plant'
       @UI.lineItem                     : [{ position: 110, importance: #LOW }]
+      @Consumption.filter.hidden       : true
       PlantList                        : abap.char(255);
 
       //=== Dates =============================================================
@@ -114,10 +119,26 @@ define root custom entity ZR_PURE001
       @Semantics.currencyCode          : true
       DocumentCurrency                 : waers;
 
-      //=== Approval ==========================================================
-      @EndUserText.label               : 'Approval Status'
+      //=== Status (filter + column) ==========================================
+      @EndUserText.label               : 'Status'
       @UI.selectionField               : [{ position: 60 }]
-      @UI.lineItem                     : [{ position: 70 }]
+      @UI.lineItem                     : [{ position: 70, criticality: 'PurchaseOrderStatusCriticality' }]
+      @UI.textArrangement              : #TEXT_ONLY
+      @ObjectModel.text.element        : ['PurchaseOrderStatusName']
+      @Consumption.valueHelpDefinition : [{ entity: { name: 'ZI_PURE001_STATUS_VH', element: 'PurchasingDocumentStatus' } }]
+      PurchaseOrderStatus              : abap.char(2);
+
+      @UI.hidden                       : true
+      @Semantics.text                  : true
+      PurchaseOrderStatusName          : abap.char(60);
+
+      @UI.hidden                       : true
+      @Consumption.filter.hidden       : true
+      PurchaseOrderStatusCriticality   : abap.int1;
+
+      //=== Approval Status (column) ==========================================
+      @EndUserText.label               : 'Approval Status'
+      @UI.lineItem                     : [{ position: 75, criticality: 'ApprovalStatusCriticality' }]
       @UI.textArrangement              : #TEXT_ONLY
       @ObjectModel.text.element        : ['ApprovalStatusText']
       ApprovalStatus                   : abap.char(1);
@@ -125,4 +146,8 @@ define root custom entity ZR_PURE001
       @UI.hidden                       : true
       @Semantics.text                  : true
       ApprovalStatusText               : abap.char(60);
+
+      @UI.hidden                       : true
+      @Consumption.filter.hidden       : true
+      ApprovalStatusCriticality        : abap.int1;
 }

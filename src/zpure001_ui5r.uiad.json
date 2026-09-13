@@ -1,0 +1,34 @@
+{
+  "formatVersion": "2",
+  "header": {
+    "description": "Print Purchase Order",
+    "originalLanguage": "en",
+    "abapLanguageVersion": "cloudDevelopment"
+  },
+  "generalInformation": {
+    "appType": "ui5",
+    "catalogId": "SAP_TC_ALV5_DEFAULT"
+  },
+  "ui5AppDetails": {
+    "appId": "zpure001"
+  },
+  "navigation": {
+    "targetMappingId": "ZPURE001_UI5R_TM",
+    "semanticObject": "ZPURE001",
+    "action": "manage",
+    "desktop": true,
+    "tablet": true,
+    "phone": true
+  },
+  "tiles": [
+    {
+      "id": "ZPURE001_UI5R_AL",
+      "tileType": "static",
+      "standard": {
+        "title": "Print Purchase Order",
+        "subtitle": "ZPURE001",
+        "keywords": "ZPURE001"
+      }
+    }
+  ]
+}

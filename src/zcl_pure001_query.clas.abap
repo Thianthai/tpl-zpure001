@@ -9,7 +9,8 @@ CLASS zcl_pure001_query DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
 
-    TYPES tt_result TYPE STANDARD TABLE OF zr_pure001 WITH EMPTY KEY.
+    TYPES tt_result        TYPE STANDARD TABLE OF zr_pure001 WITH EMPTY KEY.
+    TYPES ty_text_pattern  TYPE c LENGTH 80.
 
     CONSTANTS gc_entity_id TYPE string VALUE 'ZR_PURE001'.
 
@@ -21,17 +22,22 @@ CLASS zcl_pure001_query DEFINITION
       gr_company_code     TYPE RANGE OF zr_pure001-CompanyCode,
       gr_purchasing_group TYPE RANGE OF zr_pure001-PurchasingGroup,
       gr_material         TYPE RANGE OF zr_pure001-Material,
+      gr_item_text        TYPE RANGE OF ty_text_pattern,
       gr_plant            TYPE RANGE OF zr_pure001-Plant,
       gr_po_date          TYPE RANGE OF zr_pure001-PurchaseOrderDate,
       gr_creation_date    TYPE RANGE OF zr_pure001-CreationDate,
       gr_internal_ref     TYPE RANGE OF zr_pure001-InternalReference,
       gr_external_ref     TYPE RANGE OF zr_pure001-ExternalReference,
+      gr_po_status        TYPE RANGE OF zr_pure001-PurchaseOrderStatus,
       gr_approval_status  TYPE RANGE OF zr_pure001-ApprovalStatus.
 
     "! แปลง $filter และ $search จาก request เป็น range / pattern
     METHODS prepare_filter
       IMPORTING io_request TYPE REF TO if_rap_query_request
-      RAISING   cx_rap_query_filter_no_range.
+      RAISING   cx_rap_query_provider.
+
+    "! สร้าง pattern ค้น item text จาก filter Material (contains, ไม่สนตัวพิมพ์)
+    METHODS prepare_item_text_patterns.
 
     "! นับจำนวนทั้งหมดบน DB โดยไม่ดึงแถว (สำหรับ $count)
     METHODS count_purchase_orders
@@ -80,24 +86,33 @@ CLASS zcl_pure001_query IMPLEMENTATION.
 
   METHOD prepare_filter.
 
-    DATA(lt_filter) = io_request->get_filter( )->get_as_ranges( ).
+    TRY.
+        DATA(lt_filter) = io_request->get_filter( )->get_as_ranges( ).
+      CATCH cx_rap_query_filter_no_range INTO DATA(lx_no_range).
+        " filter ที่ Fiori ส่งมาแปลงเป็น range ไม่ได้ (เช่น expression ซับซ้อน)
+        " ไม่กลืน error — โยนต่อให้ framework แสดงข้อความของต้นเหตุ
+        RAISE EXCEPTION NEW zcx_pure001_query( previous = lx_no_range ).
+    ENDTRY.
 
     LOOP AT lt_filter ASSIGNING FIELD-SYMBOL(<lfs_filter>).
       CASE <lfs_filter>-name.
-        WHEN 'PURCHASEORDER'.     gr_purchase_order   = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'PURCHASEORDERTYPE'. gr_po_type          = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'SUPPLIER'.          gr_supplier         = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'COMPANYCODE'.       gr_company_code     = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'PURCHASINGGROUP'.   gr_purchasing_group = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'MATERIAL'.          gr_material         = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'PLANT'.             gr_plant            = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'PURCHASEORDERDATE'. gr_po_date          = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'CREATIONDATE'.      gr_creation_date    = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'INTERNALREFERENCE'. gr_internal_ref     = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'EXTERNALREFERENCE'. gr_external_ref     = CORRESPONDING #( <lfs_filter>-range ).
-        WHEN 'APPROVALSTATUS'.    gr_approval_status  = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'PURCHASEORDER'.       gr_purchase_order   = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'PURCHASEORDERTYPE'.   gr_po_type          = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'SUPPLIER'.            gr_supplier         = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'COMPANYCODE'.         gr_company_code     = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'PURCHASINGGROUP'.     gr_purchasing_group = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'MATERIAL'.            gr_material         = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'PLANT'.               gr_plant            = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'PURCHASEORDERDATE'.   gr_po_date          = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'CREATIONDATE'.        gr_creation_date    = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'INTERNALREFERENCE'.   gr_internal_ref     = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'EXTERNALREFERENCE'.   gr_external_ref     = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'PURCHASEORDERSTATUS'. gr_po_status        = CORRESPONDING #( <lfs_filter>-range ).
+        WHEN 'APPROVALSTATUS'.      gr_approval_status  = CORRESPONDING #( <lfs_filter>-range ).
       ENDCASE.
     ENDLOOP.
+
+    prepare_item_text_patterns( ).
 
     " $search จากช่อง Search → LIKE pattern (ตัวพิมพ์ใหญ่ เทียบกับ upper( ) ฝั่ง DB)
     DATA(lv_search) = io_request->get_search_expression( ).
@@ -108,30 +123,62 @@ CLASS zcl_pure001_query IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD prepare_item_text_patterns.
+
+    " Material ค้นใน item text ด้วย (functional ยืนยัน 2026-09-12)
+    " แปลงค่า include จาก filter เป็น pattern contains ตัวพิมพ์ใหญ่ ใช้คู่กับ upper( ) ใน EXISTS
+    CLEAR gr_item_text.
+
+    LOOP AT gr_material ASSIGNING FIELD-SYMBOL(<lfs_material>) WHERE sign = 'I'.
+      CASE <lfs_material>-option.
+        WHEN 'EQ'.
+          APPEND VALUE #( sign   = 'I'
+                          option = 'CP'
+                          low    = |*{ to_upper( <lfs_material>-low ) }*| ) TO gr_item_text.
+        WHEN 'CP'.
+          APPEND VALUE #( sign   = 'I'
+                          option = 'CP'
+                          low    = to_upper( <lfs_material>-low ) ) TO gr_item_text.
+        " BT / GE / LE ฯลฯ ไม่มีความหมายกับข้อความ → ไม่ค้นใน text
+      ENDCASE.
+    ENDLOOP.
+
+    " ถ้ามี filter Material แต่ไม่มี pattern เลย (เช่นใช้แต่ exclude) ต้องกัน range ว่าง
+    " เพราะ range ว่างใน OR = จริงเสมอ จะทำให้ filter Material หายไปทั้งก้อน
+    IF gr_material IS NOT INITIAL AND gr_item_text IS INITIAL.
+      gr_item_text = VALUE #( ( sign = 'E' option = 'CP' low = '*' ) ).  " = ไม่ match อะไรเลย
+    ENDIF.
+
+  ENDMETHOD.
+
+
   METHOD count_purchase_orders.
 
     " WHERE ต้องเหมือนกับใน select_purchase_orders ทุกบรรทัด — แก้ที่หนึ่งต้องแก้อีกที่ด้วย
     SELECT COUNT( * )
       FROM zi_pure001_header AS hdr
-      WHERE hdr~PurchaseOrder     IN @gr_purchase_order
-      AND   hdr~PurchaseOrderType IN @gr_po_type
-      AND   hdr~Supplier          IN @gr_supplier
-      AND   hdr~CompanyCode       IN @gr_company_code
-      AND   hdr~PurchasingGroup   IN @gr_purchasing_group
-      AND   hdr~PurchaseOrderDate IN @gr_po_date
-      AND   hdr~CreationDate      IN @gr_creation_date
-      AND   hdr~InternalReference IN @gr_internal_ref
-      AND   hdr~ExternalReference IN @gr_external_ref
-      AND   hdr~ApprovalStatus    IN @gr_approval_status
+      WHERE hdr~PurchaseOrder       IN @gr_purchase_order
+      AND   hdr~PurchaseOrderType   IN @gr_po_type
+      AND   hdr~Supplier            IN @gr_supplier
+      AND   hdr~CompanyCode         IN @gr_company_code
+      AND   hdr~PurchasingGroup     IN @gr_purchasing_group
+      AND   hdr~PurchaseOrderDate   IN @gr_po_date
+      AND   hdr~CreationDate        IN @gr_creation_date
+      AND   hdr~InternalReference   IN @gr_internal_ref
+      AND   hdr~ExternalReference   IN @gr_external_ref
+      AND   hdr~PurchaseOrderStatus IN @gr_po_status
+      AND   hdr~ApprovalStatus      IN @gr_approval_status
       AND   (    upper( hdr~PurchaseOrder )     LIKE @gv_search_pattern
               OR upper( hdr~SupplierName )      LIKE @gv_search_pattern
               OR upper( hdr~InternalReference ) LIKE @gv_search_pattern
               OR upper( hdr~ExternalReference ) LIKE @gv_search_pattern )
       AND   EXISTS ( SELECT itm~PurchaseOrder
                        FROM I_PurchaseOrderItemAPI01 AS itm
-                       WHERE itm~PurchaseOrder = hdr~PurchaseOrder
-                       AND   itm~Material      IN @gr_material
-                       AND   itm~Plant         IN @gr_plant )
+                       WHERE itm~PurchaseOrder                  = hdr~PurchaseOrder
+                       AND   itm~PurchasingDocumentDeletionCode <> 'L'
+                       AND   (    itm~Material                       IN @gr_material
+                               OR upper( itm~PurchaseOrderItemText ) IN @gr_item_text )
+                       AND   itm~Plant                               IN @gr_plant )
       INTO @rv_count.
 
   ENDMETHOD.
@@ -157,27 +204,35 @@ CLASS zcl_pure001_query IMPLEMENTATION.
 
     " Material / Plant อยู่ระดับ item → EXISTS = "ใบนี้มี item ตรงเงื่อนไขอย่างน้อย 1 รายการ"
     " ไม่ join ตรง ๆ เพื่อไม่ให้แถวบาน · ถ้า range ว่าง ABAP SQL ตัดเงื่อนไขนั้นทิ้งให้เอง
+    " text ของ Status join ตรงนี้ (ใน CDS join กับ field ที่ derive จาก case ไม่ได้)
     SELECT FROM zi_pure001_header AS hdr
-      FIELDS *
-      WHERE hdr~PurchaseOrder     IN @gr_purchase_order
-      AND   hdr~PurchaseOrderType IN @gr_po_type
-      AND   hdr~Supplier          IN @gr_supplier
-      AND   hdr~CompanyCode       IN @gr_company_code
-      AND   hdr~PurchasingGroup   IN @gr_purchasing_group
-      AND   hdr~PurchaseOrderDate IN @gr_po_date
-      AND   hdr~CreationDate      IN @gr_creation_date
-      AND   hdr~InternalReference IN @gr_internal_ref
-      AND   hdr~ExternalReference IN @gr_external_ref
-      AND   hdr~ApprovalStatus    IN @gr_approval_status
+           LEFT OUTER JOIN I_PurchasingDocumentStatusText AS sts
+             ON  sts~PurchasingDocumentStatus = hdr~PurchaseOrderStatus
+             AND sts~Language                 = @sy-langu
+      FIELDS hdr~*,
+             sts~PurchasingDocumentStatusName AS PurchaseOrderStatusName
+      WHERE hdr~PurchaseOrder       IN @gr_purchase_order
+      AND   hdr~PurchaseOrderType   IN @gr_po_type
+      AND   hdr~Supplier            IN @gr_supplier
+      AND   hdr~CompanyCode         IN @gr_company_code
+      AND   hdr~PurchasingGroup     IN @gr_purchasing_group
+      AND   hdr~PurchaseOrderDate   IN @gr_po_date
+      AND   hdr~CreationDate        IN @gr_creation_date
+      AND   hdr~InternalReference   IN @gr_internal_ref
+      AND   hdr~ExternalReference   IN @gr_external_ref
+      AND   hdr~PurchaseOrderStatus IN @gr_po_status
+      AND   hdr~ApprovalStatus      IN @gr_approval_status
       AND   (    upper( hdr~PurchaseOrder )     LIKE @gv_search_pattern
               OR upper( hdr~SupplierName )      LIKE @gv_search_pattern
               OR upper( hdr~InternalReference ) LIKE @gv_search_pattern
               OR upper( hdr~ExternalReference ) LIKE @gv_search_pattern )
       AND   EXISTS ( SELECT itm~PurchaseOrder
                        FROM I_PurchaseOrderItemAPI01 AS itm
-                       WHERE itm~PurchaseOrder = hdr~PurchaseOrder
-                       AND   itm~Material      IN @gr_material
-                       AND   itm~Plant         IN @gr_plant )
+                       WHERE itm~PurchaseOrder                  = hdr~PurchaseOrder
+                       AND   itm~PurchasingDocumentDeletionCode <> 'L'
+                       AND   (    itm~Material                       IN @gr_material
+                               OR upper( itm~PurchaseOrderItemText ) IN @gr_item_text )
+                       AND   itm~Plant                               IN @gr_plant )
       ORDER BY (lv_order_by)
       INTO CORRESPONDING FIELDS OF TABLE @rt_result
       UP TO @lv_page_size ROWS
@@ -194,9 +249,11 @@ CLASS zcl_pure001_query IMPLEMENTATION.
 
       DATA(lv_element) = to_upper( <lfs_sort>-element_name ).
 
-      " field ที่ไม่มีใน ZI_PURE001_HEADER (ประกอบใน ABAP / filter-only) sort บน DB ไม่ได้ → ข้าม
+      " field ที่ไม่ได้อยู่ใน ZI_PURE001_HEADER ตรง ๆ (ประกอบใน ABAP / filter-only / join text)
+      " sort บน DB ไม่ได้ → ข้าม
       IF lv_element = 'MATERIALLIST' OR lv_element = 'PLANTLIST'
-      OR lv_element = 'MATERIAL'     OR lv_element = 'PLANT'.
+      OR lv_element = 'MATERIAL'     OR lv_element = 'PLANT'
+      OR lv_element = 'PURCHASEORDERSTATUSNAME'.
         CONTINUE.
       ENDIF.
 
@@ -224,8 +281,9 @@ CLASS zcl_pure001_query IMPLEMENTATION.
     ENDIF.
 
     " ดึงเฉพาะ item ของ PO ในหน้านี้ (หลัง paging แล้ว) ไม่ใช่ทุกใบที่ตรง filter
+    " รวม item ที่ลบด้วย — standard แสดงทุก item (ตัดเฉพาะยอดเงินใน ZI_PURE001_TOTAL)
     SELECT FROM I_PurchaseOrderItemAPI01 AS itm
-           LEFT OUTER JOIN I_Plant AS plt                  "TODO verify: I_Plant released?
+           LEFT OUTER JOIN I_Plant AS plt
              ON plt~Plant = itm~Plant
       FIELDS itm~PurchaseOrder,
              itm~PurchaseOrderItem,
@@ -249,11 +307,16 @@ CLASS zcl_pure001_query IMPLEMENTATION.
            WHERE PurchaseOrder = <lfs_result>-PurchaseOrder.
 
         " "ชื่อ (รหัส)" — item ที่ไม่มีรหัส material (text item) แสดงชื่ออย่างเดียว
-        APPEND COND string(
+        " string template ตัดช่องว่างท้าย char ให้เอง (ห้ามใส่ ALPHA = OUT จะไม่ตัด)
+        DATA(lv_material) = COND string(
           WHEN <lfs_item>-Material IS INITIAL
             THEN <lfs_item>-PurchaseOrderItemText
-            ELSE |{ <lfs_item>-PurchaseOrderItemText } ({ <lfs_item>-Material ALPHA = OUT })| )
-          TO lt_material.
+            ELSE |{ <lfs_item>-PurchaseOrderItemText } ({ <lfs_item>-Material })| ).
+
+        " material เดียวกันหลาย item → แสดงครั้งเดียว ตามลำดับ item แรกที่เจอ
+        IF NOT line_exists( lt_material[ table_line = lv_material ] ).
+          APPEND lv_material TO lt_material.
+        ENDIF.
 
         " plant ซ้ำกันหลาย item → แสดงครั้งเดียว (sorted unique ตัด duplicate ให้)
         INSERT COND string(
