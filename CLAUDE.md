@@ -21,7 +21,10 @@ prefix parameter (`iv_`/`ev_`/`rv_`), pattern ของ RAP object — **ยั�
 | Package | `ZPURE001` | `Y<APP>` |
 | Custom entity — root | `ZR_PURE001` (UI), `ZR_PURE001_FDP` (form) | `YR_<APP>` |
 | Custom entity — child | `ZI_PURE001_FDP_ITEM`, `ZI_PURE001_FDP_ITXT` | `YI_<APP>_<ENT>` |
-| CDS view entity (reuse / helper) | `ZI_PURE001_HEADER`, `ZI_PURE001_TOTAL` | `YI_<APP>_<ENT>` |
+| CDS view entity (reuse / helper) | `ZI_PURE001_HEADER`, `ZI_PURE001_TOTAL`, `ZI_PURE001_FOLLOWON`, `ZI_PURE001_WORKFLOW` | `YI_<APP>_<ENT>` |
+| Value help view | `ZI_PURE001_STATUS_VH`, `ZI_PURE001_POTYPE_VH` | `YI_<...>_VH` |
+| Exception class | `ZCX_PURE001_QUERY` (สืบทอด `cx_rap_query_provider`) | `YCX_<APP>_<...>` |
+| IAM app / Business catalog / FLP | `ZIAM_ZPURE001_EXT` / `ZBC_ZPURE001` / `ZPURE001_UI5R` | *(ผู้ใช้ตั้งเองตอน deploy — ใช้ตามนั้น)* |
 | Abstract entity | `ZA_PURE001_FILE` | `YA_<...>` |
 | Behavior definition | `ZR_PURE001` (= ชื่อ root entity) | = ชื่อ root view |
 | Behavior pool | `ZBP_R_PURE001` | `YBP_R_<APP>` |
@@ -61,6 +64,13 @@ custom entity **ไม่ใช่ view** (ไม่มี data source ข้า
 - **แยก service UI (`ZUI_`) กับ FDP (`ZAPI_`)** คนละ entity
 - **`ESART` ไม่ released** → ใช้ `ZE_BSART` ที่มีบน tenant อยู่ก่อน (external dependency)
 - **`@Semantics.currencyCode: true` ห้ามใส่ใน view entity** ใส่ได้เฉพาะ custom entity
+- **Status / Approval Status derive เองใน `ZI_PURE001_HEADER`** (D5/D6) — status สำเร็จรูปของ SAP ไม่ released
+  · output status (Sent/Not Yet Sent/Error) รวมเป็น Released · ทาง B (privileged DEX) เก็บเป็น option ใน D7
+  **อย่าเสนอใช้ `WITH PRIVILEGED ACCESS` บน `C_OutputRequestItemDEX` เอง** เว้นแต่ functional สั่ง
+- **service alias = `PrintPurchaseOrder`** (ห้าม `PurchaseOrder` — ชน entity type `PurchaseOrderType`)
+- **`@UI.hidden` ห้ามใส่บน field ที่เป็น filter** (FE V4 เอาออกจาก filter bar ด้วย)
+- ทดสอบต้องทำบน **tenant 100** (`my427869`) — tenant 80 ไม่มี PO · service ทดสอบด้วย
+  `.../zui_pure001/0001/PrintPurchaseOrder?$count=true`
 
 ## วิธีทำงาน (ตกลงกับผู้ใช้ไว้แล้ว)
 

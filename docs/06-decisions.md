@@ -59,6 +59,110 @@ Fiori Elements generate ให้ entity ที่เปิด draft handling �
 
 ---
 
+## D5 — Status (filter) derive เองจาก PO + follow-on docs (2026-09-13)
+
+**ตัดสินใจ** field `PurchaseOrderStatus` ใน `ZI_PURE001_HEADER` derive เป็น**รหัสเดียวกับ standard**
+(`I_PurchasingDocumentStatus`) เพื่อใช้ text/VH มาตรฐานได้ · ลำดับ `case` สำคัญ
+
+| ลำดับ | เงื่อนไข | Code | Name |
+|---|---|---|---|
+| 1 | `PurchasingDocumentDeletionCode = 'L'` | `10` | Deleted |
+| 2 | `PurchasingCompletenessStatus = 'X'` | `01` | Draft (PO ยังไม่ Order) |
+| 3 | PROCSTAT `08` | `38` | Rejected |
+| 4 | PROCSTAT `03`/`04`/`26` | `02` | In Approval |
+| 5 | PROCSTAT `02`/`05` + มีแถวใน `ZI_PURE001_FOLLOWON` | `05` | Follow-On Documents |
+| 6 | PROCSTAT `02`/`05` | `08` | Released |
+| 7 | อื่น ๆ | `27` | Created |
+
+**เหตุผล** `PurchaseOrderStatus` สำเร็จรูปอยู่บน `I_PurchaseOrderTP` / `I_PurchaseOrderStatusValueHelp`
+ซึ่ง**ไม่ released** · `I_PurchasingDocumentStatus` + `…Text` released → ใช้เป็น VH/text ได้ถ้า derive รหัสให้ตรง
+· พิสูจน์กับหน้าจอ standard แล้ว 6 ใบ (4500000080/79/58, 99680198/160/044) ตรงทุกใบ
+
+**ข้อจำกัด** Sent / Not Yet Sent / Output Error (`04`/`03`/`37`) รวมเป็น **Released** — ดู D7
+
+**สิ่งที่เรียนรู้** PROCSTAT `02` "Active" บน tenant นี้ = PO ที่ยังไม่เคย Order (workflow ครอบทุก doc type)
+แต่ใช้ `PurchasingCompletenessStatus = 'X'` เป็นตัวชี้ Draft แทน เพราะไม่ผูกกับ config workflow
+
+---
+
+## D6 — Approval Status (คอลัมน์) จาก PROCSTAT + workflow view (2026-09-13)
+
+**ตัดสินใจ** derive จาก PROCSTAT ก่อน แล้วใช้ `I_WorkflowStatusOverview` (released C1) แยก
+"Approved" กับ "Approved automatically" ด้วย `NmbrOfCmpltdWrkflwDialogTasks` (= 0 → automatically)
+· PO มี workflow หลาย instance → `ZI_PURE001_WORKFLOW` เอา `max( WorkflowInternalID )`
+
+| ลำดับ | เงื่อนไข | Code / Text |
+|---|---|---|
+| 1 | Completeness `X` | ว่าง |
+| 2 | PROCSTAT `08` | `R` Rejected |
+| 3 | PROCSTAT `03`/`04`/`26` | `I` In Approval (ชนะ workflow COMPLETED — พิสูจน์กับ 99680044) |
+| 4 | workflow `COMPLETED` + dialog tasks = 0 | `B` Approved automatically |
+| 5 | workflow `COMPLETED` + dialog tasks > 0 | `A` Approved |
+| 6 | อื่น ๆ | ว่าง |
+
+**ทางที่ตัดทิ้ง** derive จาก PROCSTAT อย่างเดียว — แยก automatically ไม่ได้ · Approver name ไม่ทำใน Phase 1
+(spec ไม่ได้ขอ) แต่ Phase 2 ใช้ `I_WorkflowStatusDetails` (`WorkflowTaskProcessor` + `WrkflwTskCompletionUTCDateTime`
+ของ task ที่ `RELEASED`) สำหรับช่อง "ผู้อนุมัติ/Approved By" ในฟอร์มได้
+
+**ความเสี่ยงที่ยังไม่ได้ทดสอบ** view กลุ่ม workflow อาจมี DCL จำกัด user ทั่วไป → ต้องทดสอบด้วย business user
+จัดซื้อจริงใน Phase 5 (ถ้าเห็นว่าง fallback = PROCSTAT อย่างเดียว)
+
+---
+
+## D7 — ไม่ใช้ `C_OutputRequestItemDEX` (privileged) สำหรับ output status — เก็บเป็น option (2026-09-13)
+
+**ตัดสินใจ** ทาง **A**: Status 7 ค่า ไม่แตะ DEX view · ผู้ใช้จะ consult functional ให้รับทาง A
+· ทาง **B** บันทึกไว้ครบเผื่อ functional ยืนยันต้องการ
+
+**สิ่งที่ค้นพบ (ทาง B ทำได้จริงในทางเทคนิค)**
+- `C_OutputRequestItemDEX` released C1 แต่ DCL auto-generated `where false` → ABAP อ่านได้เฉพาะ `WITH PRIVILEGED ACCESS`
+- field: `OutputControlApplObjectType = 'PURCHASE_ORDER'`, `OutputControlApplicationObject` = เลข PO,
+  `OutputRequestItemStatus` (`1` In Preparation · `4` Completed · `5` น่าจะ Error — ยังไม่ยืนยัน), `OutputChannel`, `DispatchTime`
+- mapping ที่จะได้: มี `4` → Sent (`04`) · ไม่มี `4` แต่มี `5` → Output Error (`37`) · อื่น → Not Yet Sent (`03`)
+- `I_PurOrdOutputAutomnCube` (released) มีแค่ตัวนับ ไม่มีสถานะ — ใช้ไม่ได้
+
+**ราคาของทาง B**
+1. นโยบาย — อ่านข้าม DCL ที่ SAP ตั้งใจปิด (`where false`) · auditor อาจถาม · DEX view อาจเปลี่ยนพฤติกรรม
+2. สถาปัตยกรรม — `WITH PRIVILEGED ACCESS` ใช้ได้เฉพาะ ABAP SQL → logic Status ต้องแยกไป `ZCL_PURE001_QUERY`
+   (CTE + privileged join + **dynamic WHERE** สำหรับ filter Sent/Not Yet Sent/Error) ~+60–80 บรรทัด
+   และ logic กระจาย 2 ที่ (CDS + ABAP) ซึ่งขัดกับ D2
+
+**ถอยกลับได้** — เริ่มจาก A แล้วเพิ่ม B ทีหลังโดยโครงไม่พัง
+
+---
+
+## D8 — Material filter ค้นใน item text ด้วย (2026-09-12)
+
+**ตัดสินใจ** filter Material = `X` → PO ที่มี item `Material = X` **หรือ** `PurchaseOrderItemText` มีคำ `X`
+(contains, ไม่สนตัวพิมพ์: `upper( )` ทั้ง 2 ฝั่ง)
+
+**เหตุผล** Thappline ใช้ text item (ไม่มี material master) เยอะมาก (`C-2026-004` ในตัวอย่างคือ item text)
+filter แบบ standard (เทียบรหัสอย่างเดียว) จะแทบใช้ไม่ได้ · ผู้ใช้ตัดสินใจเอง
+
+**รายละเอียด** range `gr_item_text` สร้างจาก `gr_material` (EQ → `*X*` CP, CP คงเดิม, include เท่านั้น)
+· ถ้ามี filter แต่ไม่มี pattern (ใช้แต่ exclude) ใส่ `E CP *` กัน range ว่างทำให้ OR เป็นจริงเสมอ
+
+---
+
+## D9 — Item ที่ลบ: ตัดเฉพาะยอดเงิน แสดงใน list ตาม standard (2026-09-13)
+
+`ZI_PURE001_TOTAL` ไม่นับ `PurchasingDocumentDeletionCode = 'L'` (พิสูจน์กับ 99680044: 870,000.25 ไม่ใช่ 1,624,130.25)
+· `MaterialList` แสดงทุก item รวมที่ลบ (standard แสดง `Calculator 2025, 2026, 2027`)
+· EXISTS ของ filter รวม item ที่ลบด้วยเพื่อสอดคล้อง (แก้แล้ว a15453a)
+
+---
+
+## D10 — บทเรียน Fiori Elements V4 (2026-09-12)
+
+- `@UI.hidden: true` เอา field ออกจาก **filter bar ตั้งต้น** ด้วย (ยังเลือกเพิ่มได้ใน Adapt Filters)
+  → field ที่เป็น filter ห้ามใส่ hidden · ใช้ `@Consumption.filter.hidden` กับ field ที่ไม่ควรเป็น filter แทน
+- alias ใน service definition ห้ามชนกับ property เพราะ entity type = `<alias>Type`
+  (`PurchaseOrder` → `PurchaseOrderType` ชน property) → ใช้ `PrintPurchaseOrder`
+- `criticality:` ใน `@UI.lineItem` + field int1 (0/1/2/3) = icon ✓ ✗ เหมือน standard
+- Company Code mandatory ต้องมี `@Consumption.filter.defaultValue` (TL01) ไม่งั้น user ต้องกรอกก่อน Go ทุกครั้ง
+
+---
+
 ## ข้อจำกัดของ tenant ที่ค้นพบ (ใช้อ้างอิงเฟสต่อไป)
 
 | สิ่งที่พบ | วันที่ | ผล |
@@ -70,3 +174,18 @@ Fiori Elements generate ให้ entity ที่เปิด draft handling �
 | `I_Supplier` / `I_PurchasingGroup` / `I_PurchasingDocumentTypeText` / `I_Plant` / `I_CompanyCodeVH` | 2026-09-11 | ใช้ได้ |
 | `I_PurchaseOrderAPI01` มี `ReleaseIsNotCompleted`, `CorrespncInternalReference`, `CorrespncExternalReference` | 2026-09-11 | ใช้ได้ |
 | `I_PurchaseOrderItemAPI01` มี `NetAmount`, `DocumentCurrency`, `PurchaseOrderItemText` | 2026-09-11 | ใช้ได้ |
+| `I_PurchaseOrderTP`, `I_PurchaseOrderStatusValueHelp` | 2026-09-13 | **ไม่ released** — status สำเร็จรูปใช้ไม่ได้ |
+| `I_PurchasingDocumentStatus` / `I_PurchasingDocumentStatusText` (33 code) | 2026-09-13 | released C1 |
+| `I_PurchasingProcessingStatus` / `I_PurgProcessingStatusText` | 2026-09-13 | released C1 (PROCSTAT 01/02/03/04/05/08/11–14/26) |
+| `I_WorkflowStatusOverview`, `I_WorkflowStatusDetails`, `I_WorkflowRecipients_V2` | 2026-09-13 | released C1 — โยง PO ผ่าน `SAPObjectNodeRepresentation='PurchaseOrder'` + `SAPBusinessObjectNodeKey1` |
+| `I_MaterialDocumentItem_2`, `I_SuplrInvcItemPurOrdRefAPI01` (มี `PurchaseOrder`) | 2026-09-13 | released C1 |
+| `I_Product` (VH material) | 2026-09-12 | released C1 |
+| `I_PurchaseOrderAPI01` มี `PurchasingProcessingStatus`, `PurchasingCompletenessStatus`, `PurchasingDocumentDeletionCode`, `PurgReleaseSequenceStatus` (ว่างเสมอ) | 2026-09-13 | ใช้ได้ |
+| `C_OutputRequestItemDEX` | 2026-09-13 | released C1 แต่ DCL `where false` — อ่านได้เฉพาะ privileged (D7) |
+| `I_PurOrdOutputAutomnCube` | 2026-09-13 | released แต่ไม่มี field สถานะ |
+| view output/PO history อื่น (`I_Output*`, `*History*`) | 2026-09-13 | ไม่ released |
+| `IF_SADL_EXIT_CALC_ELEMENT_READ` released / `IF_SADL_EXIT_FILTER_TRANSFORM` ไม่ released | 2026-09-11 | virtual element กรองไม่ได้ |
+| CDS view entity: `@Semantics.currencyCode: true` ห้ามใส่ · `union` ต้องมี `@Metadata.ignorePropagatedAnnotations: true` | 2026-09-11/13 | |
+| `cx_rap_query_filter_no_range` **ไม่ใช่** subclass ของ `cx_rap_query_provider` และตัวหลัง**เป็น abstract** | 2026-09-13 | ต้องมี exception class เอง (`ZCX_PURE001_QUERY`) |
+| ADT SQL Console: รับ statement เดียว, ไม่รับ `WITH PRIVILEGED ACCESS` (ต้องใช้ class `if_oo_adt_classrun`) | 2026-09-13 | |
+| VH view จาก field ที่มี DDIC search help → warning "Search help assignment … not inherited" ปล่อยได้ | 2026-09-13 | |

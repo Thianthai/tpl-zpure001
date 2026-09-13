@@ -32,22 +32,26 @@ object ทุกตัวอยู่ใต้ `src/` ไม่มี subfolder
 
 ---
 
-## Phase 1 — RAP UI (list report) ✅ เสร็จ 2026-09-11
+## Phase 1 — RAP UI (list report) ✅ เสร็จ 2026-09-13 (ทดสอบเทียบ standard แล้ว)
 
-**เป้าหมาย** ได้หน้าจอ Fiori list report ที่ filter หา PO ได้ครบ 13 ช่อง แสดง 9 คอลัมน์
-(ยังไม่มีปุ่มพิมพ์)
+**เป้าหมาย** ได้หน้าจอ Fiori list report ที่ filter หา PO ได้ครบ 13 ช่อง แสดงคอลัมน์ตาม spec
++ Status / Approval Status เหมือน standard (ยังไม่มีปุ่มพิมพ์)
 
-**สถาปัตยกรรมที่เลือก — hybrid** (ดู [06-decisions.md](06-decisions.md) ข้อ D1–D3)
+**สถาปัตยกรรม — hybrid** (ดู [06-decisions.md](06-decisions.md) D2, D5–D10)
 
 ```
 ZUI_PURE001_O4 (binding)
-  └─ ZUI_PURE001 (service def)
-       └─ ZR_PURE001 (custom entity)  ←  ZCL_PURE001_QUERY
-                                             │  EXISTS (Material/Plant) · sort/paging/count push-down
-                                             │  ต่อ string MaterialList / PlantList
+  └─ ZUI_PURE001 (service def, alias PrintPurchaseOrder)
+       └─ ZR_PURE001 (custom entity)  ←  ZCL_PURE001_QUERY  (+ ZCX_PURE001_QUERY)
+                                             │  EXISTS Material/Plant (+ item text) · sort/paging/count push-down
+                                             │  join status text · ต่อ string MaterialList / PlantList
                                              ▼
-                                        ZI_PURE001_HEADER (view entity)  ← data logic ทั้งหมด
-                                             └─ ZI_PURE001_TOTAL (sum ต่อ PO)
+                                        ZI_PURE001_HEADER (view entity) ← data logic ทั้งหมด
+                                             ├─ ZI_PURE001_TOTAL     (sum ต่อ PO, ไม่นับ item ที่ลบ)
+                                             ├─ ZI_PURE001_FOLLOWON  (PO ที่มี GR/IR)
+                                             ├─ ZI_PURE001_WORKFLOW  (workflow ล่าสุด) → I_WorkflowStatusOverview
+                                             └─ text: I_Supplier / I_PurchasingGroup / I_PurchasingDocumentTypeText
+       VH: ZI_PURE001_STATUS_VH · ZI_PURE001_POTYPE_VH · I_Supplier · I_PurchasingGroup · I_Product · I_Plant · I_CompanyCodeVH
 ```
 
 | # | งาน | Object | สถานะ |
@@ -55,24 +59,18 @@ ZUI_PURE001_O4 (binding)
 | 1.1 | view ยอดรวมต่อ PO | `ZI_PURE001_TOTAL` | ✅ |
 | 1.2 | view header + text + derived status | `ZI_PURE001_HEADER` | ✅ |
 | 1.3 | custom entity ของ list report | `ZR_PURE001` | ✅ |
-| 1.4 | query provider | `ZCL_PURE001_QUERY` | ✅ |
+| 1.4 | query provider + exception | `ZCL_PURE001_QUERY`, `ZCX_PURE001_QUERY` | ✅ |
 | 1.5 | service definition + binding (OData V4) | `ZUI_PURE001` / `ZUI_PURE001_O4` | ✅ published |
-| 1.6 | Preview → เช็ค filter / column / sort / paging / search | — | ⏳ รอทดสอบ |
+| 1.6 | Status / Approval Status / VH / criticality | `ZI_PURE001_STATUS_VH`, `_POTYPE_VH`, `_WORKFLOW`, `_FOLLOWON` | ✅ |
+| 1.7 | ทดสอบเทียบ Manage Purchase Orders บน tenant 100 | — | ✅ 6 PO ตรงทุกคอลัมน์ |
 
-**ยืนยันบน tenant แล้ว (2026-09-11) — activate ผ่านทั้งหมดโดยไม่ต้องแก้**
+**ผลทดสอบ (tenant 100, 2026-09-13)** — 284 PO · filter 13 ช่อง + VH ครบ · Company Code default `TL01`
+· Status dropdown 7 ค่า · doc type dropdown 15 ค่าตรง standard · Material `C-2026-004` (item text) → 4500000080 ยอดทั้งใบ
+· Status/Approval Status + icon ตรง standard ทั้ง 6 ใบตัวแทน (Draft / In Approval / Rejected / Approved / Approved automatically / Follow-On)
+· Net Order Value ไม่นับ item ที่ลบ (99680044 = 870,000.25)
 
-| สิ่งที่เดาไว้ | ผล |
-|---|---|
-| `I_PurchaseOrderAPI01` / `I_PurchaseOrderItemAPI01` | released C1 |
-| `I_Supplier` / `I_PurchasingGroup` / `I_PurchasingDocumentTypeText` / `I_Plant` | ใช้ได้ |
-| `NetAmount`, `DocumentCurrency` บน item view · `ReleaseIsNotCompleted` บน header | มีจริง |
-| `@Search.searchable` บน custom entity + `get_search_expression( )` | activate ผ่าน (ผลจริงรอทดสอบ 1.6) |
-| `cx_rap_query_filter_no_range` propagate จาก `select` | compile ผ่าน |
-| `esart` | **ใช้ไม่ได้** → ใช้ `ZE_BSART` (external) แทน |
-| Editing Status (filter ที่ 2) | **ตัดออก** — เป็น draft filter ของ Fiori ไม่ใช่ field ใน CDS |
-
-**เสร็จเมื่อ** — preview แล้ว filter ครบ 13 ช่อง, กรอง Material/Plant แล้วได้ PO ที่มี item ตรง,
-`$count` / `$skip` / `$top` / sort / Search ทำงานถูก
+**ข้อจำกัดที่รับไว้** — Sent / Not Yet Sent / Output Error รวมเป็น Released · ไม่มีคอลัมน์ Approver
+· tenant 80 ไม่มี PO ทดสอบไม่ได้ ต้อง transport ไป 100
 
 ## Phase 2 — FDP data interface
 
@@ -138,16 +136,16 @@ ZUI_PURE001_O4 (binding)
 
 ---
 
-## Phase 5 — Fiori launchpad & authorization
+## Phase 5 — Fiori launchpad & authorization (5.1–5.3 ทำล่วงหน้าแล้ว 2026-09-12)
 
 **เป้าหมาย** user role Procurement เปิด tile ใช้งานได้จริง
 
-| # | งาน | Object |
-|---|---|---|
-| 5.1 | สร้าง IAM app ผูก service binding | `ZIAM_PURE001` |
-| 5.2 | สร้าง business catalog | `ZBC_PURE001` |
-| 5.3 | สร้าง FLP app descriptor + tile | `ZPURE001_FLP` |
-| 5.4 | ผูก catalog เข้า business role ของหน่วยงานจัดซื้อ | ผู้ใช้ (Fiori app มาตรฐาน) |
+| # | งาน | Object | สถานะ |
+|---|---|---|---|
+| 5.1 | สร้าง IAM app ผูก service binding | `ZIAM_ZPURE001_EXT` | ✅ (ผู้ใช้สร้างตอน deploy ทดสอบ) |
+| 5.2 | สร้าง business catalog | `ZBC_ZPURE001` (+ `ZBC_ZPURE001_0001`) | ✅ |
+| 5.3 | สร้าง FLP app descriptor + tile | `ZPURE001_UI5R` (`ZPURE001-manage`) | ✅ |
+| 5.4 | ผูก catalog เข้า business role ของหน่วยงานจัดซื้อ + **ทดสอบด้วย business user จริง** (เช็ค DCL ของ workflow view — ข้อ 12 ใน open questions) | ผู้ใช้ (Fiori app มาตรฐาน) | ⬜ |
 
 **เสร็จเมื่อ** — user ที่มี role Procurement เห็น tile "Print Purchase Order" และกดใช้งานได้
 

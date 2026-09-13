@@ -188,46 +188,44 @@ ZR_PURE001_FDP                        (root, key: PurchaseOrder)
 field ของ `ZR_PURE001` **ชื่อตรงกับ `ZI_PURE001_HEADER` แบบ 1:1** ยกเว้น 4 ตัวที่ประกอบใน ABAP:
 `Material` / `Plant` (filter-only) และ `MaterialList` / `PlantList` (display-only)
 
-### 5.1 Selection field (13 ช่อง)
+### 5.1 Selection field (13 ช่อง) — ทั้งหมดมี value help
 
 spec §2.4 ลอกรายการ filter มาจากหน้าจอ standard "Manage Purchase Orders" ทั้งชุด 14 ช่อง
-แต่ช่องที่ 2 **Editing Status ถูกตัดออก** (ผู้ใช้ confirm แล้ว 2026-09-10) เหลือ 13 ช่อง
-— เหตุผลอยู่ที่ [05-open-questions.md ข้อ 5](05-open-questions.md)
+แต่ช่องที่ 2 **Editing Status ถูกตัดออก** (draft filter ของ Fiori ไม่ใช่ field) เหลือ 13 ช่อง
 
-| # | Label | Node | ที่มา / semantics |
+| # | Label | Node | semantics / VH |
 |---|---|---|---|
-| 1 | Search | *(`$search`)* | ✅ `@Search.searchable` + `get_search_expression( )` → `LIKE` บน PO / SupplierName / Our Ref / Your Ref |
-| 2 | Supplier | `Supplier` | ✅ |
-| 3 | Purchase Order | `PurchaseOrder` | ✅ |
-| 4 | Purchasing Group | `PurchasingGroup` | ✅ |
-| 5 | Company Code | `CompanyCode` | ✅ **mandatory** · value help `I_CompanyCodeVH` |
-| 6 | Status | `ApprovalStatus` | ✅ `case ReleaseIsNotCompleted` → `I` In Approval / `A` Approved |
-| 7 | Material | `Material` | ✅ **ระดับ item** — EXISTS: PO ที่มี item ตรง ≥ 1 รายการ (ตาม standard app) |
-| 8 | Plant | `Plant` | ✅ ระดับ item — EXISTS เช่นกัน |
-| 9 | Purchase Order Date | `PurchaseOrderDate` | ✅ `#INTERVAL` |
-| 10 | Our Reference | `InternalReference` | ✅ `CorrespncInternalReference` |
-| 11 | Your Reference | `ExternalReference` | ✅ `CorrespncExternalReference` |
-| 12 | Purchasing Doc. Type | `PurchaseOrderType` | ✅ type `ZE_BSART` (external) |
-| 13 | Created On | `CreationDate` | ✅ `#INTERVAL` |
+| 1 | Search | *(`$search`)* | `LIKE` บน PO / SupplierName / Our Ref / Your Ref (ไม่สนตัวพิมพ์) |
+| 2 | Supplier | `Supplier` | VH `I_Supplier` |
+| 3 | Purchase Order | `PurchaseOrder` | VH `ZI_PURE001_HEADER` (เฉพาะที่ user เห็น) |
+| 4 | Purchasing Group | `PurchasingGroup` | VH `I_PurchasingGroup` |
+| 5 | Company Code | `CompanyCode` | **mandatory** · default **`TL01`** · VH `I_CompanyCodeVH` |
+| 6 | Status | `PurchaseOrderStatus` | dropdown 7 ค่า `ZI_PURE001_STATUS_VH` — derive ตาม [06-decisions.md D5](06-decisions.md) |
+| 7 | Material | `Material` | **ระดับ item** — EXISTS: material ตรง **หรือ item text มีคำนี้** (D8) · VH `I_Product` |
+| 8 | Plant | `Plant` | ระดับ item — EXISTS · VH `I_Plant` |
+| 9 | Purchase Order Date | `PurchaseOrderDate` | `#INTERVAL` |
+| 10 | Our Reference | `InternalReference` | `CorrespncInternalReference` |
+| 11 | Your Reference | `ExternalReference` | `CorrespncExternalReference` |
+| 12 | Purchasing Doc. Type | `PurchaseOrderType` | type `ZE_BSART` · dropdown `ZI_PURE001_POTYPE_VH` (category `F`, 15 ค่า) |
+| 13 | Created On | `CreationDate` | `#INTERVAL` |
 
-**CDS ต้นทาง (ยืนยันบน tenant แล้ว 2026-09-11)** — `I_PurchaseOrderAPI01` (header),
-`I_PurchaseOrderItemAPI01` (item), `I_Supplier`, `I_PurchasingGroup`,
-`I_PurchasingDocumentTypeText`, `I_Plant`
-
-### 5.2 Column (9 + 2 คอลัมน์ item + ปุ่ม)
+### 5.2 Column
 
 | # | Label | Node | แสดงเป็น |
 |---|---|---|---|
-| 1 | Purchasing Doc. Type | `PurchaseOrderType` + `PurchaseOrderTypeName` | `PO-Single Source (ZB00)` — `#TEXT_FIRST` |
+| 1 | Purchasing Doc. Type | `PurchaseOrderType` + `PurchaseOrderTypeName` | `Standard PO (NB)` — `#TEXT_FIRST` |
 | 2 | Our Reference | `InternalReference` | |
 | 3 | Purchase Order | `PurchaseOrder` | |
-| 4 | Supplier | `Supplier` + `SupplierName` | `ชื่อ (รหัส)` — `#TEXT_FIRST` |
+| 4 | Supplier | `Supplier` + `SupplierName` | `ชื่อ (รหัส)` |
 | 5 | Purchase Order Date | `PurchaseOrderDate` | |
-| 6 | Net Order Value | `NetOrderValue` + `DocumentCurrency` | sum ของ item ทั้งใบ (จาก `ZI_PURE001_TOTAL`) |
-| 7 | Approve Status | `ApprovalStatus` + `ApprovalStatusText` | `#TEXT_ONLY` |
-| 8 | Purchasing Group | `PurchasingGroup` + `PurchasingGroupName` | `AMR (P06)` — `#TEXT_FIRST` |
+| 6 | Net Order Value | `NetOrderValue` + `DocumentCurrency` | sum item ทั้งใบ **ไม่นับ item ที่ลบ** |
+| 7 | Status | `PurchaseOrderStatus` + `PurchaseOrderStatusName` + `PurchaseOrderStatusCriticality` | text + icon ✓/✗ |
+| 7b | Approval Status | `ApprovalStatus` + `ApprovalStatusText` + `ApprovalStatusCriticality` | Approved / Approved automatically / In Approval / Rejected + icon (D6) |
+| 8 | Purchasing Group | `PurchasingGroup` + `PurchasingGroupName` | `AMR (P06)` |
 | 9 | Created On | `CreationDate` | |
-| 10 | Material | `MaterialList` | `ชื่อ (รหัส), ชื่อ (รหัส), …` ทุก item ของใบ — `#LOW` |
-| 11 | Plant | `PlantList` | ชื่อ plant ไม่ซ้ำ — `#LOW` |
+| 10 | Material | `MaterialList` | `ชื่อ (รหัส), …` distinct · รวม item ที่ลบ (ตาม standard) |
+| 11 | Plant | `PlantList` | ชื่อ plant ไม่ซ้ำ |
 | + | **ปุ่ม Print PO Form** | action `PrintPOForm` (toolbar) | Phase 3 |
 | + | Preview / Download | `PrintUrl` / `DownloadUrl` (`type: #WITH_URL`) | Phase 3 |
+
+**ต่างจาก standard ที่รับไว้** — Status ไม่แยก Sent / Not Yet Sent / Output Error (→ Released) · ไม่มีคอลัมน์ Approver

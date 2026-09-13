@@ -3,13 +3,13 @@
 | # | ประเด็น | สถานะ | ผลกระทบ |
 |---|---|---|---|
 | 1 | **"Setting View" ใน prerequisite ข้อ 3 หมายถึงอะไร** เก็บ config อะไรบ้าง ใครเป็นคน maintain | 🔴 รอผู้ใช้คุยกับ functional | Phase 6 — ยังตัดสินใจไม่ได้ว่าจะทำเป็น Z table เฉย ๆ, RAP CRUD app หรือ Custom Business Configuration (MDO) |
-| 2 | **ที่มาของฟิลด์นอกมาตรฐาน PO** | 🔴 รอผู้ใช้คุยกับ functional | Phase 2 ประกาศ node ไว้เป็น placeholder ก่อน → เติมค่าใน Phase 6 โดยไม่ต้องแก้ layout ฟอร์ม |
+| 2 | **ที่มาของฟิลด์นอกมาตรฐาน PO** | 🟡 **มีเบาะแส** (2026-09-12): หน้า PO ใน Manage PO มี section *Custom Fields* — Performance Bond, Bank Guarantee, Retention, Framework Start/End Date, Email, Start Date → น่าจะเป็น custom field (extensibility) ที่ตรงกับช่องหลักประกัน/BG/วันที่สัญญาในฟอร์ม → Phase 2 ดึงผ่าน CDS extension ได้ · ต้องให้ functional ยืนยัน mapping | Phase 2/6 |
 | 2.1 | ☐ หลักประกันการดำเนินงาน / ☐ เงินค้ำประกัน / ☐ BG | 🔴 | |
 | 2.2 | ☐ กรมธรรม์ประกันภัย · ☐ หลักประกันผลงาน | 🔴 | |
 | 2.3 | วันที่เริ่มสัญญา / วันที่สิ้นสุดสัญญา (Valid from / Valid to) | 🔴 | |
 | 2.4 | จัดส่งโดย / Ship Via (`Truck`) | 🔴 | |
 | 2.5 | นามผู้รับสินค้า + เบอร์โทร | 🔴 | |
-| 2.6 | ผู้อนุมัติ (ชื่อ / ตำแหน่ง / วันที่ / รูปลายเซ็น) — มาจาก approval workflow หรือ config | 🔴 | |
+| 2.6 | ผู้อนุมัติ (ชื่อ / ตำแหน่ง / วันที่ / รูปลายเซ็น) — มาจาก approval workflow หรือ config | 🟡 ชื่อ+วันที่ได้จาก `I_WorkflowStatusDetails` (task `RELEASED` → `WorkflowTaskProcessor`, `WrkflwTskCompletionUTCDateTime`) — ต้องหา released view แปลง user ID → ชื่อ · ตำแหน่ง/ลายเซ็นยังต้อง config | |
 | 2.7 | ส่วนลด/Discount | 🔴 | |
 | 3 | **Output Management** — spec §2.5 แสดง Form Template `ZPURF001` ผูกกับ output type `PURCHASE_ORDER` ในแท็บ Output Management ของ Manage PO อยู่ด้วย ตกลงขอบเขตงานนี้รวมการตั้ง output type ด้วยไหม หรือทำแค่ RAP UI แยกอีกจอ | 🟡 ต้องยืนยัน | ถ้ารวม จะเพิ่มงาน config output determination ซึ่งไม่ใช่ ABAP object |
 | 4 | **ช่อง Search (filter ที่ 1)** | ✅ **แก้แล้ว** — `@Search.searchable` บน custom entity activate ผ่าน, query class รับ `$search` ผ่าน `get_search_expression( )` (ผลจริงรอทดสอบ preview) | Phase 1 |
@@ -18,6 +18,10 @@
 | 7 | **สกุลเงินอื่นที่ไม่ใช่ THB** — จำนวนเงินตัวอักษรจะทำยังไง (`บาทถ้วน` ใช้ไม่ได้) | 🟡 ต้องยืนยัน | Phase 4 |
 
 | 8 | **filter Material / Plant ระดับ item** — CDS view entity ทำไม่ได้ (ไม่มี EXISTS / STRING_AGG) และ `IF_SADL_EXIT_FILTER_TRANSFORM` ไม่ released | ✅ **แก้แล้ว** 2026-09-11 — functional ให้อ้างอิง standard app (กรองแล้วได้ PO ที่มี item ตรง ≥ 1) → ใช้ custom entity แบบ hybrid ดู [06-decisions.md](06-decisions.md) | Phase 1 |
+| 10 | **Status: Sent / Not Yet Sent / Output Error รวมเป็น Released** — ไม่มี released source ของ output management (ทาง B ใช้ `C_OutputRequestItemDEX` แบบ privileged ทำได้แต่ราคาสูง ดู [06-decisions.md D7](06-decisions.md)) | 🟡 ผู้ใช้เลือกทาง A แล้ว จะ consult functional ให้รับ | Phase 1 |
+| 11 | **คอลัมน์ Approver (ชื่อผู้อนุมัติ)** — standard มี เราไม่มี (spec ไม่ได้ขอ) ข้อมูลมีใน `I_WorkflowStatusDetails` ถ้าต้องการเพิ่มได้ | 🟡 แจ้ง functional | Phase 1 |
+| 12 | **DCL ของ workflow view** — ทดสอบด้วย admin เท่านั้น ถ้า business user จัดซื้อเห็นว่าง Approval Status จะว่าง | 🟡 ทดสอบตอนผูก business role (Phase 5.4) | Phase 5 |
+| 13 | **Editing Status / Search** — spec ลอกจาก standard; Editing Status ตัดแล้ว (ข้อ 5), Search ทำได้ (ข้อ 4) — ควรแจ้ง functional ให้รับทราบ | 🟡 | Phase 1 |
 | 9 | **`ZE_BSART`** — data element ที่ใช้แทน `esart` (ไม่ released) อยู่นอก package `ZPURE001` | ✅ ผู้ใช้ยืนยัน 2026-09-11: มีอยู่บน tenant ก่อนแล้ว → บันทึกเป็น **external dependency** ใน [02-object-list.md](02-object-list.md) | Phase 1 |
 
 **สีสถานะ** 🔴 = block งานในเฟสที่เกี่ยวข้อง · 🟡 = ทำต่อได้ด้วยสมมติฐาน แต่ควรยืนยัน ·

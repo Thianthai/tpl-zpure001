@@ -28,9 +28,9 @@ RAP UI + Form Data Provider (FDP) สำหรับพิมพ์ใบสั�
 Fiori List Report (ZUI_PURE001_O4)
         │
         ▼
-ZR_PURE001 (custom entity) ◄── ZCL_PURE001_QUERY ◄── ZI_PURE001_HEADER ◄── ZI_PURE001_TOTAL
-        │                        EXISTS · sort/paging       (view entity,        (sum ต่อ PO)
-        │                        push-down · ต่อ string      data logic)
+ZR_PURE001 (custom entity) ◄── ZCL_PURE001_QUERY ◄── ZI_PURE001_HEADER ◄─┬─ ZI_PURE001_TOTAL    (sum ต่อ PO)
+        │                        EXISTS · sort/paging       (view entity,       ├─ ZI_PURE001_FOLLOWON (GR/IR)
+        │                        push-down · ต่อ string      status/approval)   └─ ZI_PURE001_WORKFLOW (I_WorkflowStatusOverview)
         │
         ├── ปุ่ม Print PO Form ──► RAP action PrintPOForm ──┐
         │                                                   │
@@ -49,7 +49,7 @@ ZR_PURE001 (custom entity) ◄── ZCL_PURE001_QUERY ◄── ZI_PURE001_HEAD
                                                           PDF
 ```
 
-**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (2026-09-11, รอทดสอบ preview) · Phase 2 ⬜
+**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (2026-09-13 ทดสอบเทียบ standard บน tenant 100 แล้ว) · Phase 5.1–5.3 ✅ · Phase 2 ⬜ ถัดไป
 
 ## เอกสาร
 
