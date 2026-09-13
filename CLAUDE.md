@@ -21,8 +21,7 @@ prefix parameter (`iv_`/`ev_`/`rv_`), pattern ของ RAP object — **ยั�
 | Package | `ZPURE001` | `Y<APP>` |
 | Custom entity — root | `ZR_PURE001` (UI), `ZR_PURE001_FDP` (form) | `YR_<APP>` |
 | Custom entity — child | `ZI_PURE001_FDP_ITEM`, `ZI_PURE001_FDP_ITXT` | `YI_<APP>_<ENT>` |
-| CDS view entity (reuse / helper) | `ZI_PURE001_HEADER`, `ZI_PURE001_TOTAL`, `ZI_PURE001_FOLLOWON`, `ZI_PURE001_WORKFLOW` | `YI_<APP>_<ENT>` |
-| Value help view | `ZI_PURE001_STATUS_VH`, `ZI_PURE001_POTYPE_VH` | `YI_<...>_VH` |
+| Value help view (code list เท่านั้น) | `ZI_PURE001_STATUS_VH`, `ZI_PURE001_POTYPE_VH` | `YI_<...>_VH` |
 | Exception class | `ZCX_PURE001_QUERY` (สืบทอด `cx_rap_query_provider`) | `YCX_<APP>_<...>` |
 | IAM app / Business catalog / FLP | `ZIAM_ZPURE001_EXT` / `ZBC_ZPURE001` / `ZPURE001_UI5R` | *(ผู้ใช้ตั้งเองตอน deploy — ใช้ตามนั้น)* |
 | Abstract entity | `ZA_PURE001_FILE` | `YA_<...>` |
@@ -30,7 +29,7 @@ prefix parameter (`iv_`/`ev_`/`rv_`), pattern ของ RAP object — **ยั�
 | Behavior pool | `ZBP_R_PURE001` | `YBP_R_<APP>` |
 | Service definition | `ZUI_PURE001` (UI), `ZAPI_PURE001_FDP` (form data) | `YUI_<APP>` / `YAPI_<APP>` |
 | Service binding | `ZUI_PURE001_O4` | `YUI_<APP>_O4` |
-| Global class | `ZCL_PURE001_QUERY`, `ZCL_PURE001_FDP`, `ZCL_PURE001_PRINT`, `ZCL_PURE001_HTTP`, `ZCL_PURE001_UTIL` | `YCL_<APP>_<PURPOSE>` |
+| Global class | `ZCL_PURE001_DATA` (ตัวกลาง), `ZCL_PURE001_QUERY`, `ZCL_PURE001_FDP`, `ZCL_PURE001_UTIL`, `ZCL_PURE001_PRINT`, `ZCL_PURE001_HTTP` | `YCL_<APP>_<PURPOSE>` |
 | Database table | `ZPURE001_GRPH`, `ZPURE001_CFG` | `Y<APP>_<SUFFIX>` |
 | Data element | `ZE_PURE001_GRAPHIC_NAME` | `YE_<name>` |
 | HTTP service | `ZHS_PURE001` | *(กฎยังไม่ครอบคลุม — ตกลงกันเป็น case)* |
@@ -56,19 +55,20 @@ custom entity **ไม่ใช่ view** (ไม่มี data source ข้า
 
 รายละเอียดและเหตุผลอยู่ใน [docs/06-decisions.md](docs/06-decisions.md) สรุปสั้น ๆ
 
-- **Phase 1 เป็น hybrid**: `ZI_PURE001_HEADER` (view entity, data logic ทั้งหมด) → `ZR_PURE001`
-  (custom entity) → `ZCL_PURE001_QUERY` ทำเฉพาะ EXISTS / ต่อ string / push-down sort-paging-count
-  · CDS view entity ล้วนทำไม่ได้เพราะไม่มี `EXISTS` + `STRING_AGG` และ
-  `IF_SADL_EXIT_FILTER_TRANSFORM` **ไม่ released** บน tenant นี้
-- **Phase 2 (FDP) ต้องเป็น custom entity** — SAP บังคับ ไม่ใช่ทางเลือก
+- **D12 (2026-09-13, แทน D2/D11): CDS ประกาศ field อย่างเดียว · logic ทั้งหมดใน ABAP**
+  · `ZCL_PURE001_DATA` = ตัวกลางอ่าน+derive ที่ list (`ZCL_PURE001_QUERY`) และ form (`ZCL_PURE001_FDP`) ใช้ร่วมกัน
+  · CDS ที่ยอมให้มี = custom entity + VH view แบบ code list เท่านั้น **ห้ามสร้าง view entity ที่ join/derive** อีก
+  · เหตุผล: CDS บน Public Cloud ไม่มี EXISTS/STRING_AGG · projection view เป็น source ไม่ได้ ·
+    DCL inheritance ล้มเมื่อ join source ที่มี DCL หลายตัว · virtual element กรองไม่ได้
+- **Phase 2 (FDP) ต้องเป็น custom entity** — SAP บังคับ ไม่ใช่ทางเลือก · ข้อมูลผ่าน `ZCL_PURE001_DATA`
 - **แยก service UI (`ZUI_`) กับ FDP (`ZAPI_`)** คนละ entity
-- **`ESART` ไม่ released** → ใช้ `ZE_BSART` ที่มีบน tenant อยู่ก่อน (external dependency)
-- **`@Semantics.currencyCode: true` ห้ามใส่ใน view entity** ใส่ได้เฉพาะ custom entity
-- **Status / Approval Status derive เองใน `ZI_PURE001_HEADER`** (D5/D6) — status สำเร็จรูปของ SAP ไม่ released
+- **Status / Approval Status derive ใน `ZCL_PURE001_DATA`** (D5/D6) — status สำเร็จรูปของ SAP ไม่ released
   · output status (Sent/Not Yet Sent/Error) รวมเป็น Released · ทาง B (privileged DEX) เก็บเป็น option ใน D7
   **อย่าเสนอใช้ `WITH PRIVILEGED ACCESS` บน `C_OutputRequestItemDEX` เอง** เว้นแต่ functional สั่ง
+- **`ESART` ไม่ released** → ใช้ `ZE_BSART` ที่มีบน tenant อยู่ก่อน (external dependency)
 - **service alias = `PrintPurchaseOrder`** (ห้าม `PurchaseOrder` — ชน entity type `PurchaseOrderType`)
 - **`@UI.hidden` ห้ามใส่บน field ที่เป็น filter** (FE V4 เอาออกจาก filter bar ด้วย)
+- **item text ในฟอร์ม = แบบ B** (แยก node ต่อ text type ให้ฟอร์มจัด layout — ตาม SAP standard)
 - ทดสอบต้องทำบน **tenant 100** (`my427869`) — tenant 80 ไม่มี PO · service ทดสอบด้วย
   `.../zui_pure001/0001/PrintPurchaseOrder?$count=true`
 

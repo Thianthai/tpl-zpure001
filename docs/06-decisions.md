@@ -15,7 +15,7 @@
 
 ---
 
-## D2 — Phase 1 ไม่ใช้ CDS view entity ล้วน แต่เป็น hybrid (2026-09-11)
+## D2 — Phase 1 ไม่ใช้ CDS view entity ล้วน แต่เป็น hybrid (2026-09-11) — **ถูกแทนด้วย D12**
 
 **ตัดสินใจ** `ZI_PURE001_HEADER` (view entity) ทำ data logic ทั้งหมด → `ZR_PURE001` (custom entity)
 ครอบชั้นบน → `ZCL_PURE001_QUERY` ทำเฉพาะสิ่งที่ CDS ทำไม่ได้
@@ -163,6 +163,65 @@ filter แบบ standard (เทียบรหัสอย่างเดี�
 
 ---
 
+## D11 — กติกาแบ่งชั้น CDS ↔ ABAP (2026-09-13) — **ถูกแทนด้วย D12**
+
+ผู้ใช้ตั้งข้อสังเกตว่า logic เริ่มกระจาย 2 ที่ · ตัดสินใจ**คง hybrid** แต่ล็อกกติกาว่าอะไรอยู่ชั้นไหน
+— **CDS = "ข้อมูลอยู่ไหน" · ABAP = "เอามาประกอบยังไง"** ไม่ใช่ "ติดอะไรก็ย้ายไป ABAP"
+
+| อยู่ใน CDS view entity | อยู่ใน ABAP class |
+|---|---|
+| join / derive จาก **view entity** ที่ released (header, item, master data, workflow, tax rate) | อ่าน **projection view** (`*TP_2` / `*TP_3`) — texts, BP address, account assignment TP |
+| field ที่เป็น 1 แถวต่อ key | รวมหลายแถวเป็น string (Material list, text หลาย type / หลายบรรทัด) |
+| ยอดรวม / status ที่หน้า list กับฟอร์มต้องตรงกัน (`ZI_PURE001_HEADER` reuse ทั้ง 2 ที่) | format — วันที่ไทย, amount in words, quantity (`ZCL_PURE001_UTIL`) |
+| | คำนวณข้าม node (ภาษีรวมจาก item → header) |
+| | ประกอบ node ของ FDP / RAP query (filter, paging, count) |
+
+**เหตุผลที่ไม่ย้ายทั้งหมดไป ABAP** — Data Preview ทดสอบได้โดยไม่ต้องรัน FDP (Phase 1 จับบั๊ก Net Order Value / status ได้ด้วยวิธีนี้)
+· `FORM_HEADER` reuse `ZI_PURE001_HEADER` ทำให้ list กับฟอร์มตรงกันแน่นอน · join 8–10 view ใน CDS อ่านง่ายกว่า ABAP SQL
+
+**ข้อจำกัดที่ทำให้ต้องมีฝั่ง ABAP** — `I_PurchaseOrderNoteTP_2`, `I_PurchaseOrderItemNoteTP_2`,
+`I_BusinessPartnerAddressTP_3`, `I_PurOrdAccountAssignmentTP_2` เป็น **projection view** → ใช้เป็น data source ของ
+view entity ไม่ได้ (error "Projection Views are not allowed as base object") แต่ SELECT ใน ABAP SQL ได้
+
+---
+
+## D12 — Redesign: CDS ประกาศ field อย่างเดียว · logic ทั้งหมดใน ABAP (2026-09-13) — **แทน D2 และ D11**
+
+**ตัดสินใจโดยผู้ใช้** หลังเจอข้อจำกัดของ CDS บน Public Cloud ติดกัน 4 เรื่องภายใน 3 วัน
+และประเมินว่า hybrid จะสร้าง technical debt (ข้อยกเว้นเฉพาะ object) มากขึ้นเรื่อย ๆ
+
+| ข้อจำกัดที่เจอ | ผลกับ hybrid |
+|---|---|
+| CDS ไม่มี `EXISTS` / `STRING_AGG` | filter ระดับ item + Material list ต้องอยู่ ABAP อยู่แล้ว |
+| `IF_SADL_EXIT_FILTER_TRANSFORM` ไม่ released | virtual element กรองไม่ได้ |
+| **projection view (`*TP_2/_3`) ใช้เป็น data source ของ view entity ไม่ได้** | texts / BP address / account assignment TP ต้องอ่านใน ABAP |
+| **DCL inheritance ล้มเมื่อ view join source ที่มี DCL หลายตัว** ("No authorization to view data" ทั้งที่ Data Preview แต่ละ source ผ่าน) | `ZI_PURE001_FORM_HEADER` / `_FORM_ITEM` / `_FORM_APPROVER` ใช้ไม่ได้เลย |
+
+**โครงใหม่**
+
+```
+CDS  = ประกาศ field อย่างเดียว: custom entity (ZR_PURE001, ZR_PURE001_FDP …) + VH view แบบ code list
+ABAP = ZCL_PURE001_DATA   ตัวกลาง — อ่าน view มาตรฐานทีละตัว (DCL ตรวจต่อ statement) + derive
+       ZCL_PURE001_QUERY  list report — filter/search/count/sort/paging ใน memory + item list
+       ZCL_PURE001_FDP    form — ประกอบ 3 node + ภาษี/format (Phase 2)
+       ZCL_PURE001_UTIL   format · ZCX_PURE001_QUERY exception
+```
+
+**ทำไมต้องมี `ZCL_PURE001_DATA` ตัวกลาง** — Status / Approval Status / ยอดรวม / follow-on ต้องออกมาเหมือนกันทั้ง list และฟอร์ม
+ถ้าแยก QUERY/FDP ตรง ๆ logic ถูกเขียน 2 ครั้ง
+
+**สิ่งที่แลก (รับไว้แล้ว)**
+- filter Status / sort / paging / count ของ list ทำใน **memory** หลังดึง PO ที่ตรง filter พื้นฐานจาก DB
+  (284 ใบไม่รู้สึก · หลักหมื่นใบต่อ company code จะเริ่มช้า → ค่อยเพิ่ม push-down บางส่วนทีหลังได้)
+- ทดสอบผ่าน Data Preview ไม่ได้อีก → ต้องรัน app หรือเขียน ABAP Unit ให้ `ZCL_PURE001_DATA` (ดีกว่าในระยะยาว)
+
+**พิสูจน์แล้ว** — ทดสอบซ้ำบน tenant 100 ทั้ง 6 PO ตัวแทน + Material filter + Status dropdown + Search + sort → ผลเหมือนตอน hybrid ทุกข้อ
+
+**object ที่ลบ** — `ZI_PURE001_HEADER`, `ZI_PURE001_TOTAL`, `ZI_PURE001_FOLLOWON`, `ZI_PURE001_WORKFLOW`
+(และ `ZI_PURE001_FORM_HEADER` / `_FORM_ITEM` / `_FORM_APPROVER` ที่ยังไม่เคย push)
+
+---
+
 ## ข้อจำกัดของ tenant ที่ค้นพบ (ใช้อ้างอิงเฟสต่อไป)
 
 | สิ่งที่พบ | วันที่ | ผล |
@@ -189,3 +248,11 @@ filter แบบ standard (เทียบรหัสอย่างเดี�
 | `cx_rap_query_filter_no_range` **ไม่ใช่** subclass ของ `cx_rap_query_provider` และตัวหลัง**เป็น abstract** | 2026-09-13 | ต้องมี exception class เอง (`ZCX_PURE001_QUERY`) |
 | ADT SQL Console: รับ statement เดียว, ไม่รับ `WITH PRIVILEGED ACCESS` (ต้องใช้ class `if_oo_adt_classrun`) | 2026-09-13 | |
 | VH view จาก field ที่มี DDIC search help → warning "Search help assignment … not inherited" ปล่อยได้ | 2026-09-13 | |
+| **projection view** (`I_PurchaseOrderNoteTP_2`, `I_PurchaseOrderItemNoteTP_2`, `I_BusinessPartnerAddressTP_3`, `I_PurOrdAccountAssignmentTP_2`) ใช้เป็น data source ของ view entity ไม่ได้ ("Projection Views are not allowed as base object") | 2026-09-13 | อ่านใน ABAP SQL แทน (ยังต้องยืนยันตอน Phase 2 ว่า transactional_query ให้ SELECT ได้) |
+| view entity ที่ join source ที่มี DCL หลายตัว (เช่น `I_Supplier`, `I_BusinessUserBasic`, `I_EnterpriseProjectElement`, `I_WorkflowStatusDetails` + `group by`) → Data Preview "No authorization to view data" ทั้งที่แต่ละ source ผ่าน | 2026-09-13 | DCL inheritance ต้องการ field ที่ DCL ใช้ผ่าน alias เดียวกัน · SAP DCL มองไม่เห็น → **ทำใน ABAP** (D12) |
+| `I_EnterpriseProjectElement` released C1 = master ของ WBS (`WBSElementInternalID` → `ProjectElement`) · `I_WBSElement*` ไม่มี | 2026-09-13 | |
+| `I_PurOrdAccountAssignmentAPI01.WBSElementInternalID` deprecated → ใช้ `WBSElementInternalID_2` | 2026-09-13 | |
+| `I_TaxCodeRate` released — rate ต่อ tax code (`TaxType='V'` + `VATConditionType='MWVS'` → 1 แถว) · `ConditionRateRatio` ต้อง select `ConditionRateRatioUnit` คู่กัน | 2026-09-13 | |
+| `I_PaymentTermsText`, `I_CompanyCode` (VATRegistration = เลขผู้เสียภาษี), `I_Plant`, `I_BusinessUserBasic`, `I_PurchaseOrderPartnerAPI01`, `I_PurOrdScheduleLineAPI01`, `I_PurchaseOrderNoteTP_2` (F01/F02/F06), `I_PurchaseOrderItemNoteTP_2` (F01/F03/F04) | 2026-09-13 | released · มี data |
+| view กลุ่ม `I_Address*` (`I_Address_2`, `I_AddrOrgNamePostalAddress`, `I_AddressEmailAddress_2`, phone, website) released แต่**ว่างทั้งหมด** (DCL) → ที่อยู่/โทร/เว็บของ company & plant ต้อง config | 2026-09-13 | |
+| `class_constructor` ต้องอยู่ PUBLIC SECTION · `COLLECT` ต้องมี table key เป็น char (ห้าม `EMPTY KEY`) · FAE ต้อง type/length ตรงกันเป๊ะ | 2026-09-13 | |

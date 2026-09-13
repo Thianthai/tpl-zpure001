@@ -37,63 +37,58 @@ object ทุกตัวอยู่ใต้ `src/` ไม่มี subfolder
 **เป้าหมาย** ได้หน้าจอ Fiori list report ที่ filter หา PO ได้ครบ 13 ช่อง แสดงคอลัมน์ตาม spec
 + Status / Approval Status เหมือน standard (ยังไม่มีปุ่มพิมพ์)
 
-**สถาปัตยกรรม — hybrid** (ดู [06-decisions.md](06-decisions.md) D2, D5–D10)
+**สถาปัตยกรรม — D12 (redesign 2026-09-13): CDS ประกาศ field อย่างเดียว · logic ทั้งหมดใน ABAP**
 
 ```
 ZUI_PURE001_O4 (binding)
   └─ ZUI_PURE001 (service def, alias PrintPurchaseOrder)
-       └─ ZR_PURE001 (custom entity)  ←  ZCL_PURE001_QUERY  (+ ZCX_PURE001_QUERY)
-                                             │  EXISTS Material/Plant (+ item text) · sort/paging/count push-down
-                                             │  join status text · ต่อ string MaterialList / PlantList
-                                             ▼
-                                        ZI_PURE001_HEADER (view entity) ← data logic ทั้งหมด
-                                             ├─ ZI_PURE001_TOTAL     (sum ต่อ PO, ไม่นับ item ที่ลบ)
-                                             ├─ ZI_PURE001_FOLLOWON  (PO ที่มี GR/IR)
-                                             ├─ ZI_PURE001_WORKFLOW  (workflow ล่าสุด) → I_WorkflowStatusOverview
-                                             └─ text: I_Supplier / I_PurchasingGroup / I_PurchasingDocumentTypeText
-       VH: ZI_PURE001_STATUS_VH · ZI_PURE001_POTYPE_VH · I_Supplier · I_PurchasingGroup · I_Product · I_Plant · I_CompanyCodeVH
+       └─ ZR_PURE001 (custom entity — ประกาศ field)
+            └─ ZCL_PURE001_QUERY   filter Status/Approval/$search · count · sort · paging (memory) · MaterialList/PlantList
+                 └─ ZCL_PURE001_DATA   ← ตัวกลาง ใช้ร่วมกับฟอร์ม
+                      read_headers: I_PurchaseOrderAPI01 (+EXISTS item) · I_Supplier · I_PurchasingGroup · I_CompanyCode
+                                    · I_PurchasingDocumentTypeText · ยอดรวม (item ไม่ลบ) · GR/IR follow-on
+                                    · I_WorkflowStatusOverview (ล่าสุด) · derive Status / Approval / criticality
+                      read_items:   I_PurchaseOrderItemAPI01 + I_Plant
+       VH: ZI_PURE001_STATUS_VH · ZI_PURE001_POTYPE_VH · I_Supplier · I_PurchasingGroup · I_Product · I_Plant · I_CompanyCodeVH · I_PurchaseOrderAPI01
 ```
 
 | # | งาน | Object | สถานะ |
 |---|---|---|---|
-| 1.1 | view ยอดรวมต่อ PO | `ZI_PURE001_TOTAL` | ✅ |
-| 1.2 | view header + text + derived status | `ZI_PURE001_HEADER` | ✅ |
-| 1.3 | custom entity ของ list report | `ZR_PURE001` | ✅ |
-| 1.4 | query provider + exception | `ZCL_PURE001_QUERY`, `ZCX_PURE001_QUERY` | ✅ |
-| 1.5 | service definition + binding (OData V4) | `ZUI_PURE001` / `ZUI_PURE001_O4` | ✅ published |
-| 1.6 | Status / Approval Status / VH / criticality | `ZI_PURE001_STATUS_VH`, `_POTYPE_VH`, `_WORKFLOW`, `_FOLLOWON` | ✅ |
-| 1.7 | ทดสอบเทียบ Manage Purchase Orders บน tenant 100 | — | ✅ 6 PO ตรงทุกคอลัมน์ |
+| 1.1 | custom entity ของ list report | `ZR_PURE001` | ✅ |
+| 1.2 | ตัวกลางอ่าน + derive | `ZCL_PURE001_DATA` | ✅ (D12) |
+| 1.3 | query provider + exception | `ZCL_PURE001_QUERY`, `ZCX_PURE001_QUERY` | ✅ |
+| 1.4 | service definition + binding (OData V4) | `ZUI_PURE001` / `ZUI_PURE001_O4` | ✅ published |
+| 1.5 | VH dropdown Status / doc type | `ZI_PURE001_STATUS_VH`, `_POTYPE_VH` | ✅ |
+| 1.6 | ทดสอบเทียบ Manage Purchase Orders บน tenant 100 | — | ✅ 6 PO ตรงทุกคอลัมน์ (ทั้งก่อนและหลัง redesign) |
 
 **ผลทดสอบ (tenant 100, 2026-09-13)** — 284 PO · filter 13 ช่อง + VH ครบ · Company Code default `TL01`
 · Status dropdown 7 ค่า · doc type dropdown 15 ค่าตรง standard · Material `C-2026-004` (item text) → 4500000080 ยอดทั้งใบ
 · Status/Approval Status + icon ตรง standard ทั้ง 6 ใบตัวแทน (Draft / In Approval / Rejected / Approved / Approved automatically / Follow-On)
-· Net Order Value ไม่นับ item ที่ลบ (99680044 = 870,000.25)
+· Net Order Value ไม่นับ item ที่ลบ (99680044 = 870,000.25) · ทดสอบซ้ำหลัง redesign D12 ผลเหมือนเดิมทุกข้อ
 
 **ข้อจำกัดที่รับไว้** — Sent / Not Yet Sent / Output Error รวมเป็น Released · ไม่มีคอลัมน์ Approver
 · tenant 80 ไม่มี PO ทดสอบไม่ได้ ต้อง transport ไป 100
 
-## Phase 2 — FDP data interface
+## Phase 2 — FDP data interface (+ utility) — กำลังทำ
 
-**เป้าหมาย** ได้ data interface ที่ Adobe Form ดูดข้อมูลไปใช้ได้ครบ
-— *นี่คือส่วนหลักที่ผู้ใช้ขอ*
+**เป้าหมาย** ได้ data interface ที่ Adobe Form `ZPURF002` ดูดข้อมูลไปใช้ได้ครบ — *นี่คือส่วนหลักที่ผู้ใช้ขอ*
+· สัญญา XML: [03-data-interface.md](03-data-interface.md) (แบบ B — แยก node ต่อ text type)
 
-| # | งาน | Object |
-|---|---|---|
-| 2.1 | สร้าง custom entity 3 ชั้น (header / item / item text) | `ZR_PURE001_FDP`, `..._ITEM`, `..._ITXT` |
-| 2.2 | สร้าง query class เติมข้อมูลทั้ง 3 node | `ZCL_PURE001_FDP` |
-| 2.3 | สร้าง service definition สำหรับ FDP | `ZAPI_PURE001_FDP` |
-| 2.4 | ทดสอบด้วย `cl_fp_fdp_services=>get_instance( 'ZAPI_PURE001_FDP' )->read_to_xml_v2( )` แล้ว dump XML ออกมาดู | — |
-| 2.5 | ส่ง XML schema ให้ผู้ใช้เอาไป bind ใน LiveCycle Designer | Claude → ผู้ใช้ |
-| 2.6 | ผู้ใช้สร้าง form object `ZPURF001` + upload XDP | ผู้ใช้ |
+| # | งาน | Object | สถานะ |
+|---|---|---|---|
+| 2.1 | utility: วันที่ไทย / amount in words / quantity | `ZCL_PURE001_UTIL` | ✅ 742dd06 |
+| 2.2 | ขยายตัวกลางให้ครอบข้อมูลฟอร์ม (schedule, acct assignment, WBS, tax rate, texts, approver) | `ZCL_PURE001_DATA` | ⬜ |
+| 2.3 | custom entity 3 ชั้น | `ZR_PURE001_FDP`, `ZI_PURE001_ITEM_FDP`, `ZI_PURE001_ITXT_FDP` | ⬜ |
+| 2.4 | service definition FDP | `ZAPI_PURE001_FDP` | ⬜ |
+| 2.5 | query provider ประกอบ 3 node | `ZCL_PURE001_FDP` | ⬜ |
+| 2.6 | ทดสอบ `cl_fp_fdp_services=>get_instance( 'ZAPI_PURE001_FDP' )->read_to_xml_v2( )` dump XML | class ชั่วคราว | ⬜ |
+| 2.7 | ผู้ใช้สร้าง `ZPURF002` + bind XML | ผู้ใช้ | ⬜ |
 
-**ฟิลด์ที่ทำเป็น placeholder ไว้ก่อน** (รอ functional สรุป — ดู [05-open-questions.md](05-open-questions.md))
-— หลักประกัน/BG checkbox · วันที่เริ่ม-สิ้นสุดสัญญา · Ship Via · นามผู้รับสินค้า ·
-ผู้อนุมัติ + ลายเซ็น · ส่วนลด
-ประกาศ node ไว้ในสัญญาตั้งแต่ตอนนี้ แต่ยังไม่เติมค่า → เติมทีหลังโดยไม่ต้องแก้ฟอร์ม
+**แหล่งข้อมูลที่ยืนยันแล้ว (2026-09-13)** ดูตารางใน [03-data-interface.md](03-data-interface.md) และ tenant findings ใน [06-decisions.md](06-decisions.md)
 
-**เสร็จเมื่อ** — dump XML ออกมาแล้วมีครบทั้ง 3 ชั้น ข้อมูลตรงกับ PO จริงบน tenant
+**placeholder ที่รอ functional** — ที่อยู่/โทร/เว็บบริษัทและ plant (config), custom field หลักประกัน/BG/Email (`YY1_*`), โลโก้/ลายเซ็น (graphics), ตำแหน่งผู้อนุมัติ
 
----
+**เสร็จเมื่อ** — dump XML ออกมาแล้วมีครบทั้ง 3 ชั้น ข้อมูลตรงกับ PO จริงบน tenant 100 (4500000080, 99680198, 0099680019)
 
 ## Phase 3 — Print output
 
@@ -116,9 +111,9 @@ ZUI_PURE001_O4 (binding)
 
 ---
 
-## Phase 4 — Utility & master data
+## Phase 4 — Utility & master data → รวมเข้า Phase 2 แล้ว (`ZCL_PURE001_UTIL` ✅) · graphics table รอเช็ค
 
-**เป้าหมาย** เติมค่าที่ format ยากให้ครบ
+**เป้าหมาย (เดิม)** เติมค่าที่ format ยากให้ครบ
 
 | # | งาน | Object |
 |---|---|---|

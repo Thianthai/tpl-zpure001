@@ -25,31 +25,26 @@ RAP UI + Form Data Provider (FDP) สำหรับพิมพ์ใบสั�
    (`ZPURF001`) โดยผ่าน `cl_fp_fdp_services` → `read_to_xml_v2()` → `cl_fp_ads_util=>render_pdf()`
 
 ```
-Fiori List Report (ZUI_PURE001_O4)
-        │
-        ▼
-ZR_PURE001 (custom entity) ◄── ZCL_PURE001_QUERY ◄── ZI_PURE001_HEADER ◄─┬─ ZI_PURE001_TOTAL    (sum ต่อ PO)
-        │                        EXISTS · sort/paging       (view entity,       ├─ ZI_PURE001_FOLLOWON (GR/IR)
-        │                        push-down · ต่อ string      status/approval)   └─ ZI_PURE001_WORKFLOW (I_WorkflowStatusOverview)
-        │
-        ├── ปุ่ม Print PO Form ──► RAP action PrintPOForm ──┐
-        │                                                   │
-        └── column Preview/Download URL ──► ZHS_PURE001 ────┤
-                                            (HTTP service)  │
-                                                            ▼
-                                            cl_fp_fdp_services( 'ZAPI_PURE001_FDP' )
-                                                            │
-                                            ZR_PURE001_FDP ─┼─ ZI_PURE001_FDP_ITEM
-                                            (custom entity) │        │
-                                                            │        └─ ZI_PURE001_FDP_ITXT
-                                                            ▼
-                                            cl_fp_ads_util=>render_pdf( ZPURF001 )
-                                                            │
-                                                            ▼
-                                                          PDF
+Fiori List Report (ZUI_PURE001_O4)                        Adobe Form ZPURF002 (Phase 2)
+        │                                                          ▲
+        ▼                                                          │ cl_fp_ads_util=>render_pdf
+ZR_PURE001 (custom entity)                    ZR_PURE001_FDP ─┬─ ZI_PURE001_ITEM_FDP ─── ZI_PURE001_ITXT_FDP
+        │                                     (custom entity)  │   (custom entity)        (custom entity)
+        ▼                                                      ▼
+ZCL_PURE001_QUERY                                    ZCL_PURE001_FDP   ◄── cl_fp_fdp_services( 'ZAPI_PURE001_FDP' )
+ filter · search · count · sort · paging              ประกอบ 3 node · ภาษี · format
+ MaterialList / PlantList                                      │
+        │                                                      │
+        └──────────────────┬───────────────────────────────────┘
+                           ▼
+                   ZCL_PURE001_DATA   ← ตัวกลาง: อ่าน view มาตรฐาน + derive Status / Approval / ยอดรวม
+                   ZCL_PURE001_UTIL   ← วันที่ไทย · amount in words · quantity
+        (CDS = ประกาศ field อย่างเดียว · logic ทั้งหมดใน ABAP — D12)
+
+Phase 3: ปุ่ม Print PO Form (RAP action) + ZHS_PURE001 (HTTP preview) → PDF
 ```
 
-**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (2026-09-13 ทดสอบเทียบ standard บน tenant 100 แล้ว) · Phase 5.1–5.3 ✅ · Phase 2 ⬜ ถัดไป
+**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (redesign D12 2026-09-13 ทดสอบซ้ำผ่าน) · Phase 5.1–5.3 ✅ · Phase 2 🔨 กำลังทำ (util ✅ · FDP ⬜)
 
 ## เอกสาร
 
