@@ -174,8 +174,7 @@ CLASS zcl_pure001_query IMPLEMENTATION.
               OR upper( hdr~ExternalReference ) LIKE @gv_search_pattern )
       AND   EXISTS ( SELECT itm~PurchaseOrder
                        FROM I_PurchaseOrderItemAPI01 AS itm
-                       WHERE itm~PurchaseOrder                  = hdr~PurchaseOrder
-                       AND   itm~PurchasingDocumentDeletionCode <> 'L'
+                       WHERE itm~PurchaseOrder = hdr~PurchaseOrder
                        AND   (    itm~Material                       IN @gr_material
                                OR upper( itm~PurchaseOrderItemText ) IN @gr_item_text )
                        AND   itm~Plant                               IN @gr_plant )
@@ -228,8 +227,7 @@ CLASS zcl_pure001_query IMPLEMENTATION.
               OR upper( hdr~ExternalReference ) LIKE @gv_search_pattern )
       AND   EXISTS ( SELECT itm~PurchaseOrder
                        FROM I_PurchaseOrderItemAPI01 AS itm
-                       WHERE itm~PurchaseOrder                  = hdr~PurchaseOrder
-                       AND   itm~PurchasingDocumentDeletionCode <> 'L'
+                       WHERE itm~PurchaseOrder = hdr~PurchaseOrder
                        AND   (    itm~Material                       IN @gr_material
                                OR upper( itm~PurchaseOrderItemText ) IN @gr_item_text )
                        AND   itm~Plant                               IN @gr_plant )

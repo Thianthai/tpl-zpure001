@@ -6,9 +6,9 @@ define view entity ZI_PURE001_TOTAL
   key PurchaseOrder,
 
       @Semantics.amount.currencyCode: 'DocumentCurrency'
-      sum( NetAmount )   as NetOrderValue,        // TODO verify: ชื่อ field ยอดสุทธิระดับ item
+      sum( NetAmount )   as NetOrderValue,
 
-      DocumentCurrency                            // TODO verify: มี field นี้บน item view ไหม
+      DocumentCurrency
 }
 where
   PurchasingDocumentDeletionCode <> 'L'   // ไม่นับ item ที่ลบ — ตรง Net Order Value ของ standard
