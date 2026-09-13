@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_PURE001_UTIL</CLSNAME>
+    <CLSNAME>ZCL_PURE001_FDP</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Print Purchase Order - Utility</DESCRIPT>
+    <DESCRIPT>Print Purchase Order - Form Data Provider</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

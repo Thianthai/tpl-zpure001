@@ -7,7 +7,7 @@ CLASS zcl_pure001_data DEFINITION
 
     TYPES ty_text_pattern TYPE c LENGTH 80.
 
-    "! เงื่อนไขค้นหา PO — range ทุกตัว optional (ว่าง = ไม่กรอง)
+    " เงื่อนไขค้นหา PO — range ทุกตัว optional (ว่าง = ไม่กรอง)
     TYPES:
       BEGIN OF ty_selection,
         purchase_order   TYPE RANGE OF zr_pure001-PurchaseOrder,
@@ -45,10 +45,23 @@ CLASS zcl_pure001_data DEFINITION
             WorkflowInternalID             TYPE i_workflowstatusoverview-WorkflowInternalID,
             WorkflowExternalStatus         TYPE i_workflowstatusoverview-WorkflowExternalStatus,
             NmbrOfCmpltdWrkflwDialogTasks  TYPE i_workflowstatusoverview-NmbrOfCmpltdWrkflwDialogTasks,
+
+            "--- เพิ่มสำหรับฟอร์ม (Phase 2) ---
+            CompanyTaxNumber               TYPE i_companycode-VATRegistration,
+            CompanyCountry                 TYPE i_companycode-Country,
+            SupplierTaxNumber              TYPE i_supplier-TaxNumber3,
+            SupplierName1                  TYPE i_supplier-BusinessPartnerName1,
+            SupplierName2                  TYPE i_supplier-BusinessPartnerName2,
+            SupplierStreet                 TYPE i_supplier-StreetName,
+            SupplierDistrict               TYPE i_supplier-DistrictName,
+            SupplierCity                   TYPE i_supplier-CityName,
+            SupplierPostalCode             TYPE i_supplier-PostalCode,
+            SupplierMasterPhone            TYPE i_supplier-PhoneNumber1,
+            PaymentTermsText               TYPE i_paymenttermstext-PaymentTermsDescription,
           END OF ty_header,
           tt_header TYPE STANDARD TABLE OF ty_header WITH EMPTY KEY.
 
-    "! PO item (รวม item ที่ลบ — ผู้เรียกกรองเอง) · Phase 2 จะเพิ่ม schedule / account assignment / tax rate
+    " PO item (รวม item ที่ลบ — ผู้เรียกกรองเอง) · Phase 2 จะเพิ่ม schedule / account assignment / tax rate
     TYPES:
       BEGIN OF ty_item,
         PurchaseOrder                  TYPE i_purchaseorderitemapi01-PurchaseOrder,
@@ -75,7 +88,99 @@ CLASS zcl_pure001_data DEFINITION
       END OF ty_po_key,
       tt_po_key TYPE STANDARD TABLE OF ty_po_key WITH EMPTY KEY.
 
-    "! รหัส Status = I_PurchasingDocumentStatus (ตรง standard app)
+    " schedule line แรก (0001) ของ item — วันส่ง / PR / performance period
+    TYPES:
+      BEGIN OF ty_schedule_line,
+        PurchaseOrder              TYPE i_purordschedulelineapi01-PurchaseOrder,
+        PurchaseOrderItem          TYPE i_purordschedulelineapi01-PurchaseOrderItem,
+        ScheduleLineDeliveryDate   TYPE i_purordschedulelineapi01-ScheduleLineDeliveryDate,
+        PerformancePeriodStartDate TYPE i_purordschedulelineapi01-PerformancePeriodStartDate,
+        PerformancePeriodEndDate   TYPE i_purordschedulelineapi01-PerformancePeriodEndDate,
+        PurchaseRequisition        TYPE i_purordschedulelineapi01-PurchaseRequisition,
+        PurchaseRequisitionItem    TYPE i_purordschedulelineapi01-PurchaseRequisitionItem,
+      END OF ty_schedule_line,
+      tt_schedule_line TYPE STANDARD TABLE OF ty_schedule_line WITH EMPTY KEY.
+
+    " account assignment แรก (01) ของ item + WBS external ID
+    TYPES:
+      BEGIN OF ty_account_assignment,
+        PurchaseOrder         TYPE i_purordaccountassignmentapi01-PurchaseOrder,
+        PurchaseOrderItem     TYPE i_purordaccountassignmentapi01-PurchaseOrderItem,
+        GLAccount             TYPE i_purordaccountassignmentapi01-GLAccount,
+        CostCenter            TYPE i_purordaccountassignmentapi01-CostCenter,
+        OrderID               TYPE i_purordaccountassignmentapi01-OrderID,
+        WBSElementInternalID  TYPE i_purordaccountassignmentapi01-WBSElementInternalID_2,
+        WBSElement            TYPE i_enterpriseprojectelement-ProjectElement,
+        GoodsRecipientName    TYPE i_purordaccountassignmentapi01-GoodsRecipientName,
+        UnloadingPointName    TYPE i_purordaccountassignmentapi01-UnloadingPointName,
+      END OF ty_account_assignment,
+      tt_account_assignment TYPE STANDARD TABLE OF ty_account_assignment WITH EMPTY KEY.
+
+    " อัตราภาษี input tax (MWVS) ต่อ tax code ที่มีผลวันนี้
+    TYPES:
+      BEGIN OF ty_tax_rate,
+        TaxCode TYPE i_taxcoderate-TaxCode,
+        TaxRate TYPE i_taxcoderate-ConditionRateRatio,
+      END OF ty_tax_rate,
+      tt_tax_rate TYPE STANDARD TABLE OF ty_tax_rate WITH EMPTY KEY.
+
+    " text ของ PO header (item ว่าง) / item — จาก projection view (อ่านได้เฉพาะ ABAP SQL)
+    TYPES:
+      BEGIN OF ty_text,
+        PurchaseOrder     TYPE i_purchaseorderitemnotetp_2-PurchaseOrder,
+        PurchaseOrderItem TYPE i_purchaseorderitemnotetp_2-PurchaseOrderItem,
+        TextObjectType    TYPE i_purchaseorderitemnotetp_2-TextObjectType,
+        Language          TYPE i_purchaseorderitemnotetp_2-Language,
+        PlainLongText     TYPE i_purchaseorderitemnotetp_2-PlainLongText,
+      END OF ty_text,
+      tt_text TYPE STANDARD TABLE OF ty_text WITH EMPTY KEY.
+
+    " ผู้อนุมัติ = คนกด RELEASED ล่าสุดใน workflow ล่าสุด (ไม่มีแถว = approved automatically / ยังไม่อนุมัติ)
+    TYPES:
+      BEGIN OF ty_approver,
+        PurchaseOrder    TYPE zr_pure001-PurchaseOrder,
+        ApprovedByUser   TYPE i_workflowstatusdetails-WorkflowTaskProcessor,
+        ApprovedByName   TYPE i_businessuserbasic-PersonFullName,
+        ApprovedDateTime TYPE i_workflowstatusdetails-WrkflwTskCompletionUTCDateTime,
+      END OF ty_approver,
+      tt_approver TYPE STANDARD TABLE OF ty_approver WITH EMPTY KEY.
+
+    TYPES:
+      BEGIN OF ty_user_name,
+        UserID         TYPE i_businessuserbasic-UserID,
+        PersonFullName TYPE i_businessuserbasic-PersonFullName,
+      END OF ty_user_name,
+      tt_user_name TYPE STANDARD TABLE OF ty_user_name WITH EMPTY KEY.
+
+    METHODS read_schedule_lines
+      IMPORTING it_purchase_order        TYPE tt_po_key
+      RETURNING VALUE(rt_schedule_line)  TYPE tt_schedule_line.
+
+    METHODS read_account_assignments
+      IMPORTING it_purchase_order             TYPE tt_po_key
+      RETURNING VALUE(rt_account_assignment)  TYPE tt_account_assignment.
+
+    METHODS read_tax_rates
+      IMPORTING iv_country         TYPE i_companycode-Country
+      RETURNING VALUE(rt_tax_rate) TYPE tt_tax_rate.
+
+    METHODS read_header_texts
+      IMPORTING it_purchase_order TYPE tt_po_key
+      RETURNING VALUE(rt_text)    TYPE tt_text.
+
+    METHODS read_item_texts
+      IMPORTING it_purchase_order TYPE tt_po_key
+      RETURNING VALUE(rt_text)    TYPE tt_text.
+
+    METHODS read_approvers
+      IMPORTING it_header          TYPE tt_header
+      RETURNING VALUE(rt_approver) TYPE tt_approver.
+
+    METHODS read_user_names
+      IMPORTING it_user             TYPE tt_user_name
+      RETURNING VALUE(rt_user_name) TYPE tt_user_name.
+
+    " รหัส Status = I_PurchasingDocumentStatus (ตรง standard app)
     CONSTANTS:
       BEGIN OF gc_status,
         draft       TYPE zr_pure001-PurchaseOrderStatus VALUE '01',
@@ -190,7 +295,9 @@ CLASS zcl_pure001_data IMPLEMENTATION.
   METHOD enrich_master_texts.
 
     SELECT FROM I_Supplier
-      FIELDS Supplier, SupplierName
+      FIELDS Supplier, SupplierName, TaxNumber3,
+             BusinessPartnerName1, BusinessPartnerName2,
+             StreetName, DistrictName, CityName, PostalCode, PhoneNumber1
       FOR ALL ENTRIES IN @ct_header
       WHERE Supplier = @ct_header-Supplier
       INTO TABLE @DATA(lt_supplier).
@@ -202,22 +309,56 @@ CLASS zcl_pure001_data IMPLEMENTATION.
       INTO TABLE @DATA(lt_pgroup).
 
     SELECT FROM I_CompanyCode
-      FIELDS CompanyCode, CompanyCodeName
+      FIELDS CompanyCode, CompanyCodeName, VATRegistration, Country
       FOR ALL ENTRIES IN @ct_header
       WHERE CompanyCode = @ct_header-CompanyCode
       INTO TABLE @DATA(lt_company).
 
-    " doc type ทั้งชุด (15 ค่า) ไม่ต้อง FAE
     SELECT FROM I_PurchasingDocumentTypeText
       FIELDS PurchasingDocumentType, PurchasingDocumentTypeName
       WHERE PurchasingDocumentCategory = 'F'
       AND   Language                   = @sy-langu
       INTO TABLE @DATA(lt_potype).
 
+    " payment terms text ภาษาของ PO — Description ก่อน ถ้าว่างใช้ Name
+    SELECT FROM I_PaymentTermsText
+      FIELDS PaymentTerms, Language, PaymentTermsName, PaymentTermsDescription
+      FOR ALL ENTRIES IN @ct_header
+      WHERE PaymentTerms = @ct_header-PaymentTerms
+      AND   Language     = @ct_header-Language
+      INTO TABLE @DATA(lt_payment_terms).
+
     LOOP AT ct_header ASSIGNING FIELD-SYMBOL(<lfs_header>).
-      <lfs_header>-SupplierName          = VALUE #( lt_supplier[ Supplier = <lfs_header>-Supplier ]-SupplierName OPTIONAL ).
+
+      ASSIGN lt_supplier[ Supplier = <lfs_header>-Supplier ] TO FIELD-SYMBOL(<lfs_supplier>).
+      IF sy-subrc = 0.
+        <lfs_header>-SupplierName        = <lfs_supplier>-SupplierName.
+        <lfs_header>-SupplierTaxNumber   = <lfs_supplier>-TaxNumber3.
+        <lfs_header>-SupplierName1       = <lfs_supplier>-BusinessPartnerName1.
+        <lfs_header>-SupplierName2       = <lfs_supplier>-BusinessPartnerName2.
+        <lfs_header>-SupplierStreet      = <lfs_supplier>-StreetName.
+        <lfs_header>-SupplierDistrict    = <lfs_supplier>-DistrictName.
+        <lfs_header>-SupplierCity        = <lfs_supplier>-CityName.
+        <lfs_header>-SupplierPostalCode  = <lfs_supplier>-PostalCode.
+        <lfs_header>-SupplierMasterPhone = <lfs_supplier>-PhoneNumber1.
+      ENDIF.
+
+      ASSIGN lt_company[ CompanyCode = <lfs_header>-CompanyCode ] TO FIELD-SYMBOL(<lfs_company>).
+      IF sy-subrc = 0.
+        <lfs_header>-CompanyCodeName  = <lfs_company>-CompanyCodeName.
+        <lfs_header>-CompanyTaxNumber = <lfs_company>-VATRegistration.
+        <lfs_header>-CompanyCountry   = <lfs_company>-Country.
+      ENDIF.
+
+      ASSIGN lt_payment_terms[ PaymentTerms = <lfs_header>-PaymentTerms
+                               Language     = <lfs_header>-Language ] TO FIELD-SYMBOL(<lfs_terms>).
+      IF sy-subrc = 0.
+        <lfs_header>-PaymentTermsText = COND #( WHEN <lfs_terms>-PaymentTermsDescription IS NOT INITIAL
+                                                THEN <lfs_terms>-PaymentTermsDescription
+                                                ELSE <lfs_terms>-PaymentTermsName ).
+      ENDIF.
+
       <lfs_header>-PurchasingGroupName   = VALUE #( lt_pgroup[ PurchasingGroup = <lfs_header>-PurchasingGroup ]-PurchasingGroupName OPTIONAL ).
-      <lfs_header>-CompanyCodeName       = VALUE #( lt_company[ CompanyCode = <lfs_header>-CompanyCode ]-CompanyCodeName OPTIONAL ).
       <lfs_header>-PurchaseOrderTypeName = VALUE #( lt_potype[ PurchasingDocumentType = <lfs_header>-PurchaseOrderType ]-PurchasingDocumentTypeName OPTIONAL ).
     ENDLOOP.
 
@@ -268,11 +409,11 @@ CLASS zcl_pure001_data IMPLEMENTATION.
       WHERE PurchaseOrder = @ct_header-PurchaseOrder
       APPENDING TABLE @lt_follow_on.
 
-    SORT lt_follow_on.
-    DELETE ADJACENT DUPLICATES FROM lt_follow_on.
+    SORT lt_follow_on BY PurchaseOrder.
+    DELETE ADJACENT DUPLICATES FROM lt_follow_on COMPARING PurchaseOrder.
 
     LOOP AT ct_header ASSIGNING FIELD-SYMBOL(<lfs_header>).
-      <lfs_header>-HasFollowOnDocument = xsdbool( line_exists( lt_follow_on[ table_line = <lfs_header>-PurchaseOrder ] ) ).
+      <lfs_header>-HasFollowOnDocument = xsdbool( line_exists( lt_follow_on[ PurchaseOrder = <lfs_header>-PurchaseOrder ] ) ).
     ENDLOOP.
 
   ENDMETHOD.
@@ -407,6 +548,173 @@ CLASS zcl_pure001_data IMPLEMENTATION.
       INTO CORRESPONDING FIELDS OF TABLE @rt_item.
 
     SORT rt_item BY PurchaseOrder PurchaseOrderItem.
+
+  ENDMETHOD.
+
+
+  METHOD read_schedule_lines.
+
+    IF it_purchase_order IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    SELECT FROM I_PurOrdScheduleLineAPI01
+      FIELDS PurchaseOrder, PurchaseOrderItem, ScheduleLineDeliveryDate,
+             PerformancePeriodStartDate, PerformancePeriodEndDate,
+             PurchaseRequisition, PurchaseRequisitionItem
+      FOR ALL ENTRIES IN @it_purchase_order
+      WHERE PurchaseOrder             = @it_purchase_order-PurchaseOrder
+      AND   PurchaseOrderScheduleLine = '0001'
+      INTO CORRESPONDING FIELDS OF TABLE @rt_schedule_line.
+
+  ENDMETHOD.
+
+
+  METHOD read_account_assignments.
+
+    IF it_purchase_order IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    SELECT FROM I_PurOrdAccountAssignmentAPI01
+      FIELDS PurchaseOrder, PurchaseOrderItem, GLAccount, CostCenter, OrderID,
+             WBSElementInternalID_2 AS WBSElementInternalID,
+             GoodsRecipientName, UnloadingPointName
+      FOR ALL ENTRIES IN @it_purchase_order
+      WHERE PurchaseOrder           = @it_purchase_order-PurchaseOrder
+      AND   AccountAssignmentNumber = '01'
+      INTO CORRESPONDING FIELDS OF TABLE @rt_account_assignment.
+
+    " WBS internal → external (C-2025-054) ผ่าน Enterprise Project
+    DATA(lt_wbs_key) = VALUE tt_account_assignment( FOR ls_aa IN rt_account_assignment
+                                                    WHERE ( WBSElementInternalID IS NOT INITIAL )
+                                                    ( WBSElementInternalID = ls_aa-WBSElementInternalID ) ).
+    IF lt_wbs_key IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    SELECT FROM I_EnterpriseProjectElement
+      FIELDS WBSElementInternalID, ProjectElement                       " TODO verify: ชื่อ field
+      FOR ALL ENTRIES IN @lt_wbs_key
+      WHERE WBSElementInternalID = @lt_wbs_key-WBSElementInternalID
+      INTO TABLE @DATA(lt_wbs).
+
+    LOOP AT rt_account_assignment ASSIGNING FIELD-SYMBOL(<lfs_aa>) WHERE WBSElementInternalID IS NOT INITIAL.
+      <lfs_aa>-WBSElement = VALUE #( lt_wbs[ WBSElementInternalID = <lfs_aa>-WBSElementInternalID ]-ProjectElement OPTIONAL ).
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD read_tax_rates.
+
+    DATA(lv_today) = cl_abap_context_info=>get_system_date( ).
+
+    " input tax (V) condition MWVS ประเทศของ company code ช่วงที่มีผลวันนี้ → 1 แถวต่อ tax code
+    SELECT FROM I_TaxCodeRate
+      FIELDS TaxCode, ConditionRateRatio AS TaxRate
+      WHERE Country                    = @iv_country
+      AND   TaxType                    = 'V'
+      AND   VATConditionType           = 'MWVS'
+      AND   CndnRecordValidityStartDate <= @lv_today
+      AND   CndnRecordValidityEndDate   >= @lv_today
+      INTO CORRESPONDING FIELDS OF TABLE @rt_tax_rate.
+
+  ENDMETHOD.
+
+
+  METHOD read_header_texts.
+
+    IF it_purchase_order IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    " STRING column ใช้กับ FAE ไม่ได้ (implicit DISTINCT) → ใช้ range แทน (พิมพ์ทีละไม่กี่ใบ)
+    DATA(lr_purchase_order) = VALUE ty_selection-purchase_order(
+      FOR ls_key IN it_purchase_order ( sign = 'I' option = 'EQ' low = ls_key-PurchaseOrder ) ).
+
+    " F01 Header Text · F02 Header Note · F06 Shipping Instructions (จัดส่งโดย)
+    SELECT FROM I_PurchaseOrderNoteTP_2
+      FIELDS PurchaseOrder, TextObjectType, Language, PlainLongText
+      WHERE PurchaseOrder IN @lr_purchase_order
+      INTO CORRESPONDING FIELDS OF TABLE @rt_text.
+
+  ENDMETHOD.
+
+
+  METHOD read_item_texts.
+
+    IF it_purchase_order IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    DATA(lr_purchase_order) = VALUE ty_selection-purchase_order(
+      FOR ls_key IN it_purchase_order ( sign = 'I' option = 'EQ' low = ls_key-PurchaseOrder ) ).
+
+    " F03 Material PO Text · F01 Item Text · F04 Delivery Text
+    SELECT FROM I_PurchaseOrderItemNoteTP_2
+      FIELDS PurchaseOrder, PurchaseOrderItem, TextObjectType, Language, PlainLongText
+      WHERE PurchaseOrder IN @lr_purchase_order
+      INTO CORRESPONDING FIELDS OF TABLE @rt_text.
+
+    SORT rt_text BY PurchaseOrder PurchaseOrderItem TextObjectType.
+
+  ENDMETHOD.
+
+
+  METHOD read_approvers.
+
+    " เฉพาะ PO ที่มี workflow instance
+    DATA(lt_workflow) = VALUE tt_header( FOR ls_h IN it_header WHERE ( WorkflowInternalID IS NOT INITIAL ) ( ls_h ) ).
+    IF lt_workflow IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    SELECT FROM I_WorkflowStatusDetails
+      FIELDS WorkflowInternalID, WorkflowTaskInternalID, WorkflowTaskProcessor, WrkflwTskCompletionUTCDateTime
+      FOR ALL ENTRIES IN @lt_workflow
+      WHERE WorkflowInternalID         = @lt_workflow-WorkflowInternalID
+      AND   WorkflowTaskResult         = 'RELEASED'
+      AND   WorkflowTaskExternalStatus = 'COMPLETED'
+      INTO TABLE @DATA(lt_task).
+
+    " task RELEASED ล่าสุดต่อ workflow
+    SORT lt_task BY WorkflowInternalID ASCENDING WorkflowTaskInternalID DESCENDING.
+    DELETE ADJACENT DUPLICATES FROM lt_task COMPARING WorkflowInternalID.
+
+    LOOP AT lt_workflow ASSIGNING FIELD-SYMBOL(<lfs_header>).
+      ASSIGN lt_task[ WorkflowInternalID = <lfs_header>-WorkflowInternalID ] TO FIELD-SYMBOL(<lfs_task>).
+      IF sy-subrc = 0.
+        APPEND VALUE #( PurchaseOrder    = <lfs_header>-PurchaseOrder
+                        ApprovedByUser   = <lfs_task>-WorkflowTaskProcessor
+                        ApprovedDateTime = <lfs_task>-WrkflwTskCompletionUTCDateTime ) TO rt_approver.
+      ENDIF.
+    ENDLOOP.
+
+    IF rt_approver IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    DATA(lt_user) = read_user_names( VALUE #( FOR ls_a IN rt_approver ( UserID = ls_a-ApprovedByUser ) ) ).
+
+    LOOP AT rt_approver ASSIGNING FIELD-SYMBOL(<lfs_approver>).
+      <lfs_approver>-ApprovedByName = VALUE #( lt_user[ UserID = <lfs_approver>-ApprovedByUser ]-PersonFullName OPTIONAL ).
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD read_user_names.
+
+    IF it_user IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    SELECT FROM I_BusinessUserBasic
+      FIELDS UserID, PersonFullName
+      FOR ALL ENTRIES IN @it_user
+      WHERE UserID = @it_user-UserID
+      INTO TABLE @rt_user_name.
 
   ENDMETHOD.
 

@@ -1,0 +1,7 @@
+@EndUserText.label: 'Print PO - Form Data Provider'
+@ObjectModel.leadingEntity.name: 'ZR_PURE001_FDP'
+define service ZAPI_PURE001_FDP {
+  expose ZR_PURE001_FDP      as PurchaseOrderHeader;
+  expose ZI_PURE001_ITEM_FDP as PurchaseOrderItem;
+  expose ZI_PURE001_ITXT_FDP as PurchaseOrderItemText;
+}
