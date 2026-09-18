@@ -242,6 +242,30 @@ API ที่ใช้ (source บน tenant): `if_rap_query_filter_tree->get_ro
 
 ---
 
+## D14 — ฟอร์มใหม่ `ZPURF002` clone จากฟอร์มเดิม re-bind กับ FDP ของเรา · script เท่าที่จำเป็น (2026-09-18)
+
+**บริบท** — ลูกค้ามีฟอร์ม output management `YY1_MM_PUR_PURCHASE_ORDER` (customized, ใช้กับ Manage PO) ผูกกับ
+standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ตัว + JavaScript ในฟอร์มเยอะ
+(ลำดับ, description 5 บรรทัด, amount in words ไทย, วันที่ไทย, service item → `1 AU`, ซ่อน/แสดง) · ผู้ใช้อยากใช้ฟอร์มเดียวกัน
+
+**ทางที่ลอง** — A: เรียก standard FDP จากโปรแกรมเรา `cl_fp_fdp_services=>get_instance( 'FDP_EF_PURCHASE_ORDER_SRV' )`
+→ **`CX_SADL_GW_V4_REPOSITORY: Service is not registered` (repository SRVD)** — standard FDP เป็น classic Gateway service
+ไม่ใช่ service definition, API นี้มองไม่เห็น · B: ปรับ FDP เราให้คาย XML รูป standard (~50 path + `YY1_*`) — เปราะ, ไม่ clean
+
+**ตัดสินใจ (ผู้ใช้ + functional)** — **ทำฟอร์มใหม่ `ZPURF002` หน้าตาเหมือนเดิม** bind กับ `ZAPI_PURE001_FDP` · ต่างกันปรับ case by case
+- clone `.xdp` เดิมด้วย script (`form/build_xdp.py`): คง layout + **ชื่อ object เดิมทุกตัว** (ผู้ใช้ขอ) · เปลี่ยน binding 61 จุด
+  · ถอด `calculate` 13 จุด + validate/presence script · ลบ `ItemLimit`, `frmHiddenGlobalFields` · checkbox on = `X`
+  · ถอด data picture `date{…}` ออกจาก field วันที่ (ไม่งั้น Acrobat parse ข้อความไทยแล้วพิมพ์ `2568-11-10`) + `nullTest="error"`
+  · amount in words: script `editValue` เดิมทำค่า bound หาย → ใช้ presence script แบบเดียวกับ Total
+- **ค่าที่ฟอร์มเคยคำนวณเอง ย้ายมา ABAP**: `ItemDescriptionText` (ช่องรายการทั้งช่อง คั่น newline — คง node `_ItemText` แบบ B ไว้ด้วย),
+  `ApprovalNoteText` (ว่าง = ไม่พิมพ์ → ไม่ต้อง script presence), `SupplierCodeName`, service item (`Quantity = 0`) → `QuantityText = 1` / `Unit = AU`
+- script ที่เหลือ 14 จุด = เลขหน้า + แสดงยอดรวม/amount in words เฉพาะหน้าสุดท้าย (layout — ทำใน ABAP ไม่ได้)
+- พฤติกรรมที่**คงตามฟอร์มเดิมโดยตั้งใจ**: แถวรายการแยกข้ามหน้าได้ (ไม่ใส่ `keep intact`) · ผู้จัดทำ/ผู้อนุมัติพิมพ์ทุกหน้า · label ยอดรวมพิมพ์ทุกหน้า
+- ทดสอบ Designer preview: 1 หน้า (0099680042) และ 6 หน้า (25 รายการสังเคราะห์) ผ่าน 2026-09-18
+- Form Object `ZPURF002` สร้างใน ADT แล้ว upload `.xdp` (ตาม demo `YF_DMOFDP`) — ไม่ผ่าน Form Templates app
+
+---
+
 ## ข้อจำกัดของ tenant ที่ค้นพบ (ใช้อ้างอิงเฟสต่อไป)
 
 | สิ่งที่พบ | วันที่ | ผล |
@@ -286,4 +310,7 @@ API ที่ใช้ (source บน tenant): `if_rap_query_filter_tree->get_ro
 | `get_as_ranges( )` ใช้กับ filter ของ child ที่ key หลาย field ไม่ได้ (OR ของ AND) | 2026-09-14 | D13 — filter tree |
 | FDP serializer: data element ที่มี conversion exit ตัด 0 (`ebeln`) · `abap.char` ออกดิบ · `abap.unit` → ISO code · `int`/`dec` มี space ท้าย · `Language` → ISO 2 ตัว | 2026-09-14 | ดู [03 §0](03-data-interface.md) |
 | `I_BusinessUserBasic` (`UserID` → `PersonFullName`) · `I_WorkflowStatusDetails` (`WorkflowTaskResult = 'RELEASED'`, `WorkflowTaskExternalStatus = 'COMPLETED'`, `WorkflowTaskProcessor`) · `I_EnterpriseProjectElement` (`WBSElementInternalID` → `ProjectElement`) · `I_TaxCodeRate` (`Country`/`TaxType`/`VATConditionType`/validity) | 2026-09-14 | ใช้ได้จริง มี data |
+| `cl_fp_fdp_services=>get_instance( )` รับเฉพาะ **service definition (SRVD)** — standard FDP `FDP_EF_PURCHASE_ORDER_SRV` (classic Gateway) → "Service is not registered" | 2026-09-18 | เรียก standard FDP จาก custom code ไม่ได้ (D14) |
+| ฟอร์ม output management เดิมของลูกค้าใช้ custom field `YY1_*_PDH` (header) / `_PDI` (item) เติมค่าผ่าน custom logic ฝั่ง standard | 2026-09-18 | ค่าเหล่านั้นเราคำนวณเองใน `ZCL_PURE001_FDP` |
+| Designer (SAP build) ไม่มีแท็บ Preview PDF ถ้าเครื่องไม่มี Acrobat Reader · "Generate Preview Data" จะเขียนทับไฟล์ data ที่ตั้งไว้ (ห้ามกดถ้าชี้ไฟล์ข้อมูลจริง) | 2026-09-18 | |
 | ADT: short dump ดูที่ Runtime Error Viewer · error ของ gateway (`/IWBEP/CX_GATEWAY`) ดูที่ `/sap/bc/adt/gw/errorlog` — `ZCX_PURE001_QUERY->get_text( )` โผล่ใน Error Context ทำให้ debug filter ได้โดยไม่ต้อง trace | 2026-09-14 | |

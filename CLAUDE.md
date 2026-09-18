@@ -74,6 +74,10 @@ custom entity **ไม่ใช่ view** (ไม่มี data source ข้า
 - **D13: filter ของ entity ที่ key หลาย field (ItemText) อ่านผ่าน `get_as_tree( )`** — framework ส่ง
   `(PO = x AND Item = y) OR (…)` ซึ่ง `get_as_ranges( )` โยน `cx_rap_query_filter_no_range` (ไม่ใช่ bug ของเรา)
 - **FOR ALL ENTRIES คงไว้** — ผู้ใช้สั่ง (2026-09-14) ยังไม่แตะ performance ทำโปรแกรมให้ถูกก่อน อย่าเสนอ refactor เอง
+- **D14: ฟอร์ม `ZPURF002` = clone ฟอร์มเดิม `YY1_MM_PUR_PURCHASE_ORDER` re-bind กับ `ZAPI_PURE001_FDP`** (master = `form/ZPURF002.xdp`,
+  generate ด้วย `form/build_xdp.py`) · **ชื่อ object ในฟอร์มคงชื่อเดิม** · **script เท่าที่จำเป็น** — ค่าที่ต้อง derive/format ทำใน ABAP แล้วส่งเป็น field
+  · เรียก standard FDP `FDP_EF_PURCHASE_ORDER_SRV` จาก `cl_fp_fdp_services` **ไม่ได้** (classic Gateway ไม่ใช่ SRVD)
+  · Form Object สร้างใน **ADT** (ไม่ใช่ Form Templates app) แล้ว upload `.xdp`
 - ทดสอบต้องทำบน **tenant 100** (`my427869`) — tenant 80 ไม่มี PO · service ทดสอบด้วย
   `.../zui_pure001/0001/PrintPurchaseOrder?$count=true`
 

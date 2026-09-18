@@ -82,8 +82,8 @@ ZUI_PURE001_O4 (binding)
 | 2.4 | service definition FDP | `ZAPI_PURE001_FDP` | ✅ c5b66b3 |
 | 2.5 | query provider ประกอบ 3 node | `ZCL_PURE001_FDP` | ✅ c5b66b3 |
 | 2.6 | ทดสอบ `cl_fp_fdp_services=>get_instance( 'ZAPI_PURE001_FDP' )->read_to_xml_v2( )` dump XML | `ZCL_PURE001_TEST_FDP` (ไม่ push) | ✅ 6 PO ผ่าน 2026-09-14 |
-| 2.8 | เก็บตกจากผล XML — `AccountAssignmentText` เว้นวรรคเกิน (ต้องแก้) · เลข 0 นำหน้า PR/GL/Order · หน่วยออกเป็น ISO (`C62`) · fallback ภาษา text | `ZCL_PURE001_FDP`, `ZI_PURE001_ITEM_FDP` | ⬜ รอผู้ใช้ตัดสินใจ — ดู [03 §0](03-data-interface.md) |
-| 2.7 | ผู้ใช้สร้าง `ZPURF002` + bind XML | ผู้ใช้ | ⬜ |
+| 2.8 | เก็บตกจากผล XML — ~~`AccountAssignmentText` เว้นวรรคเกิน~~ (แก้แล้ว 09-18) · เลข 0 นำหน้า PR/GL/Order (ไม่พิมพ์ดิบบนฟอร์มแล้ว — ไม่ต้องแก้) · **หน่วยออกเป็น ISO (`C62`) — โผล่บนฟอร์มแล้ว ต้องแก้ก่อน go-live** · fallback ภาษา text | `ZCL_PURE001_FDP`, `ZI_PURE001_ITEM_FDP` | ⬜ |
+| 2.7 | ฟอร์ม `ZPURF002` — clone จากฟอร์มเดิม re-bind กับ FDP (D14) · เพิ่ม field `ItemDescriptionText` / `SupplierCodeName` / `ApprovalNoteText` + service item `1 AU` ให้ฟอร์มไม่ต้องมี script | `form/ZPURF002.xdp`, FDP entity/class | ✅ Designer preview ผ่าน 09-18 · ⬜ สร้าง Form Object ใน ADT + push |
 
 **แหล่งข้อมูลที่ยืนยันแล้ว (2026-09-13)** ดูตารางใน [03-data-interface.md](03-data-interface.md) และ tenant findings ใน [06-decisions.md](06-decisions.md)
 

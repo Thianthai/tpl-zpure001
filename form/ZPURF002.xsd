@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema">
+ <element name="Form">
+  <complexType>
+   <sequence>
+    <element name="PurchaseOrderHeader" type="PurchaseOrderHeader"/>
+   </sequence>
+  </complexType>
+ </element>
+ <complexType name="PurchaseOrderHeader">
+  <sequence>
+   <element name="PurchaseOrder" type="string"/>
+   <element name="CompanyCode" type="string"/>
+   <element name="CompanyName" type="string"/>
+   <element name="CompanyTaxNumber" type="string"/>
+   <element name="CompanyAddressLine1" type="string"/>
+   <element name="CompanyAddressLine2" type="string"/>
+   <element name="CompanyPhone" type="string"/>
+   <element name="CompanyWebsite" type="string"/>
+   <element name="CompanyLogoMimeType" type="string"/>
+   <element name="CompanyLogoFileName" type="string"/>
+   <element name="CompanyLogo" type="string"/>
+   <element name="PurchaseOrderType" type="string"/>
+   <element name="PurchaseOrderTypeName" type="string"/>
+   <element name="Language" type="string"/>
+   <element name="PurchaseOrderDate" type="string"/>
+   <element name="PurchaseOrderDateText" type="string"/>
+   <element name="ExternalReference" type="string"/>
+   <element name="InternalReference" type="string"/>
+   <element name="PaymentTerms" type="string"/>
+   <element name="PaymentTermsText" type="string"/>
+   <element name="DeliveryDate" type="string"/>
+   <element name="DeliveryDateText" type="string"/>
+   <element name="ValidityStartDate" type="string"/>
+   <element name="ValidityStartDateText" type="string"/>
+   <element name="ValidityEndDate" type="string"/>
+   <element name="ValidityEndDateText" type="string"/>
+   <element name="ShipVia" type="string"/>
+   <element name="HeaderText" type="string"/>
+   <element name="HeaderNote" type="string"/>
+   <element name="PerfGuaranteeFlag" type="string"/>
+   <element name="PerfGuaranteeCash" type="string"/>
+   <element name="PerfGuaranteeBG" type="string"/>
+   <element name="InsurancePolicyFlag" type="string"/>
+   <element name="WarrantyGuaranteeFlag" type="string"/>
+   <element name="WarrantyGuaranteeCash" type="string"/>
+   <element name="WarrantyGuaranteeBG" type="string"/>
+   <element name="Supplier" type="string"/>
+   <element name="SupplierName" type="string"/>
+   <element name="SupplierCodeName" type="string"/>
+   <element name="SupplierTaxNumber" type="string"/>
+   <element name="SupplierAddress" type="string"/>
+   <element name="SupplierStreet" type="string"/>
+   <element name="SupplierDistrict" type="string"/>
+   <element name="SupplierCity" type="string"/>
+   <element name="SupplierPostalCode" type="string"/>
+   <element name="SupplierContactName" type="string"/>
+   <element name="SupplierPhone" type="string"/>
+   <element name="SupplierEmail" type="string"/>
+   <element name="ShipToPlant" type="string"/>
+   <element name="ShipToName" type="string"/>
+   <element name="ShipToPlantName" type="string"/>
+   <element name="ShipToAddressLine1" type="string"/>
+   <element name="ShipToAddressLine2" type="string"/>
+   <element name="GoodsRecipientName" type="string"/>
+   <element name="UnloadingPointName" type="string"/>
+   <element name="GoodsRecipientPhone" type="string"/>
+   <element name="DocumentCurrency" type="string"/>
+   <element name="TotalAmount" type="decimal"/>
+   <element name="DiscountAmount" type="decimal"/>
+   <element name="AmountBeforeTax" type="decimal"/>
+   <element name="TaxAmount" type="decimal"/>
+   <element name="NetAmount" type="decimal"/>
+   <element name="AmountInWords" type="string"/>
+   <element name="PreparedByUser" type="string"/>
+   <element name="PreparedByName" type="string"/>
+   <element name="PreparedDate" type="string"/>
+   <element name="PreparedDateText" type="string"/>
+   <element name="ApprovedByUser" type="string"/>
+   <element name="ApprovedByName" type="string"/>
+   <element name="ApprovedDate" type="string"/>
+   <element name="ApprovedDateText" type="string"/>
+   <element name="ApprovedByPosition" type="string"/>
+   <element name="ApprovedBySignMimeType" type="string"/>
+   <element name="ApprovedBySignFileName" type="string"/>
+   <element name="ApprovedBySignature" type="string"/>
+   <element name="IsApprovedAutomatically" type="string"/>
+   <element name="ApprovalNoteText" type="string"/>
+   <element name="_Item">
+    <complexType>
+     <sequence>
+      <element name="PurchaseOrderItem" type="PurchaseOrderItem" minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+    </complexType>
+   </element>
+  </sequence>
+ </complexType>
+ <complexType name="PurchaseOrderItem">
+  <sequence>
+   <element name="PurchaseOrder" type="string"/>
+   <element name="PurchaseOrderItem" type="string"/>
+   <element name="ItemNumber" type="decimal"/>
+   <element name="Material" type="string"/>
+   <element name="MaterialDescription" type="string"/>
+   <element name="ItemDescription" type="string"/>
+   <element name="ItemDescriptionText" type="string"/>
+   <element name="Quantity" type="decimal"/>
+   <element name="QuantityText" type="string"/>
+   <element name="Unit" type="string"/>
+   <element name="DocumentCurrency" type="string"/>
+   <element name="NetPriceAmount" type="decimal"/>
+   <element name="NetPriceQuantity" type="decimal"/>
+   <element name="ItemAmount" type="decimal"/>
+   <element name="TaxCode" type="string"/>
+   <element name="TaxRate" type="decimal"/>
+   <element name="TaxAmount" type="decimal"/>
+   <element name="DeliveryDate" type="string"/>
+   <element name="DeliveryDateText" type="string"/>
+   <element name="PerformancePeriodStartDate" type="string"/>
+   <element name="PerformancePeriodEndDate" type="string"/>
+   <element name="PurchaseRequisition" type="string"/>
+   <element name="GLAccount" type="string"/>
+   <element name="CostCenter" type="string"/>
+   <element name="OrderID" type="string"/>
+   <element name="WBSElement" type="string"/>
+   <element name="AccountAssignmentText" type="string"/>
+   <element name="Plant" type="string"/>
+   <element name="_ItemText">
+    <complexType>
+     <sequence>
+      <element name="PurchaseOrderItemText" type="PurchaseOrderItemText" minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+    </complexType>
+   </element>
+  </sequence>
+ </complexType>
+ <complexType name="PurchaseOrderItemText">
+  <sequence>
+   <element name="PurchaseOrder" type="string"/>
+   <element name="PurchaseOrderItem" type="string"/>
+   <element name="TextSequence" type="decimal"/>
+   <element name="TextObjectType" type="string"/>
+   <element name="TextTypeName" type="string"/>
+   <element name="Text" type="string"/>
+  </sequence>
+ </complexType>
+</schema>

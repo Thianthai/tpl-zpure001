@@ -62,7 +62,19 @@ XML ที่ได้จาก `read_to_xml_v2( )` — **ชื่อ node ร�
 | `Language` ออกเป็น ISO 2 ตัว | `EN` | (ภายใน `E` — lookup text ทำใน ABAP แล้ว ไม่กระทบ) |
 | `AccountAssignmentText` เว้นวรรคเกิน | `PR No.: 3680141     Acc.Code: 611401` | 🔧 **ต้องแก้** — `ALPHA = OUT` คืน blank ท้าย ต้อง `condense` |
 
-**ข้อสังเกตที่ต้องให้ functional ตัดสิน** — ดู [05-open-questions.md](05-open-questions.md) ข้อ 14–19
+**field ที่เพิ่ม 2026-09-18 เพื่อให้ฟอร์ม `ZPURF002` ไม่ต้องมี script (D14)** — XML ยืนยันแล้วกับ 0099680042
+
+| Node | Entity | Type | ค่า |
+|---|---|---|---|
+| `SupplierCodeName` | `ZR_PURE001_FDP` | `abap.char(100)` | `10004 บริษัท นาคา…` (แทน `YY1_SuppCodeNameBranch` — สาขาไม่มี source, 05 ข้อ 22) |
+| `ApprovalNoteText` | `ZR_PURE001_FDP` | `abap.char(120)` | `เอกสารสั่งซื้อนี้ได้รับการอนุมัติจากผู้มีอำนาจ ผ่านระบบอิเล็กทรอนิกส์เรียบร้อยแล้ว` เมื่อ ApprovalStatus = A หรือ B · ไม่งั้นว่าง (ฟอร์มไม่พิมพ์) |
+| `ItemDescriptionText` | `ZI_PURE001_ITEM_FDP` | `abap.string` | ช่อง "รายการ" ทั้งช่อง คั่น newline: `ItemDescription` → text F03 → F01 → F04 → `DeliveryDateText` → `AccountAssignmentText` → `WBS: …` |
+| (กติกา) service item | `ZI_PURE001_ITEM_FDP` | — | `Quantity = 0` → `QuantityText = 1`, `Unit = AU` (`Quantity` ตัวเลขคง 0) — ตามฟอร์มเดิม |
+| (แก้) `AccountAssignmentText` | | | `condense` หลัง `ALPHA = OUT` → `PR No.: 2680017  Acc.Code: 542000  Order No.: 8200000042` |
+
+**การ bind บนฟอร์ม `ZPURF002`** — ดู [../form/README.md](../form/README.md) · binding ทั้งหมดอยู่ใน `form/build_xdp.py` (`ref_map`)
+
+**ข้อสังเกตที่ต้องให้ functional ตัดสิน** — ดู [05-open-questions.md](05-open-questions.md) ข้อ 14–22
 
 ---
 
