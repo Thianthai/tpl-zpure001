@@ -52,6 +52,7 @@ define root custom entity ZR_PURE001_FDP
       //=== Supplier (2.3) ====================================================
       Supplier                 : lifnr;
       SupplierName             : abap.char(80);
+      SupplierCodeName         : abap.char(100);   // "10004 บริษัท นาคา…" (แทน YY1_SuppCodeNameBranch — สาขายังไม่มี source)
       SupplierTaxNumber        : abap.char(20);
       SupplierAddress          : abap.char(255);
       SupplierStreet           : abap.char(60);
@@ -104,6 +105,7 @@ define root custom entity ZR_PURE001_FDP
                                    acceptableMimeTypes: ['image/png', 'image/jpeg'], contentDispositionPreference: #INLINE }
       ApprovedBySignature      : abap.rawstring(0); // ⏸ graphics
       IsApprovedAutomatically  : abap.char(1);
-
+      ApprovalNoteText         : abap.char(120);   // ข้อความ "อนุมัติผ่านระบบอิเล็กทรอนิกส์" — ว่างถ้ายังไม่อนุมัติ
+      
       _Item                    : composition of exact one to many ZI_PURE001_ITEM_FDP;
 }

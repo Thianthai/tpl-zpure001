@@ -11,6 +11,7 @@ define custom entity ZI_PURE001_ITEM_FDP
       Material                   : matnr;
       MaterialDescription        : abap.char(40);
       ItemDescription            : abap.char(80);
+      ItemDescriptionText        : abap.string;     // ช่อง "รายการ" ทั้งช่อง หลายบรรทัด (ประกอบใน ABAP)
       @Semantics.quantity.unitOfMeasure : 'Unit'
       Quantity                   : abap.quan(13,3);
       QuantityText               : abap.char(20);

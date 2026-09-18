@@ -32,6 +32,11 @@ CLASS zcl_pure001_fdp DEFINITION
 
     CONSTANTS gc_time_zone TYPE c LENGTH 6 VALUE 'UTC+7'.   " เวลาไทย
 
+    CONSTANTS:
+      gc_service_unit  TYPE c LENGTH 3 VALUE 'AU',
+      gc_approval_note TYPE string
+        VALUE 'เอกสารสั่งซื้อนี้ได้รับการอนุมัติจากผู้มีอำนาจ ผ่านระบบอิเล็กทรอนิกส์เรียบร้อยแล้ว'.
+
     DATA:
       go_data             TYPE REF TO zcl_pure001_data,
       gr_purchase_order   TYPE RANGE OF zr_pure001_fdp-PurchaseOrder,
@@ -85,6 +90,19 @@ CLASS zcl_pure001_fdp DEFINITION
     METHODS compose_address
       IMPORTING it_part           TYPE string_table
       RETURNING VALUE(rv_address) TYPE string.
+
+    "! text ของ item เรียงตามฟอร์ม (F03 → F01 → F04) ภาษาของ PO เฉพาะที่มีข้อความ
+    METHODS get_ordered_item_texts
+      IMPORTING iv_purchase_order      TYPE clike
+                iv_purchase_order_item TYPE clike
+                iv_language            TYPE clike
+      RETURNING VALUE(rt_text)         TYPE zcl_pure001_data=>tt_text.
+
+    "! ช่อง "รายการ" ทั้งช่อง: description → texts → delivery → PR/Acc/Order → WBS (คั่น newline)
+    METHODS compose_item_description
+      IMPORTING is_item        TYPE zi_pure001_item_fdp
+                iv_language    TYPE zr_pure001_fdp-Language
+      RETURNING VALUE(rv_text) TYPE string.
 
 ENDCLASS.
 
@@ -296,6 +314,7 @@ CLASS zcl_pure001_fdp IMPLEMENTATION.
       "--- Supplier --------------------------------------------------------------
       <lfs_out>-Supplier           = <lfs_src>-Supplier.
       <lfs_out>-SupplierName       = <lfs_src>-SupplierName.
+      <lfs_out>-SupplierCodeName   = condense( |{ <lfs_src>-Supplier ALPHA = OUT } { <lfs_src>-SupplierName }| ).
       <lfs_out>-SupplierTaxNumber  = <lfs_src>-SupplierTaxNumber.
       <lfs_out>-SupplierStreet     = <lfs_src>-SupplierStreet.
       <lfs_out>-SupplierDistrict   = <lfs_src>-SupplierDistrict.
@@ -355,6 +374,9 @@ CLASS zcl_pure001_fdp IMPLEMENTATION.
         <lfs_out>-ApprovedDateText = zcl_pure001_util=>to_thai_date( <lfs_out>-ApprovedDate ).
       ENDIF.
       <lfs_out>-IsApprovedAutomatically = xsdbool( <lfs_src>-ApprovalStatus = zcl_pure001_data=>gc_approval-automatic ).
+      <lfs_out>-ApprovalNoteText = COND #( WHEN <lfs_src>-ApprovalStatus = zcl_pure001_data=>gc_approval-approved
+                                             OR <lfs_src>-ApprovalStatus = zcl_pure001_data=>gc_approval-automatic
+                                           THEN gc_approval_note ).
       " ApprovedByPosition / ApprovedBySignature = ⏸ config / graphics
 
     ENDLOOP.
@@ -421,19 +443,28 @@ CLASS zcl_pure001_fdp IMPLEMENTATION.
           <lfs_out>-WBSElement = <lfs_aa>-WBSElement.
         ENDIF.
 
-        " "PR No.: 168999  Acc.Code: 820000  Order No.: 1600000001" — ข้ามส่วนที่ว่าง (ตัด 0 นำหน้า)
+        " "PR No.: 168999  Acc.Code: 820000  Order No.: 1600000001" — ข้ามส่วนที่ว่าง (ตัด 0 นำหน้า + blank ท้ายจาก ALPHA)
         DATA lt_part TYPE string_table.
         CLEAR lt_part.
         IF <lfs_out>-PurchaseRequisition IS NOT INITIAL.
-          APPEND |PR No.: { <lfs_out>-PurchaseRequisition ALPHA = OUT }| TO lt_part.
+          APPEND |PR No.: { condense( |{ <lfs_out>-PurchaseRequisition ALPHA = OUT }| ) }| TO lt_part.
         ENDIF.
         IF <lfs_out>-GLAccount IS NOT INITIAL.
-          APPEND |Acc.Code: { <lfs_out>-GLAccount ALPHA = OUT }| TO lt_part.
+          APPEND |Acc.Code: { condense( |{ <lfs_out>-GLAccount ALPHA = OUT }| ) }| TO lt_part.
         ENDIF.
         IF <lfs_out>-OrderID IS NOT INITIAL.
-          APPEND |Order No.: { <lfs_out>-OrderID ALPHA = OUT }| TO lt_part.
+          APPEND |Order No.: { condense( |{ <lfs_out>-OrderID ALPHA = OUT }| ) }| TO lt_part.
         ENDIF.
         <lfs_out>-AccountAssignmentText = concat_lines_of( table = lt_part sep = `  ` ).
+
+        " item บริการ (quantity 0 / unit ว่าง) → แสดง 1 AU ตามฟอร์มเดิม (Quantity ตัวเลขคง 0 ตามจริง)
+        IF <lfs_out>-Quantity IS INITIAL.
+          <lfs_out>-QuantityText = '1'.
+          <lfs_out>-Unit         = gc_service_unit.
+        ENDIF.
+
+        <lfs_out>-ItemDescriptionText = compose_item_description( is_item     = <lfs_out>
+                                                                  iv_language = <lfs_header>-Language ).
 
       ENDLOOP.
     ENDLOOP.
@@ -443,31 +474,19 @@ CLASS zcl_pure001_fdp IMPLEMENTATION.
 
   METHOD build_item_texts.
 
-    " ลำดับตามฟอร์ม: Material PO Text → Item Text → Delivery Text · ภาษาของ PO · เฉพาะที่มีข้อความ
-    DATA(lt_type_order) = VALUE string_table( ( |{ gc_text_type-material_po_text }| )
-                                              ( |{ gc_text_type-item_text }| )
-                                              ( |{ gc_text_type-delivery_text }| ) ).
-
     LOOP AT gt_header ASSIGNING FIELD-SYMBOL(<lfs_header>).
       LOOP AT get_active_items( <lfs_header>-PurchaseOrder ) ASSIGNING FIELD-SYMBOL(<lfs_item>).
 
-        DATA(lv_sequence) = 0.
+        DATA(lt_text) = get_ordered_item_texts( iv_purchase_order      = <lfs_item>-PurchaseOrder
+                                                iv_purchase_order_item = <lfs_item>-PurchaseOrderItem
+                                                iv_language            = <lfs_header>-Language ).
 
-        LOOP AT lt_type_order INTO DATA(lv_type).
-          ASSIGN gt_item_text[ PurchaseOrder     = <lfs_item>-PurchaseOrder
-                               PurchaseOrderItem = <lfs_item>-PurchaseOrderItem
-                               TextObjectType    = lv_type
-                               Language          = <lfs_header>-Language ] TO FIELD-SYMBOL(<lfs_text>).
-          IF sy-subrc <> 0 OR <lfs_text>-PlainLongText IS INITIAL.
-            CONTINUE.
-          ENDIF.
-
-          lv_sequence += 1.
+        LOOP AT lt_text ASSIGNING FIELD-SYMBOL(<lfs_text>).
           APPEND VALUE #( PurchaseOrder     = <lfs_item>-PurchaseOrder
                           PurchaseOrderItem = <lfs_item>-PurchaseOrderItem
-                          TextSequence      = lv_sequence
-                          TextObjectType    = lv_type
-                          TextTypeName      = SWITCH #( lv_type
+                          TextSequence      = sy-tabix
+                          TextObjectType    = <lfs_text>-TextObjectType
+                          TextTypeName      = SWITCH #( <lfs_text>-TextObjectType
                                                 WHEN gc_text_type-material_po_text THEN 'Material PO Text'
                                                 WHEN gc_text_type-item_text        THEN 'Item Text'
                                                 WHEN gc_text_type-delivery_text    THEN 'Delivery Text' )
@@ -476,6 +495,54 @@ CLASS zcl_pure001_fdp IMPLEMENTATION.
 
       ENDLOOP.
     ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD get_ordered_item_texts.
+
+    " ลำดับตามฟอร์ม: Material PO Text → Item Text → Delivery Text · ภาษาของ PO · เฉพาะที่มีข้อความ
+    DATA(lt_type_order) = VALUE string_table( ( |{ gc_text_type-material_po_text }| )
+                                              ( |{ gc_text_type-item_text }| )
+                                              ( |{ gc_text_type-delivery_text }| ) ).
+
+    LOOP AT lt_type_order INTO DATA(lv_type).
+      ASSIGN gt_item_text[ PurchaseOrder     = iv_purchase_order
+                           PurchaseOrderItem = iv_purchase_order_item
+                           TextObjectType    = lv_type
+                           Language          = iv_language ] TO FIELD-SYMBOL(<lfs_text>).
+      IF sy-subrc = 0 AND <lfs_text>-PlainLongText IS NOT INITIAL.
+        APPEND <lfs_text> TO rt_text.
+      ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD compose_item_description.
+
+    DATA lt_line TYPE string_table.
+
+    APPEND is_item-ItemDescription TO lt_line.                       " บรรทัด 1: "C01-216-0 desc" / desc อย่างเดียว
+
+    DATA(lt_text) = get_ordered_item_texts( iv_purchase_order      = is_item-PurchaseOrder
+                                            iv_purchase_order_item = is_item-PurchaseOrderItem
+                                            iv_language            = iv_language ).
+    LOOP AT lt_text ASSIGNING FIELD-SYMBOL(<lfs_text>).
+      APPEND <lfs_text>-PlainLongText TO lt_line.
+    ENDLOOP.
+
+    IF is_item-DeliveryDateText IS NOT INITIAL.
+      APPEND is_item-DeliveryDateText TO lt_line.                    " Delivery Time : dd/mm/yyyy
+    ENDIF.
+    IF is_item-AccountAssignmentText IS NOT INITIAL.
+      APPEND is_item-AccountAssignmentText TO lt_line.               " PR No.: …  Acc.Code: …  Order No.: …
+    ENDIF.
+    IF is_item-WBSElement IS NOT INITIAL.
+      APPEND |WBS: { is_item-WBSElement }| TO lt_line.
+    ENDIF.
+
+    rv_text = concat_lines_of( table = lt_line sep = cl_abap_char_utilities=>newline ).
 
   ENDMETHOD.
 
