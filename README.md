@@ -44,7 +44,7 @@ ZCL_PURE001_QUERY                                    ZCL_PURE001_FDP   ◄──
 Phase 3: ปุ่ม Print PO Form (RAP action) + ZHS_PURE001 (HTTP preview) → PDF
 ```
 
-**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (redesign D12 2026-09-13 ทดสอบซ้ำผ่าน · ⚠️ bug VH Material ข้อ 21) · Phase 5.1–5.3 ✅ · Phase 2 🔨 XML ผ่าน 6 PO (`c5b66b3`) + **ฟอร์ม `ZPURF002` Designer preview ผ่าน 2026-09-18** (`form/`) · ค้าง: Form Object ใน ADT, หน่วย ISO, field ใหม่ 4 ตัวยังไม่ push
+**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (redesign D12 2026-09-13 ทดสอบซ้ำผ่าน · ⚠️ bug VH Material ข้อ 21) · Phase 5.1–5.3 ✅ · Phase 2 🔨 XML ผ่าน 6 PO (`c5b66b3`) + **ฟอร์ม `ZPURF002` Designer preview ผ่าน 2026-09-18** (`form/`) · field ใหม่ push แล้ว `1b5205b` · ค้าง: Form Object ใน ADT, หน่วย ISO
 
 ## เอกสาร
 
