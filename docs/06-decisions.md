@@ -222,6 +222,26 @@ ABAP = ZCL_PURE001_DATA   ตัวกลาง — อ่าน view มาต�
 
 ---
 
+## D13 — filter ของ FDP child ที่ key หลาย field อ่านผ่าน filter tree (2026-09-14)
+
+**ปัญหา** — FDP อ่าน 3 ชั้นด้วย `PurchaseOrderHeader(PurchaseOrder='…')?$expand=_Item($expand=_ItemText)`
+แล้วเรียก `if_rap_query_provider~select` แยกต่อ entity · root/item ได้ filter `PurchaseOrder = x` (range ได้)
+แต่ **`ZI_PURE001_ITXT_FDP` ได้ `( PO = x AND Item = 00010 ) OR ( PO = x AND Item = 00020 ) …`**
+→ `get_as_ranges( )` โยน `cx_rap_query_filter_no_range` (range แยกต่อ field ผูกคู่กันไม่ได้ — ไม่ใช่ bug)
+· demo `YCL_DMOFDP` ไม่เจอเพราะมี 2 ชั้นและลูกใช้ key ชุดเดียวกับ header (และ `CATCH … ##NO_HANDLER` กลืน exception)
+
+**ทางเลือก** — A: regex บน `get_as_sql_string( )` (ง่าย แต่ parse text) · **B: เดิน `get_as_tree( )`** (ทาง SAP)
+
+**ตัดสินใจ (ผู้ใช้เลือก B)** — `ZCL_PURE001_FDP->prepare_filter`: `get_as_ranges` ก่อน ถ้าโยน no_range →
+`get_as_tree( )->get_root_node( )` แล้ว `collect_po_from_tree( )` เดินทุก node เก็บค่าจาก node `equals`
+ที่ลูกเป็น identifier `PURCHASEORDER` (ลำดับลูกไม่การันตี · identifier case ไม่การันตี → `to_upper`) → range EQ + dedupe
+· ส่ง text ของ **item ที่ไม่ลบทั้งหมด**ของ PO กลับ ซึ่งตรงกับชุด key ที่ framework ขอ (ไม่ต้องกรองระดับ item)
+
+API ที่ใช้ (source บน tenant): `if_rap_query_filter_tree->get_root_node( )` · `if_rap_query_filter_tree_node->get_type( ) / get_children( ) / get_value( )` (REF TO data)
+· enum `if_rap_query_filter_tree_types=>node_types-identifier / value / equals / logical_and / logical_or / logical_not / is_null / matches_pattern / less_than / greater_than`
+
+---
+
 ## ข้อจำกัดของ tenant ที่ค้นพบ (ใช้อ้างอิงเฟสต่อไป)
 
 | สิ่งที่พบ | วันที่ | ผล |
@@ -256,3 +276,14 @@ ABAP = ZCL_PURE001_DATA   ตัวกลาง — อ่าน view มาต�
 | `I_PaymentTermsText`, `I_CompanyCode` (VATRegistration = เลขผู้เสียภาษี), `I_Plant`, `I_BusinessUserBasic`, `I_PurchaseOrderPartnerAPI01`, `I_PurOrdScheduleLineAPI01`, `I_PurchaseOrderNoteTP_2` (F01/F02/F06), `I_PurchaseOrderItemNoteTP_2` (F01/F03/F04) | 2026-09-13 | released · มี data |
 | view กลุ่ม `I_Address*` (`I_Address_2`, `I_AddrOrgNamePostalAddress`, `I_AddressEmailAddress_2`, phone, website) released แต่**ว่างทั้งหมด** (DCL) → ที่อยู่/โทร/เว็บของ company & plant ต้อง config | 2026-09-13 | |
 | `class_constructor` ต้องอยู่ PUBLIC SECTION · `COLLECT` ต้องมี table key เป็น char (ห้าม `EMPTY KEY`) · FAE ต้อง type/length ตรงกันเป๊ะ | 2026-09-13 | |
+| **projection view (`I_PurchaseOrderNoteTP_2`, `I_PurchaseOrderItemNoteTP_2`) SELECT ใน ABAP SQL ได้** — ยืนยันแล้ว (syntax check + ข้อมูลออกจริง) | 2026-09-14 | ปิดความเสี่ยงของ D12 |
+| FAE + คอลัมน์ `STRING` (`PlainLongText`) → warning "should not be used … DISTINCT semantics" | 2026-09-14 | ใช้ `WHERE PurchaseOrder IN @lr_range` แทน (พิมพ์ทีละไม่กี่ใบ) |
+| inline `SELECT col … INTO TABLE @DATA(lt)` คอลัมน์เดียว → line type เป็น **structure 1 component** ไม่ใช่ elementary · `SORT` / `DELETE ADJACENT` / table expression ต้องอ้างชื่อ component ไม่ใช่ `table_line` | 2026-09-14 | warning "empty primary key" / "compatibility of EBELN with TABLE_LINE" |
+| `if_rap_query_filter=>tt_name_range_pairs-range` เป็น range แบบ string → ต้อง `CORRESPONDING #( )` เข้า range ที่ type จริง | 2026-09-14 | |
+| `CONVERT UTCLONG … INTO DATE d TIME ZONE tz` — parser อ่าน `TIME ZONE` เป็น `TIME <ตัวแปร ZONE>` ต้องเขียน `INTO DATE d TIME t TIME ZONE tz` · และ `I_WorkflowStatusDetails.WrkflwTskCompletionUTCDateTime` เป็น **`TZNTSTMPL` (DEC 21,7)** ไม่ใช่ utclong → ใช้ `CONVERT TIME STAMP ts TIME ZONE tz INTO DATE d` (tz = `c LENGTH 6` `'UTC+7'`) | 2026-09-14 | |
+| service definition alias + `Type` ห้ามซ้ำชื่อ property (`PurchaseOrder` → `PurchaseOrderType` ชน) — เกิดกับ FDP service เหมือน UI service | 2026-09-14 | alias `PurchaseOrderHeader` |
+| composition ใน custom entity derive on-condition จาก `association to parent` ของลูก → activate parent ก่อนลูก = runtime object ของ parent เสีย → `CATALOG_INCONSISTENCY [CIE-3031] Association _ITEMTEXT … has no on-condition` ตอน framework โหลด query class | 2026-09-14 | **re-activate 3 entity พร้อมกัน** แก้ได้ |
+| `get_as_ranges( )` ใช้กับ filter ของ child ที่ key หลาย field ไม่ได้ (OR ของ AND) | 2026-09-14 | D13 — filter tree |
+| FDP serializer: data element ที่มี conversion exit ตัด 0 (`ebeln`) · `abap.char` ออกดิบ · `abap.unit` → ISO code · `int`/`dec` มี space ท้าย · `Language` → ISO 2 ตัว | 2026-09-14 | ดู [03 §0](03-data-interface.md) |
+| `I_BusinessUserBasic` (`UserID` → `PersonFullName`) · `I_WorkflowStatusDetails` (`WorkflowTaskResult = 'RELEASED'`, `WorkflowTaskExternalStatus = 'COMPLETED'`, `WorkflowTaskProcessor`) · `I_EnterpriseProjectElement` (`WBSElementInternalID` → `ProjectElement`) · `I_TaxCodeRate` (`Country`/`TaxType`/`VATConditionType`/validity) | 2026-09-14 | ใช้ได้จริง มี data |
+| ADT: short dump ดูที่ Runtime Error Viewer · error ของ gateway (`/IWBEP/CX_GATEWAY`) ดูที่ `/sap/bc/adt/gw/errorlog` — `ZCX_PURE001_QUERY->get_text( )` โผล่ใน Error Context ทำให้ debug filter ได้โดยไม่ต้อง trace | 2026-09-14 | |

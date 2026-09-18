@@ -20,7 +20,7 @@ prefix parameter (`iv_`/`ev_`/`rv_`), pattern ของ RAP object — **ยั�
 |---|---|---|
 | Package | `ZPURE001` | `Y<APP>` |
 | Custom entity — root | `ZR_PURE001` (UI), `ZR_PURE001_FDP` (form) | `YR_<APP>` |
-| Custom entity — child | `ZI_PURE001_FDP_ITEM`, `ZI_PURE001_FDP_ITXT` | `YI_<APP>_<ENT>` |
+| Custom entity — child | `ZI_PURE001_ITEM_FDP`, `ZI_PURE001_ITXT_FDP` | `YI_<APP>_<ENT>` |
 | Value help view (code list เท่านั้น) | `ZI_PURE001_STATUS_VH`, `ZI_PURE001_POTYPE_VH` | `YI_<...>_VH` |
 | Exception class | `ZCX_PURE001_QUERY` (สืบทอด `cx_rap_query_provider`) | `YCX_<APP>_<...>` |
 | IAM app / Business catalog / FLP | `ZIAM_ZPURE001_EXT` / `ZBC_ZPURE001` / `ZPURE001_UI5R` | *(ผู้ใช้ตั้งเองตอน deploy — ใช้ตามนั้น)* |
@@ -33,7 +33,7 @@ prefix parameter (`iv_`/`ev_`/`rv_`), pattern ของ RAP object — **ยั�
 | Database table | `ZPURE001_GRPH`, `ZPURE001_CFG` | `Y<APP>_<SUFFIX>` |
 | Data element | `ZE_PURE001_GRAPHIC_NAME` | `YE_<name>` |
 | HTTP service | `ZHS_PURE001` | *(กฎยังไม่ครอบคลุม — ตกลงกันเป็น case)* |
-| Adobe Form object | `ZPURF001` | *(ตาม spec §2.5)* |
+| Adobe Form object | `ZPURF002` (ผู้ใช้สร้างเอง) | *(`ZPURF001` ใน spec §2.5 = ฟอร์ม output management ของ Manage PO — นอกขอบเขต)* |
 
 ดูรายการเต็มที่ [docs/02-object-list.md](docs/02-object-list.md)
 
@@ -69,6 +69,11 @@ custom entity **ไม่ใช่ view** (ไม่มี data source ข้า
 - **service alias = `PrintPurchaseOrder`** (ห้าม `PurchaseOrder` — ชน entity type `PurchaseOrderType`)
 - **`@UI.hidden` ห้ามใส่บน field ที่เป็น filter** (FE V4 เอาออกจาก filter bar ด้วย)
 - **item text ในฟอร์ม = แบบ B** (แยก node ต่อ text type ให้ฟอร์มจัด layout — ตาม SAP standard)
+- **XML node ของ FDP = alias ใน `ZAPI_PURE001_FDP`**: `PurchaseOrderHeader` → `_Item/PurchaseOrderItem` → `_ItemText/PurchaseOrderItemText`
+  · alias ห้ามซ้ำกับชื่อ property + `Type` (`PurchaseOrder` ชน `PurchaseOrderType`)
+- **D13: filter ของ entity ที่ key หลาย field (ItemText) อ่านผ่าน `get_as_tree( )`** — framework ส่ง
+  `(PO = x AND Item = y) OR (…)` ซึ่ง `get_as_ranges( )` โยน `cx_rap_query_filter_no_range` (ไม่ใช่ bug ของเรา)
+- **FOR ALL ENTRIES คงไว้** — ผู้ใช้สั่ง (2026-09-14) ยังไม่แตะ performance ทำโปรแกรมให้ถูกก่อน อย่าเสนอ refactor เอง
 - ทดสอบต้องทำบน **tenant 100** (`my427869`) — tenant 80 ไม่มี PO · service ทดสอบด้วย
   `.../zui_pure001/0001/PrintPurchaseOrder?$count=true`
 

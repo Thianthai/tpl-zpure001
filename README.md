@@ -11,7 +11,7 @@ RAP UI + Form Data Provider (FDP) สำหรับพิมพ์ใบสั�
 | FRICEW Type | Enhancement (Medium) |
 | Processing | Online |
 | Package | `ZPURE001` |
-| Form Object | `ZPURF001` |
+| Form Object | `ZPURF002` (ฟอร์มใหม่ — `ZPURF001` ใน spec คือฟอร์ม output management ของ Manage PO นอกขอบเขต) |
 | Requested by | Procurement Team (08.07.2026) |
 | Spec | [TPL_ZPURE001_Print Purchase Order.docx](TPL_ZPURE001_Print%20Purchase%20Order.docx) V1.0 (17.08.2026) |
 
@@ -22,7 +22,7 @@ RAP UI + Form Data Provider (FDP) สำหรับพิมพ์ใบสั�
 1. **RAP UI** — Fiori list report "Print Purchase Order" ที่ให้ user filter หา PO
    แล้วกดปุ่ม **Print PO Form** เพื่อพิมพ์/preview เอกสาร
 2. **Form Data Provider (FDP)** — data interface ที่ป้อนข้อมูล PO ให้ Adobe Form
-   (`ZPURF001`) โดยผ่าน `cl_fp_fdp_services` → `read_to_xml_v2()` → `cl_fp_ads_util=>render_pdf()`
+   (`ZPURF002`) โดยผ่าน `cl_fp_fdp_services` → `read_to_xml_v2()` → `cl_fp_ads_util=>render_pdf()`
 
 ```
 Fiori List Report (ZUI_PURE001_O4)                        Adobe Form ZPURF002 (Phase 2)
@@ -44,7 +44,7 @@ ZCL_PURE001_QUERY                                    ZCL_PURE001_FDP   ◄──
 Phase 3: ปุ่ม Print PO Form (RAP action) + ZHS_PURE001 (HTTP preview) → PDF
 ```
 
-**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (redesign D12 2026-09-13 ทดสอบซ้ำผ่าน) · Phase 5.1–5.3 ✅ · Phase 2 🔨 กำลังทำ (util ✅ · FDP ⬜)
+**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (redesign D12 2026-09-13 ทดสอบซ้ำผ่าน) · Phase 5.1–5.3 ✅ · Phase 2 🔨 checkpoint `c5b66b3` (2026-09-14 — XML ครบ 3 ชั้น ทดสอบผ่าน 6 PO · เหลือเก็บตกเล็กน้อย)
 
 ## เอกสาร
 

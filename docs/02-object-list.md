@@ -39,20 +39,21 @@
 > ⚠️ ชื่อของ **Phase 2 เป็นต้นไปยังเป็นแค่ข้อเสนอ** — ต้องสรุปให้ผู้ใช้รีวิวและ confirm
 > ตอนขึ้นเฟสนั้นจริง ๆ อีกครั้ง ตาม `CLAUDE.md` ข้อ 8
 
-## Phase 2 — FDP data interface (+ utility) — ชื่อ confirm แล้ว 2026-09-13 · redesign D12
+## Phase 2 — FDP data interface (+ utility) — 🔨 checkpoint `c5b66b3` (2026-09-14) · XML ทดสอบผ่าน 6 PO
 
 สัญญา XML: [03-data-interface.md](03-data-interface.md) · ข้อมูลทั้งหมดผ่าน `ZCL_PURE001_DATA` (ไม่มี view เพิ่ม)
 
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
 | `ZCL_PURE001_UTIL` | Class | `to_thai_date( )` · `format_date_dmy( )` · `amount_in_words( )` TH/EN · `format_quantity( )` | ✅ 09-13 | ✅ 742dd06 |
-| `ZR_PURE001_FDP` | Custom entity (root) | form header — `#OUTPUT_FORM_DATA_PROVIDER` | ✅ 09-13 | ⬜ |
-| `ZI_PURE001_ITEM_FDP` | Custom entity (child) | form item | ✅ 09-13 | ⬜ |
-| `ZI_PURE001_ITXT_FDP` | Custom entity (child ของ item) | ข้อความใต้รายการ 1 node/text type (แบบ B) | ✅ 09-13 | ⬜ |
-| `ZAPI_PURE001_FDP` | Service definition | **ชื่อที่ส่งให้ `cl_fp_fdp_services=>get_instance( )`** | ✅ 09-13 | ⬜ |
-| `ZCL_PURE001_FDP` | Class | `if_rap_query_provider` ของ 3 entity — เรียก DATA + อ่าน texts / schedule / acct assignment / WBS / tax rate / approver → ประกอบ + คำนวณ + format | ✅ 09-13 | ⬜ |
-| `ZCL_PURE001_DATA` | Class | **ขยาย** ให้ครอบข้อมูลฟอร์ม (schedule line, account assignment, WBS, tax rate, texts, approver) | ✅ | ⬜ |
-| `ZPURF002` | Form object | layout XDP — **ผู้ใช้ทำเองจาก LiveCycle Designer** (ชื่ออาจเปลี่ยน) | — | ⬜ |
+| `ZR_PURE001_FDP` | Custom entity (root) | form header — `#OUTPUT_FORM_DATA_PROVIDER` · XML node `PurchaseOrderHeader` | ✅ 09-13 | ✅ c5b66b3 |
+| `ZI_PURE001_ITEM_FDP` | Custom entity (child) | form item · XML node `PurchaseOrderItem` (ใต้ `_Item`) | ✅ 09-13 | ✅ c5b66b3 |
+| `ZI_PURE001_ITXT_FDP` | Custom entity (child ของ item) | ข้อความใต้รายการ 1 node/text type (แบบ B) · XML node `PurchaseOrderItemText` (ใต้ `_ItemText`) | ✅ 09-13 | ✅ c5b66b3 |
+| `ZAPI_PURE001_FDP` | Service definition | **ชื่อที่ส่งให้ `cl_fp_fdp_services=>get_instance( )`** · alias `PurchaseOrderHeader` / `PurchaseOrderItem` / `PurchaseOrderItemText` (ห้าม `PurchaseOrder` — ชน entity type `PurchaseOrderType`) | ✅ 09-13 | ✅ c5b66b3 |
+| `ZCL_PURE001_FDP` | Class | `if_rap_query_provider` ของ 3 entity — เรียก DATA → ประกอบ 3 node + VAT/ยอดรวม + วันที่ไทย + amount in words · filter ของ item text อ่านผ่าน **filter tree** (D13) | ✅ 09-13 | ✅ c5b66b3 |
+| `ZCL_PURE001_DATA` | Class | **ขยาย** ให้ครอบข้อมูลฟอร์ม: `read_schedule_lines` · `read_account_assignments` (+WBS) · `read_tax_rates` · `read_header_texts` / `read_item_texts` (range แทน FAE — STRING column) · `read_approvers` · `read_user_names` · payment terms / company / supplier master ใน `enrich_master_texts` | ✅ | ✅ c5b66b3 |
+| `ZCL_PURE001_TEST_FDP` | Class (ชั่วคราว) | `if_oo_adt_classrun` dump XML ด้วย `read_to_xml_v2( )` — **อยู่บน tenant แต่ไม่ push** · ลบเมื่อจบ Phase 2 | — | 🔨 ไม่ push |
+| `ZPURF002` | Form object | layout XDP — **ผู้ใช้ทำเองจาก LiveCycle Designer** bind ตาม node ใน [03](03-data-interface.md) | — | ⬜ |
 
 **ลบทิ้งระหว่างทาง (ไม่เคย push)** — `ZI_PURE001_FORM_HEADER`, `ZI_PURE001_FORM_ITEM`, `ZI_PURE001_FORM_APPROVER` (DCL inheritance ล้ม — D12)
 
@@ -105,6 +106,6 @@
 - ชื่อ table ต้อง ≤ 16 ตัวอักษร → `ZPURE001_GRPH` (13) และ `ZPURE001_CFG` (12) ผ่าน
 - ชื่อ CDS / class / data element ต้อง ≤ 30 ตัวอักษร → ยาวสุดคือ
   `ZE_PURE001_GRAPHIC_NAME` (23) ผ่าน
-- Adobe Form object ใช้ชื่อ `ZPURF001` ตามที่ spec §2.5 ระบุไว้ในภาพ Output Management
+- Adobe Form object ของโปรเจกต์นี้คือ **`ZPURF002`** (ฟอร์มใหม่ พิมพ์จาก ZPURE001 เท่านั้น) · `ZPURF001` ที่เห็นใน spec §2.5 คือฟอร์ม output management ของ Manage PO — **นอกขอบเขต**
 - IAM / catalog / FLP ผู้ใช้ตั้งชื่อเองตอน deploy (`ZIAM_ZPURE001_EXT`, `ZBC_ZPURE001`, `ZPURE001_UI5R`)
   — ใช้ตามนั้น ไม่ rename

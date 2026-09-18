@@ -22,6 +22,13 @@
 | 11 | **คอลัมน์ Approver (ชื่อผู้อนุมัติ)** — standard มี เราไม่มี (spec ไม่ได้ขอ) ข้อมูลมีใน `I_WorkflowStatusDetails` ถ้าต้องการเพิ่มได้ | 🟡 แจ้ง functional | Phase 1 |
 | 12 | **DCL ของ workflow view** — ทดสอบด้วย admin เท่านั้น ถ้า business user จัดซื้อเห็นว่าง Approval Status จะว่าง | 🟡 ทดสอบตอนผูก business role (Phase 5.4) | Phase 5 |
 | 13 | **Editing Status / Search** — spec ลอกจาก standard; Editing Status ตัดแล้ว (ข้อ 5), Search ทำได้ (ข้อ 4) — ควรแจ้ง functional ให้รับทราบ | 🟡 | Phase 1 |
+| 14 | **item บริการ `Quantity = 0` / `Unit` ว่าง** (99680019, 99680044, 99680042 item 10) แต่ `NetPriceAmount = ItemAmount` — ฟอร์มพิมพ์ช่องจำนวน/หน่วยอย่างไร (เว้นว่าง? `1 งาน`?) | 🟡 พบ 2026-09-14 · เป็นเคสปกติของลูกค้า | Phase 2 — `QuantityText` |
+| 15 | **item ไม่มี tax code** (99680019 · 99680042 item 20 ในใบเดียวกับ item V1) → VAT 0 — ถูกต้องตามใบจริงไหม | 🟡 ยืนยันกับ Manage PO | Phase 2 |
+| 16 | **`CostCenter` ไม่อยู่ใน `AccountAssignmentText`** — spec ตัวอย่างมีแค่ PR / Acc.Code / Order No. แต่ข้อมูลจริงมี `COM999` · field แยก `CostCenter` มีให้ bind แล้ว ต้องพิมพ์ไหม | 🟡 | Phase 2 |
+| 17 | **พิมพ์ใบที่ยัง In Approval / Draft ได้ไหม** — FDP ไม่กรอง status (99680044 In Approval ออก XML ได้) นโยบายอยู่ที่ปุ่ม Print | 🟡 | Phase 3 |
+| 18 | **ภาษาของ long text** — ข้อมูลจริง text ทุกใบเป็น `E` ขณะที่เราอ่านตาม `Language` ของ PO → PO ภาษาไทยจะได้ text ว่าง ควร fallback (ภาษา PO → ไม่มีก็ภาษาใดก็ได้) ไหม | 🟡 รอผู้ใช้ตัดสิน | Phase 2 |
+| 19 | **หน่วยนับบนฟอร์ม** — XML ให้ ISO code (`C62` แทน `ST`/ชิ้น) ต้องการ commercial code หรือชื่อหน่วยภาษาไทย/อังกฤษ | 🟡 | Phase 2 — เพิ่ม `UnitName` |
+| 20 | **line break ใน long text** — `PlainLongText` ของ `I_*NoteTP_2` ดูเหมือนยุบหลายบรรทัดเป็น space (99680042 `1. … 2. … 3. …`) ถ้าจริง ฟอร์มจัดย่อหน้าตามต้นฉบับไม่ได้ · ทดสอบด้วย `4500000021` F02 (`HD NOTE 1` / `HD NOTE 2`) | ⏳ ยังไม่ทดสอบ | Phase 2 |
 | 9 | **`ZE_BSART`** — data element ที่ใช้แทน `esart` (ไม่ released) อยู่นอก package `ZPURE001` | ✅ ผู้ใช้ยืนยัน 2026-09-11: มีอยู่บน tenant ก่อนแล้ว → บันทึกเป็น **external dependency** ใน [02-object-list.md](02-object-list.md) | Phase 1 |
 
 **สีสถานะ** 🔴 = block งานในเฟสที่เกี่ยวข้อง · 🟡 = ทำต่อได้ด้วยสมมติฐาน แต่ควรยืนยัน ·

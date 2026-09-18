@@ -69,7 +69,7 @@ ZUI_PURE001_O4 (binding)
 **ข้อจำกัดที่รับไว้** — Sent / Not Yet Sent / Output Error รวมเป็น Released · ไม่มีคอลัมน์ Approver
 · tenant 80 ไม่มี PO ทดสอบไม่ได้ ต้อง transport ไป 100
 
-## Phase 2 — FDP data interface (+ utility) — กำลังทำ
+## Phase 2 — FDP data interface (+ utility) — 🔨 checkpoint `c5b66b3` 2026-09-14 (XML ผ่าน · เก็บตกก่อนปิดเฟส)
 
 **เป้าหมาย** ได้ data interface ที่ Adobe Form `ZPURF002` ดูดข้อมูลไปใช้ได้ครบ — *นี่คือส่วนหลักที่ผู้ใช้ขอ*
 · สัญญา XML: [03-data-interface.md](03-data-interface.md) (แบบ B — แยก node ต่อ text type)
@@ -77,18 +77,19 @@ ZUI_PURE001_O4 (binding)
 | # | งาน | Object | สถานะ |
 |---|---|---|---|
 | 2.1 | utility: วันที่ไทย / amount in words / quantity | `ZCL_PURE001_UTIL` | ✅ 742dd06 |
-| 2.2 | ขยายตัวกลางให้ครอบข้อมูลฟอร์ม (schedule, acct assignment, WBS, tax rate, texts, approver) | `ZCL_PURE001_DATA` | ⬜ |
-| 2.3 | custom entity 3 ชั้น | `ZR_PURE001_FDP`, `ZI_PURE001_ITEM_FDP`, `ZI_PURE001_ITXT_FDP` | ⬜ |
-| 2.4 | service definition FDP | `ZAPI_PURE001_FDP` | ⬜ |
-| 2.5 | query provider ประกอบ 3 node | `ZCL_PURE001_FDP` | ⬜ |
-| 2.6 | ทดสอบ `cl_fp_fdp_services=>get_instance( 'ZAPI_PURE001_FDP' )->read_to_xml_v2( )` dump XML | class ชั่วคราว | ⬜ |
+| 2.2 | ขยายตัวกลางให้ครอบข้อมูลฟอร์ม (schedule, acct assignment, WBS, tax rate, texts, approver) | `ZCL_PURE001_DATA` | ✅ c5b66b3 |
+| 2.3 | custom entity 3 ชั้น | `ZR_PURE001_FDP`, `ZI_PURE001_ITEM_FDP`, `ZI_PURE001_ITXT_FDP` | ✅ c5b66b3 |
+| 2.4 | service definition FDP | `ZAPI_PURE001_FDP` | ✅ c5b66b3 |
+| 2.5 | query provider ประกอบ 3 node | `ZCL_PURE001_FDP` | ✅ c5b66b3 |
+| 2.6 | ทดสอบ `cl_fp_fdp_services=>get_instance( 'ZAPI_PURE001_FDP' )->read_to_xml_v2( )` dump XML | `ZCL_PURE001_TEST_FDP` (ไม่ push) | ✅ 6 PO ผ่าน 2026-09-14 |
+| 2.8 | เก็บตกจากผล XML — `AccountAssignmentText` เว้นวรรคเกิน (ต้องแก้) · เลข 0 นำหน้า PR/GL/Order · หน่วยออกเป็น ISO (`C62`) · fallback ภาษา text | `ZCL_PURE001_FDP`, `ZI_PURE001_ITEM_FDP` | ⬜ รอผู้ใช้ตัดสินใจ — ดู [03 §0](03-data-interface.md) |
 | 2.7 | ผู้ใช้สร้าง `ZPURF002` + bind XML | ผู้ใช้ | ⬜ |
 
 **แหล่งข้อมูลที่ยืนยันแล้ว (2026-09-13)** ดูตารางใน [03-data-interface.md](03-data-interface.md) และ tenant findings ใน [06-decisions.md](06-decisions.md)
 
 **placeholder ที่รอ functional** — ที่อยู่/โทร/เว็บบริษัทและ plant (config), custom field หลักประกัน/BG/Email (`YY1_*`), โลโก้/ลายเซ็น (graphics), ตำแหน่งผู้อนุมัติ
 
-**เสร็จเมื่อ** — dump XML ออกมาแล้วมีครบทั้ง 3 ชั้น ข้อมูลตรงกับ PO จริงบน tenant 100 (4500000080, 99680198, 0099680019)
+**เสร็จเมื่อ** — dump XML ออกมาแล้วมีครบทั้ง 3 ชั้น ข้อมูลตรงกับ PO จริงบน tenant 100 ✅ (ทดสอบ 99680198, 4500000080, 0099680019, 99680044, 0099680047, 0099680042 — ครอบ approved automatically / WBS / item ลบ / header text / item text 3 ชนิด) · เหลือปิด 2.8 + ลบ `ZCL_PURE001_TEST_FDP`
 
 ## Phase 3 — Print output
 

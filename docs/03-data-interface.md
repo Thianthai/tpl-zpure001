@@ -2,7 +2,7 @@
 
 เอกสารนี้คือ **สัญญาระหว่าง ABAP กับ Adobe LiveCycle Designer**
 ผู้ทำฟอร์ม (`ZPURF002`) bind field ตามชื่อ node ในนี้ · ผู้เขียน ABAP เติมค่าตามนี้
-· XML จริงที่ FDP คาย (`cl_fp_fdp_services=>read_to_xml_v2`) จะมีโครงตาม §2–§4 เป๊ะ
+· XML จริงที่ FDP คาย (`cl_fp_fdp_services=>read_to_xml_v2`) มีโครงตาม §2–§4 — **ยืนยันแล้ว 2026-09-14** (checkpoint `c5b66b3`, ดู §0)
 
 > layout เป้าหมาย: [docs/spec/po-form-target-layout.png](spec/po-form-target-layout.png)
 > spec ฟอร์ม: `TPL_ZPURF002_PO Form.docx` (ระบุเพิ่ม 2 field: Our Reference + Delivery Date ของ item แรก)
@@ -19,19 +19,69 @@
 
 ---
 
+## 0. ผลทดสอบจริง (tenant 100 · 2026-09-14 · `ZCL_PURE001_TEST_FDP`)
+
+XML ที่ได้จาก `read_to_xml_v2( )` — **ชื่อ node ระดับบนสุดคือ alias ใน `ZAPI_PURE001_FDP` ไม่ใช่ชื่อ entity**
+
+```xml
+<Form version="2">
+  <PurchaseOrderHeader>                 ← ZR_PURE001_FDP   (alias PurchaseOrderHeader)
+    <PurchaseOrder>99680198</PurchaseOrder> … field ตาม §2 …
+    <_Item>
+      <PurchaseOrderItem>               ← ZI_PURE001_ITEM_FDP (alias PurchaseOrderItem) · 1 node ต่อ item
+        … field ตาม §3 …
+        <_ItemText>
+          <PurchaseOrderItemText>       ← ZI_PURE001_ITXT_FDP (alias PurchaseOrderItemText) · 1 node ต่อ text type
+            … field ตาม §4 …
+          </PurchaseOrderItemText>
+        </_ItemText>                    ← item ที่ไม่มี text จะเป็น <_ItemText/> ว่าง
+      </PurchaseOrderItem>
+    </_Item>
+  </PurchaseOrderHeader>
+</Form>
+```
+
+| PO | เส้นทางที่พิสูจน์ | ผล |
+|---|---|---|
+| `99680198` | material item 6 รายการ · F03 · ผู้อนุมัติจริง · 800,000 + VAT 7% | ✅ `แปดแสนห้าหมื่นหกพันบาทถ้วน` |
+| `4500000080` | approved automatically (`IsApprovedAutomatically = X`, ApprovedBy ว่าง) · WBS `C-2026-004` · PR / GL · performance period · text item | ✅ |
+| `0099680019` | WBS `C-2025-054` · GL 820000 · item บริการ quantity 0 · ไม่มี tax code | ✅ (ดูข้อสังเกต) |
+| `99680044` | **item ลบไม่ออก** → 870,000.25 ตรง standard · VAT ปัดเศษ `60,900.02` · สตางค์ `…ยี่สิบเจ็ดสตางค์` · In Approval · F01+F04 | ✅ |
+| `0099680047` | header text F01/F02/F06 → `HeaderText` / `HeaderNote` / `ShipVia` · supplier อังกฤษ district ว่าง | ✅ |
+| `0099680042` | F03 → F01 → F04 ครบ 3 node · Order No. · 10.5 ล้าน (recursion หลักล้าน) · `&amp;` escape | ✅ |
+
+**พฤติกรรมของ serializer ที่ผู้ทำฟอร์มต้องรู้**
+
+| เรื่อง | ที่เห็น | ผล/ทางแก้ |
+|---|---|---|
+| field type data element ที่มี conversion exit (`ebeln`) ถูกตัด 0 นำหน้า | `<PurchaseOrder>99680198</PurchaseOrder>` | ตรง standard |
+| field `abap.char(n)` ออกดิบ | `<PurchaseRequisition>0003680141</PurchaseRequisition>`, `<GLAccount>0000611401</GLAccount>`, `<OrderID>008200000042</OrderID>` | ⬜ รอเลือก: เปลี่ยน type เป็น `banfn`/`saknr`/`kostl`/`aufnr` หรือใช้ `AccountAssignmentText` (ตัด 0 แล้ว) |
+| `abap.unit` ถูกแปลงเป็น **ISO code** | `<Unit>C62</Unit>` (ภายใน `ST`) · `EA`/`DR`/`BX` บังเอิญเท่ากัน | ⬜ ควรเพิ่ม `UnitName` (`I_UnitOfMeasureText` ภาษา PO) หรือ commercial code |
+| `abap.int4` / `abap.dec` มี space ท้าย (ตำแหน่งเครื่องหมาย) | `<ItemNumber>1 </ItemNumber>`, `<TaxRate>7.00 </TaxRate>`, `<TextSequence>1 </TextSequence>` | ปกติ ADS parse ได้ — ถ้าเพี้ยนเปลี่ยนเป็น text field |
+| `abap.curr` / `abap.quan` / `abap.dats` ออกสะอาด | `856000.00`, `2`, `20260714` | ใช้ได้เลย |
+| `Language` ออกเป็น ISO 2 ตัว | `EN` | (ภายใน `E` — lookup text ทำใน ABAP แล้ว ไม่กระทบ) |
+| `AccountAssignmentText` เว้นวรรคเกิน | `PR No.: 3680141     Acc.Code: 611401` | 🔧 **ต้องแก้** — `ALPHA = OUT` คืน blank ท้าย ต้อง `condense` |
+
+**ข้อสังเกตที่ต้องให้ functional ตัดสิน** — ดู [05-open-questions.md](05-open-questions.md) ข้อ 14–19
+
+---
+
 ## 1. โครงสร้าง node
 
 ```
-ZR_PURE001_FDP                       root · key: PurchaseOrder
+ZR_PURE001_FDP  → XML <PurchaseOrderHeader>          root · key: PurchaseOrder
 │  §2.1 company · §2.2 PO · §2.3 supplier · §2.4 ship-to · §2.5 totals · §2.6 signature
 │
 └─ _Item : composition [0..*]
-   ZI_PURE001_ITEM_FDP               key: PurchaseOrder, PurchaseOrderItem
+   ZI_PURE001_ITEM_FDP  → XML <_Item><PurchaseOrderItem>       key: PurchaseOrder, PurchaseOrderItem
    │  §3 รายการ · จำนวน · หน่วย · ราคา · ภาษี · PR / Acc / Order / WBS · วันส่ง
    │
    └─ _ItemText : composition [0..*]
-      ZI_PURE001_ITXT_FDP            key: PurchaseOrder, PurchaseOrderItem, TextSequence
+      ZI_PURE001_ITXT_FDP  → XML <_ItemText><PurchaseOrderItemText>   key: PurchaseOrder, PurchaseOrderItem, TextSequence
          §4 ข้อความใต้รายการ 1 node ต่อ text type (Material PO Text → Item Text → Delivery Text)
+
+(ชื่อ node = alias ใน ZAPI_PURE001_FDP · composition ใน custom entity ไม่มี on-condition เอง — derive จาก
+ association to parent ของลูก จึงต้อง activate ลูกก่อน/พร้อมกัน ไม่งั้น CATALOG_INCONSISTENCY ตอน runtime)
 ```
 
 **การไหลของข้อมูล (D12 — logic ทั้งหมดใน ABAP)**
@@ -217,13 +267,13 @@ WBS: C-19-OPD13-00CO-ME                                   ← §3 WBSElement (�
 
 | เรื่อง | กติกา |
 |---|---|
-| key | รับ `PurchaseOrder` จาก filter (FDP ส่ง `PURCHASEORDER` = ค่าเดียวหรือหลายค่า) — ต้องรองรับหลายใบในคำขอเดียว (ปุ่มพิมพ์เลือกหลาย PO) |
+| key | รับ `PurchaseOrder` จาก filter (`get_as_ranges` → `PURCHASEORDER`) · framework อ่านทั้ง 3 ชั้นด้วย `$expand=_Item($expand=_ItemText)` แล้วเรียก `select` แยกต่อ entity · **ItemText มาเป็น `(PO = x AND Item = y) OR (…)` ซึ่งแปลง range ไม่ได้ → เดิน `get_as_tree( )` เก็บค่า PO** (D13) — ส่ง text ของ item ที่ไม่ลบทั้งหมดกลับ ซึ่งตรงกับชุด key ที่ขอ |
 | item ที่ลบ | ไม่ส่งออก |
-| ภาษา text | `Language` ของ PO · ถ้าไม่มี text ในภาษานั้น ไม่ fallback (ว่าง) |
+| ภาษา text | `Language` ของ PO · ถ้าไม่มี text ในภาษานั้น ไม่ fallback (ว่าง) — ⬜ ทบทวน: ข้อมูลจริง text ทุกใบเป็น `E` (05 ข้อ 18) |
 | วันที่ไทย | `to_thai_date( iv_date )` → `21 พฤศจิกายน 2568` · วันที่ว่าง → `''` |
-| amount in words | `amount_in_words_th( iv_amount iv_currency )` → THB `(…บาทถ้วน)` / `(…บาท…สตางค์)` · สกุลอื่น → ภาษาอังกฤษ |
+| amount in words | `zcl_pure001_util=>amount_in_words( iv_amount iv_currency )` → THB `(…บาทถ้วน)` / `(…บาท…สตางค์)` · สกุลอื่น → ภาษาอังกฤษ |
 | ยอดรวม/ภาษี | คำนวณจาก item ที่ส่งออก (ไม่ใช่จาก header) เพื่อให้ตัวเลขในฟอร์มตรงกับรายการที่พิมพ์ |
-| approver | จาก `ZI_PURE001_FORM_APPROVER` — ถ้า approved automatically → ชื่อว่าง + `IsApprovedAutomatically = 'X'` |
+| approver | `ZCL_PURE001_DATA->read_approvers( )` — task `RELEASED`+`COMPLETED` ล่าสุดของ workflow ล่าสุด → `I_BusinessUserBasic` · timestamp `TZNTSTMPL` แปลงเป็นวันที่ด้วย `CONVERT TIME STAMP … TIME ZONE 'UTC+7'` · approved automatically → ชื่อว่าง + `IsApprovedAutomatically = 'X'` · ยังไม่อนุมัติ → ว่างทั้งคู่ |
 | error | โยน `ZCX_PURE001_QUERY` |
 
 ---
