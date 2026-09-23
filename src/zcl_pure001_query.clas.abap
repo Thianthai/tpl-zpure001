@@ -13,9 +13,6 @@ CLASS zcl_pure001_query DEFINITION
 
     CONSTANTS gc_entity_id TYPE string VALUE 'ZR_PURE001'.
 
-    "! path ของ HTTP service ที่ให้ preview และ download PDF
-    CONSTANTS gc_print_service TYPE string VALUE '/sap/bc/http/sap/zhs_pure001'.
-
     DATA:
       go_data             TYPE REF TO zcl_pure001_data,
       gs_selection        TYPE zcl_pure001_data=>ty_selection,
@@ -45,11 +42,6 @@ CLASS zcl_pure001_query DEFINITION
 
     "! ประกอบ MaterialList / PlantList — เรียกหลัง paging เท่านั้น
     METHODS add_item_lists
-      CHANGING ct_result TYPE tt_result.
-
-    "! ใส่ลิงก์ preview และ download ของ HTTP service ให้ทุกแถว
-    "! ลิงก์รับได้ทีละใบ การพิมพ์หลายใบพร้อมกันใช้ปุ่ม PrintPOForm แทน
-    METHODS add_print_links
       CHANGING ct_result TYPE tt_result.
 
 ENDCLASS.
@@ -86,7 +78,6 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
       DATA(lt_result) = CORRESPONDING tt_result( lt_header ).
 
       add_item_lists( CHANGING ct_result = lt_result ).
-      add_print_links( CHANGING ct_result = lt_result ).
 
       io_response->set_data( lt_result ).
     ENDIF.
@@ -274,19 +265,6 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
       <lfs_result>-MaterialList = concat_lines_of( table = lt_material sep = `, ` ).
       <lfs_result>-PlantList    = concat_lines_of( table = lt_plant    sep = `, ` ).
 
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
-  METHOD add_print_links.
-
-    LOOP AT ct_result ASSIGNING FIELD-SYMBOL(<lfs_result>).
-      " mode P เปิดในแท็บเบราว์เซอร์ mode D บันทึกเป็นไฟล์
-      <lfs_result>-PrintUrl    = |{ gc_print_service }?po={ <lfs_result>-PurchaseOrder }&mode=P|.
-      <lfs_result>-DownloadUrl = |{ gc_print_service }?po={ <lfs_result>-PurchaseOrder }&mode=D|.
-      <lfs_result>-PrintUrlBTN = 'Preview'.
-      <lfs_result>-DownloadBTN = 'Download'.
     ENDLOOP.
 
   ENDMETHOD.
