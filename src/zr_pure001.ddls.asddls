@@ -77,7 +77,7 @@ define root custom entity ZR_PURE001
       // query class: EXISTS "PO มี item ที่ material ตรง หรือ item text มีคำนี้ (ไม่สนตัวพิมพ์)"
       @EndUserText.label               : 'Material'
       @UI.selectionField               : [{ position: 70 }]
-      @Consumption.valueHelpDefinition : [{ entity: { name: 'I_Product', element: 'Product' } }]
+      @Consumption.valueHelpDefinition : [{ entity: { name: 'I_ProductStdVH', element: 'Product' } }]
       Material                         : matnr;
 
       @EndUserText.label               : 'Plant'
