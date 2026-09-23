@@ -352,4 +352,5 @@ standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ต
 | ฟอร์ม output management เดิมของลูกค้าใช้ custom field `YY1_*_PDH` (header) / `_PDI` (item) เติมค่าผ่าน custom logic ฝั่ง standard | 2026-09-18 | ค่าเหล่านั้นเราคำนวณเองใน `ZCL_PURE001_FDP` |
 | Designer (SAP build) ไม่มีแท็บ Preview PDF ถ้าเครื่องไม่มี Acrobat Reader · "Generate Preview Data" จะเขียนทับไฟล์ data ที่ตั้งไว้ (ห้ามกดถ้าชี้ไฟล์ข้อมูลจริง) | 2026-09-18 | |
 | RAP action ที่คืนไฟล์ผ่าน abstract entity ไม่ถูก Fiori Elements V4 จัดการให้ ต้องมี UI5 controller extension รับ result เอง | 2026-09-23 | D15 |
+| `I_Product` ใช้เป็น value help ใน OData V4 ไม่ได้ — `PRODCHARC1INTERNALNUMBER` มี conversion exit ATINN ทำให้ metadata ของ VH service พัง ใช้ `I_ProductStdVH` แทน | 2026-09-23 | |
 | ADT: short dump ดูที่ Runtime Error Viewer · error ของ gateway (`/IWBEP/CX_GATEWAY`) ดูที่ `/sap/bc/adt/gw/errorlog` — `ZCX_PURE001_QUERY->get_text( )` โผล่ใน Error Context ทำให้ debug filter ได้โดยไม่ต้อง trace | 2026-09-14 | |
