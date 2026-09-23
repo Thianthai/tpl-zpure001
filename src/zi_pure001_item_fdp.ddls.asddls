@@ -17,6 +17,7 @@ define custom entity ZI_PURE001_ITEM_FDP
       QuantityText               : abap.char(20);
       @Semantics.unitOfMeasure   : true
       Unit                       : abap.unit(3);
+      UnitText                   : abap.char(3);
       @Semantics.currencyCode    : true
       DocumentCurrency           : waers;
       @Semantics.amount.currencyCode : 'DocumentCurrency'

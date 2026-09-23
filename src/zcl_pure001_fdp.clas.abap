@@ -464,6 +464,9 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
           <lfs_out>-Unit         = gc_service_unit.
         ENDIF.
 
+        " ฟอร์มพิมพ์รหัสหน่วยภายใน ไม่ใช่รหัส ISO ที่ serializer แปลงให้ Unit
+        <lfs_out>-UnitText = <lfs_out>-Unit.
+
         <lfs_out>-ItemDescriptionText = compose_item_description( is_item     = <lfs_out>
                                                                   iv_language = <lfs_header>-Language ).
 
