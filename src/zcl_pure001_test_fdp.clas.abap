@@ -8,7 +8,9 @@ CLASS zcl_pure001_test_fdp DEFINITION
 ENDCLASS.
 
 
-CLASS zcl_pure001_test_fdp IMPLEMENTATION.
+
+CLASS ZCL_PURE001_TEST_FDP IMPLEMENTATION.
+
 
   METHOD if_oo_adt_classrun~main.
 
@@ -34,5 +36,4 @@ CLASS zcl_pure001_test_fdp IMPLEMENTATION.
     ENDTRY.
 
   ENDMETHOD.
-
 ENDCLASS.

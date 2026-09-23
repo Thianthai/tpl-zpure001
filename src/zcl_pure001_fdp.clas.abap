@@ -107,7 +107,8 @@ CLASS zcl_pure001_fdp DEFINITION
 ENDCLASS.
 
 
-CLASS zcl_pure001_fdp IMPLEMENTATION.
+
+CLASS ZCL_PURE001_FDP IMPLEMENTATION.
 
 
   METHOD if_rap_query_provider~select.
@@ -579,5 +580,4 @@ CLASS zcl_pure001_fdp IMPLEMENTATION.
     ENDLOOP.
     rv_address = concat_lines_of( table = lt_filled sep = ` ` ).
   ENDMETHOD.
-
 ENDCLASS.

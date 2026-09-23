@@ -20,7 +20,9 @@ CLASS zcx_pure001_query DEFINITION
 ENDCLASS.
 
 
-CLASS zcx_pure001_query IMPLEMENTATION.
+
+CLASS ZCX_PURE001_QUERY IMPLEMENTATION.
+
 
   METHOD constructor ##ADT_SUPPRESS_GENERATION.
     super->constructor( previous = previous ).
@@ -33,11 +35,11 @@ CLASS zcx_pure001_query IMPLEMENTATION.
     gv_text = text.
   ENDMETHOD.
 
+
   METHOD get_text.
     " ข้อความ: ที่ส่งมาตรง ๆ > ของ exception ต้นเหตุ > ค่า default ของ framework
     result = COND #( WHEN gv_text IS NOT INITIAL     THEN gv_text
                      WHEN previous IS BOUND          THEN previous->get_text( )
                      ELSE super->get_text( ) ).
   ENDMETHOD.
-
 ENDCLASS.

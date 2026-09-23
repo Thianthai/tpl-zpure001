@@ -47,7 +47,8 @@ CLASS zcl_pure001_query DEFINITION
 ENDCLASS.
 
 
-CLASS zcl_pure001_query IMPLEMENTATION.
+
+CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
 
 
   METHOD if_rap_query_provider~select.
@@ -260,5 +261,4 @@ CLASS zcl_pure001_query IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
-
 ENDCLASS.
