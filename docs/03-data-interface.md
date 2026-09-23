@@ -83,6 +83,7 @@ XML ที่ได้จาก `read_to_xml_v2( )` — **ชื่อ node ร�
 
 > ฟอร์มเดิมที่พิมพ์ผ่าน standard ต้องใช้ JavaScript แปลงวันที่เอง (`FirstDeliveryDate` ของ `PurchaseOrderItemNode[0]` → พ.ศ. + เดือนไทย)
 > เพราะ XFA display pattern ทำปฏิทินพุทธไม่ได้ · ต้องระบุ index `[0]` ไม่ใช่ `[*]` ซึ่งใช้ได้เฉพาะ subform ที่ repeat
+> — ผู้ใช้ upload ฟอร์มเดิมเข้า *Maintain Form Templates* แล้วทดสอบกับ PO จริง **ผ่านแล้ว 2026-09-23**
 
 **ข้อสังเกตที่ต้องให้ functional ตัดสิน** — ดู [05-open-questions.md](05-open-questions.md) ข้อ 14–22
 
