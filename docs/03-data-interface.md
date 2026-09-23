@@ -74,6 +74,16 @@ XML ที่ได้จาก `read_to_xml_v2( )` — **ชื่อ node ร�
 
 **การ bind บนฟอร์ม `ZPURF002`** — ดู [../form/README.md](../form/README.md) · binding ทั้งหมดอยู่ใน `form/build_xdp.py` (`ref_map`)
 
+**2026-09-23 ฟอร์มต้นทางเพิ่ม 2 ช่องในกรอบขวาบน** — ฝั่ง ABAP **ไม่ต้องแก้อะไร** ทั้งสองค่ามีใน `ZR_PURE001_FDP` ตั้งแต่ Phase 2
+
+| ช่องบนฟอร์ม | bind กับ | ที่มา |
+|---|---|---|
+| เลขที่อ้างอิงภายใน / Our Reference | `InternalReference` | `I_PurchaseOrderAPI01.CorrespncInternalReference` |
+| วันที่ส่งสินค้า / Delivery Date | `DeliveryDateText` | schedule line `0001` ของ item แรกที่ไม่ถูกลบ แปลงเป็นวันที่ไทย |
+
+> ฟอร์มเดิมที่พิมพ์ผ่าน standard ต้องใช้ JavaScript แปลงวันที่เอง (`FirstDeliveryDate` ของ `PurchaseOrderItemNode[0]` → พ.ศ. + เดือนไทย)
+> เพราะ XFA display pattern ทำปฏิทินพุทธไม่ได้ · ต้องระบุ index `[0]` ไม่ใช่ `[*]` ซึ่งใช้ได้เฉพาะ subform ที่ repeat
+
 **ข้อสังเกตที่ต้องให้ functional ตัดสิน** — ดู [05-open-questions.md](05-open-questions.md) ข้อ 14–22
 
 ---

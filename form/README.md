@@ -9,6 +9,8 @@
 | `ZPURF002.xsd` | data description สำหรับ Designer (Data Connection `DataConnection` ชี้ `.\ZPURF002.xsd`) — โครงเดียวกับ XML ที่ `cl_fp_fdp_services=>read_to_xml_v2( )` คาย |
 | `sample/0099680042.xml` | XML จริงจาก tenant 100 (3 รายการ, service item, text 3 ชนิด, WBS) — ใช้เป็น Preview Data ใน Designer |
 | `sample/99680056_multipage.xml` | XML สังเคราะห์ 25 รายการ + เติม approver / checkbox / Ship Via / Valid from-to — ทดสอบหลายหน้า |
+| `sample/0099680042_newfields.xml` | ชุดเดียวกับ 0099680042 แต่เติม Reference / Our Reference / Delivery Date / Ship Via / Valid from-to — ทดสอบ field ที่เพิ่ม 2026-09-23 |
+| `sample/99680056_multipage_newfields.xml` | ชุด 25 รายการ + Our Reference + Delivery Date |
 | `build_xdp.py` | script ที่ใช้ generate `.xdp` จากฟอร์มเดิม (บันทึกว่าเปลี่ยนอะไรบ้าง: binding map, script ที่ถอด, subform ที่ลบ) — รันซ้ำได้ถ้ามีไฟล์ต้นฉบับ |
 
 ## หลักการของฟอร์มนี้ (D14)
@@ -25,3 +27,10 @@
 1. เปิด `ZPURF002.xdp` ใน Adobe LiveCycle Designer (ตัวที่มากับ SAP) — ต้องมี Acrobat Reader ถึงจะมีแท็บ Preview PDF
 2. Form Properties → Preview → Data File = `.\sample\0099680042.xml` (หรือ multipage)
 3. แก้ → Save → **copy ไฟล์กลับมาทับที่นี่** → upload เข้า Form Object `ZPURF002` ใน ADT → push
+
+## ถ้าฟอร์มต้นทางเปลี่ยน
+
+ฟอร์ม output management เดิมของลูกค้าถูกแก้ layout ได้เรื่อย ๆ (เช่น 2026-09-23 เพิ่ม Our Reference กับ Delivery Date
+ลดฟอนต์กรอบขวาเป็น 6.9pt แล้วขยับตำแหน่ง) วิธี apply เข้ามาที่ `ZPURF002.xdp` คือ **rerun `build_xdp.py`** กับไฟล์ใหม่
+ไม่ใช่ไล่แก้มือใน Designer เพราะ script คง binding ของ FDP เราไว้ครบ
+field ที่ต้นทางเพิ่มใหม่ ให้เติม 1 บรรทัดใน `ref_map` ก่อนรัน

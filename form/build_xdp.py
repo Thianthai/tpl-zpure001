@@ -48,6 +48,8 @@ ref_map={
  '$.PurchaseOrderNode.YY1_SuppCodeNameBranch_PDH':  H+'SupplierCodeName',
  '$.PurchaseOrderNode.YY1_SupplierAddress_PDH':     H+'SupplierAddress',
  '$.PurchaseOrderNode.CorrespncExternalReference':  H+'ExternalReference',
+ '$.PurchaseOrderNode.CorrespncInternalReference':  H+'InternalReference',
+ '$.PurchaseOrderNode.PurchaseOrderItems.PurchaseOrderItemNode[*].FirstDeliveryDate': H+'DeliveryDateText',
  '$.PurchaseOrderNode.SupplierRespSalesPersonName': H+'SupplierContactName',
  '$.PurchaseOrderNode.YY1_Email_PO_PDH':            H+'SupplierEmail',
  '$.PurchaseOrderNode.SupplierPhoneNumber':         H+'SupplierPhone',
