@@ -150,4 +150,33 @@ define root custom entity ZR_PURE001
       @UI.hidden                       : true
       @Consumption.filter.hidden       : true
       ApprovalStatusCriticality        : abap.int1;
+      
+      //=== Print (Phase 3) ===================================================
+      @UI.hidden                       : true
+      @Consumption.filter.hidden       : true
+      PrintUrl                         : abap.char(1000);
+
+      @UI.hidden                       : true
+      @Consumption.filter.hidden       : true
+      DownloadUrl                      : abap.char(1000);
+
+      @EndUserText.label               : 'Preview'
+      @Consumption.filter.hidden       : true
+      @UI.lineItem                     : [{ position: 200, label: 'Preview', type: #WITH_URL, url: 'PrintUrl' }]
+      PrintUrlBTN                      : abap.char(20);
+
+      @EndUserText.label               : 'Download'
+      @Consumption.filter.hidden       : true
+      @UI.lineItem                     : [{ position: 210, label: 'Download', type: #WITH_URL, url: 'DownloadUrl' }]
+      DownloadBTN                      : abap.char(20);
+
+      @EndUserText.label               : 'Print PO Form'
+      @Consumption.filter.hidden       : true
+      @UI.lineItem                     : [{ position: 220,
+                                            label: 'Print PO Form',
+                                            type: #FOR_ACTION,
+                                            dataAction: 'PrintPOForm',
+                                            inline: false,
+                                            invocationGrouping: #CHANGE_SET }]
+      PrintPOFormBTN                   : abap.char(1);
 }

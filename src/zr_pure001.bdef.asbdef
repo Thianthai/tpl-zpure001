@@ -1,0 +1,11 @@
+unmanaged implementation in class zbp_r_pure001 unique;
+strict ( 2 );
+
+define behavior for ZR_PURE001
+lock master
+authorization master ( instance )
+{
+  field ( readonly ) PurchaseOrder;
+
+  action PrintPOForm result [1] ZA_PURE001_FILE;
+}

@@ -13,6 +13,9 @@ CLASS zcl_pure001_query DEFINITION
 
     CONSTANTS gc_entity_id TYPE string VALUE 'ZR_PURE001'.
 
+    "! path ของ HTTP service ที่ให้ preview และ download PDF
+    CONSTANTS gc_print_service TYPE string VALUE '/sap/bc/http/sap/zhs_pure001'.
+
     DATA:
       go_data             TYPE REF TO zcl_pure001_data,
       gs_selection        TYPE zcl_pure001_data=>ty_selection,
@@ -44,6 +47,11 @@ CLASS zcl_pure001_query DEFINITION
     METHODS add_item_lists
       CHANGING ct_result TYPE tt_result.
 
+    "! ใส่ลิงก์ preview และ download ของ HTTP service ให้ทุกแถว
+    "! ลิงก์รับได้ทีละใบ การพิมพ์หลายใบพร้อมกันใช้ปุ่ม PrintPOForm แทน
+    METHODS add_print_links
+      CHANGING ct_result TYPE tt_result.
+
 ENDCLASS.
 
 
@@ -63,6 +71,7 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
 
     " อ่าน + derive ครั้งเดียว แล้วกรอง/นับ/เรียง/ตัดหน้าใน memory (D12)
     DATA(lt_header) = go_data->read_headers( gs_selection ).
+
     apply_memory_filters( CHANGING ct_header = lt_header ).
 
     " นับก่อน paging เสมอ
@@ -75,7 +84,9 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
       apply_paging(  EXPORTING io_request = io_request CHANGING ct_header = lt_header ).
 
       DATA(lt_result) = CORRESPONDING tt_result( lt_header ).
+
       add_item_lists( CHANGING ct_result = lt_result ).
+      add_print_links( CHANGING ct_result = lt_result ).
 
       io_response->set_data( lt_result ).
     ENDIF.
@@ -127,11 +138,15 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
     LOOP AT gs_selection-material ASSIGNING FIELD-SYMBOL(<lfs_material>) WHERE sign = 'I'.
       CASE <lfs_material>-option.
         WHEN 'EQ'.
-          APPEND VALUE #( sign = 'I' option = 'CP'
-                          low  = |*{ to_upper( <lfs_material>-low ) }*| ) TO gs_selection-item_text.
+          APPEND VALUE #( sign   = 'I'
+                          option = 'CP'
+                          low    = |*{ to_upper( <lfs_material>-low ) }*|
+                        ) TO gs_selection-item_text.
         WHEN 'CP'.
-          APPEND VALUE #( sign = 'I' option = 'CP'
-                          low  = to_upper( <lfs_material>-low ) ) TO gs_selection-item_text.
+          APPEND VALUE #( sign   = 'I'
+                          option = 'CP'
+                          low    = to_upper( <lfs_material>-low )
+                        ) TO gs_selection-item_text.
       ENDCASE.
     ENDLOOP.
 
@@ -156,10 +171,10 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
     " $search: เลข PO / ชื่อผู้ขาย / Our Ref / Your Ref (contains, ไม่สนตัวพิมพ์)
     IF gv_search IS NOT INITIAL.
       LOOP AT ct_header ASSIGNING FIELD-SYMBOL(<lfs_header>).
-        IF     to_upper( <lfs_header>-PurchaseOrder )     NS gv_search
-           AND to_upper( <lfs_header>-SupplierName )      NS gv_search
-           AND to_upper( <lfs_header>-InternalReference ) NS gv_search
-           AND to_upper( <lfs_header>-ExternalReference ) NS gv_search.
+        IF  to_upper( <lfs_header>-PurchaseOrder )     NS gv_search
+        AND to_upper( <lfs_header>-SupplierName )      NS gv_search
+        AND to_upper( <lfs_header>-InternalReference ) NS gv_search
+        AND to_upper( <lfs_header>-ExternalReference ) NS gv_search.
           DELETE ct_header.
         ENDIF.
       ENDLOOP.
@@ -184,7 +199,8 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
       ENDIF.
 
       APPEND VALUE #( name       = lv_element
-                      descending = <lfs_sort>-descending ) TO lt_order.
+                      descending = <lfs_sort>-descending
+                    ) TO lt_order.
     ENDLOOP.
 
     IF lt_order IS INITIAL.
@@ -199,6 +215,7 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
   METHOD apply_paging.
 
     DATA(lo_paging) = io_request->get_paging( ).
+
     IF lo_paging IS NOT BOUND.
       RETURN.
     ENDIF.
@@ -220,38 +237,37 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
 
   METHOD add_item_lists.
 
+    DATA lt_material TYPE STANDARD TABLE OF string WITH EMPTY KEY.
+    DATA lt_plant    TYPE SORTED TABLE OF string WITH UNIQUE KEY table_line.
+
     IF ct_result IS INITIAL.
       RETURN.
     ENDIF.
 
     " item ทุกรายการรวมที่ลบ (standard แสดงทุก item)
-    DATA(lt_item) = go_data->read_items(
-      VALUE #( FOR ls_result IN ct_result ( PurchaseOrder = ls_result-PurchaseOrder ) ) ).
+    DATA(lt_item) = go_data->read_items( VALUE #( FOR ls_result IN ct_result
+                                                  ( PurchaseOrder = ls_result-PurchaseOrder )
+                                                )
+                                       ).
 
     LOOP AT ct_result ASSIGNING FIELD-SYMBOL(<lfs_result>).
-
-      DATA lt_material TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-      DATA lt_plant    TYPE SORTED TABLE OF string WITH UNIQUE KEY table_line.
       CLEAR: lt_material, lt_plant.
 
       LOOP AT lt_item ASSIGNING FIELD-SYMBOL(<lfs_item>)
-           WHERE PurchaseOrder = <lfs_result>-PurchaseOrder.
+        WHERE PurchaseOrder = <lfs_result>-PurchaseOrder.
 
         " "ชื่อ (รหัส)" — text item (ไม่มี material) แสดงชื่ออย่างเดียว · string template ตัดช่องว่างท้ายให้
-        DATA(lv_material) = COND string(
-          WHEN <lfs_item>-Material IS INITIAL
-            THEN <lfs_item>-MaterialDescription
-            ELSE |{ <lfs_item>-MaterialDescription } ({ <lfs_item>-Material })| ).
+        DATA(lv_material) = COND string( WHEN <lfs_item>-Material IS INITIAL
+                                           THEN <lfs_item>-MaterialDescription
+                                         ELSE |{ <lfs_item>-MaterialDescription } ({ <lfs_item>-Material })| ).
 
         IF NOT line_exists( lt_material[ table_line = lv_material ] ).
           APPEND lv_material TO lt_material.
         ENDIF.
 
-        INSERT COND string(
-          WHEN <lfs_item>-PlantName IS INITIAL
-            THEN <lfs_item>-Plant
-            ELSE <lfs_item>-PlantName )
-          INTO TABLE lt_plant.
+        INSERT COND string( WHEN <lfs_item>-PlantName IS INITIAL
+                              THEN <lfs_item>-Plant
+                            ELSE <lfs_item>-PlantName ) INTO TABLE lt_plant.
 
       ENDLOOP.
 
@@ -261,4 +277,18 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
+
+
+  METHOD add_print_links.
+
+    LOOP AT ct_result ASSIGNING FIELD-SYMBOL(<lfs_result>).
+      " mode P เปิดในแท็บเบราว์เซอร์ mode D บันทึกเป็นไฟล์
+      <lfs_result>-PrintUrl    = |{ gc_print_service }?po={ <lfs_result>-PurchaseOrder }&mode=P|.
+      <lfs_result>-DownloadUrl = |{ gc_print_service }?po={ <lfs_result>-PurchaseOrder }&mode=D|.
+      <lfs_result>-PrintUrlBTN = 'Preview'.
+      <lfs_result>-DownloadBTN = 'Download'.
+    ENDLOOP.
+
+  ENDMETHOD.
+
 ENDCLASS.
