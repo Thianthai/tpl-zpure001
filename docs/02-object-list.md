@@ -50,12 +50,12 @@
 |---|---|---|---|---|
 | `ZCL_PURE001_UTIL` | Class | `to_thai_date( )` · `format_date_dmy( )` · `amount_in_words( )` TH/EN · `format_quantity( )` | ✅ 09-13 | ✅ 742dd06 |
 | `ZR_PURE001_FDP` | Custom entity (root) | form header — `#OUTPUT_FORM_DATA_PROVIDER` · XML node `PurchaseOrderHeader` · +`SupplierCodeName`, `ApprovalNoteText` (09-18) | ✅ 09-13 | ✅ 1b5205b |
-| `ZI_PURE001_ITEM_FDP` | Custom entity (child) | form item · XML node `PurchaseOrderItem` (ใต้ `_Item`) · +`ItemDescriptionText` (09-18) | ✅ 09-13 | ✅ 1b5205b |
+| `ZI_PURE001_ITEM_FDP` | Custom entity (child) | form item · XML node `PurchaseOrderItem` (ใต้ `_Item`) · +`ItemDescriptionText` (09-18) · +`UnitText` (09-23) | ✅ 09-13 | ✅ c4577a0 |
 | `ZI_PURE001_ITXT_FDP` | Custom entity (child ของ item) | ข้อความใต้รายการ 1 node/text type (แบบ B) · XML node `PurchaseOrderItemText` (ใต้ `_ItemText`) | ✅ 09-13 | ✅ c5b66b3 |
 | `ZAPI_PURE001_FDP` | Service definition | **ชื่อที่ส่งให้ `cl_fp_fdp_services=>get_instance( )`** · alias `PurchaseOrderHeader` / `PurchaseOrderItem` / `PurchaseOrderItemText` (ห้าม `PurchaseOrder` — ชน entity type `PurchaseOrderType`) | ✅ 09-13 | ✅ c5b66b3 |
 | `ZCL_PURE001_FDP` | Class | `if_rap_query_provider` ของ 3 entity — เรียก DATA → ประกอบ 3 node + VAT/ยอดรวม + วันที่ไทย + amount in words · filter ของ item text อ่านผ่าน **filter tree** (D13) · 09-18: `compose_item_description` / `get_ordered_item_texts` / service item `1 AU` / condense acct-assignment | ✅ 09-13 | ✅ 1b5205b |
 | `ZCL_PURE001_DATA` | Class | **ขยาย** ให้ครอบข้อมูลฟอร์ม: `read_schedule_lines` · `read_account_assignments` (+WBS) · `read_tax_rates` · `read_header_texts` / `read_item_texts` (range แทน FAE — STRING column) · `read_approvers` · `read_user_names` · payment terms / company / supplier master ใน `enrich_master_texts` | ✅ | ✅ c5b66b3 |
-| `ZCL_PURE001_TEST_FDP` | Class (ชั่วคราว) | `if_oo_adt_classrun` dump XML ด้วย `read_to_xml_v2( )` — หลุดขึ้น Git ใน 1b5205b · **ลบบน tenant แล้ว push ตอนจบ Phase 2** (abapGit จะลบไฟล์ให้) | — | ⚠️ 1b5205b (รอลบ) |
+| ~~`ZCL_PURE001_TEST_FDP`~~ | Class (ชั่วคราว) | utility dump XML ระหว่างพัฒนา — **ลบแล้ว 2026-09-23** (`c4577a0`) | — | ❌ ลบแล้ว |
 | `ZPURF002` | Form object (ADT) | template `form/ZPURF002.xdp` — clone จากฟอร์ม output management เดิม `YY1_MM_PUR_PURCHASE_ORDER` re-bind กับ `ZAPI_PURE001_FDP` (D14) · Designer preview ผ่านทั้ง 1 หน้าและ 6 หน้า 2026-09-18 · Data Provider = `ZAPI_PURE001_FDP` | ✅ 09-18 | 🔨 สร้าง+activate บน tenant 09-23 · **abapGit serialize ไม่ได้** (ไม่มีใน `src/`) master = `form/ZPURF002.xdp` |
 
 **ลบทิ้งระหว่างทาง (ไม่เคย push)** — `ZI_PURE001_FORM_HEADER`, `ZI_PURE001_FORM_ITEM`, `ZI_PURE001_FORM_APPROVER` (DCL inheritance ล้ม — D12)

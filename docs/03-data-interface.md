@@ -56,7 +56,7 @@ XML ที่ได้จาก `read_to_xml_v2( )` — **ชื่อ node ร�
 |---|---|---|
 | field type data element ที่มี conversion exit (`ebeln`) ถูกตัด 0 นำหน้า | `<PurchaseOrder>99680198</PurchaseOrder>` | ตรง standard |
 | field `abap.char(n)` ออกดิบ | `<PurchaseRequisition>0003680141</PurchaseRequisition>`, `<GLAccount>0000611401</GLAccount>`, `<OrderID>008200000042</OrderID>` | ⬜ รอเลือก: เปลี่ยน type เป็น `banfn`/`saknr`/`kostl`/`aufnr` หรือใช้ `AccountAssignmentText` (ตัด 0 แล้ว) |
-| `abap.unit` ถูกแปลงเป็น **ISO code** | `<Unit>C62</Unit>` (ภายใน `ST`) · `EA`/`DR`/`BX` บังเอิญเท่ากัน | ⬜ ควรเพิ่ม `UnitName` (`I_UnitOfMeasureText` ภาษา PO) หรือ commercial code |
+| `abap.unit` ถูกแปลงเป็น **ISO code** | `<Unit>C62</Unit>` (ภายใน `ST`) · `EA`/`DR`/`BX` บังเอิญเท่ากัน | ✅ แก้แล้ว 09-23 — เพิ่ม `UnitText : abap.char(3)` ส่งรหัสภายในคู่กันไป ฟอร์ม bind ช่องหน่วยกับ field นี้ |
 | `abap.int4` / `abap.dec` มี space ท้าย (ตำแหน่งเครื่องหมาย) | `<ItemNumber>1 </ItemNumber>`, `<TaxRate>7.00 </TaxRate>`, `<TextSequence>1 </TextSequence>` | ปกติ ADS parse ได้ — ถ้าเพี้ยนเปลี่ยนเป็น text field |
 | `abap.curr` / `abap.quan` / `abap.dats` ออกสะอาด | `856000.00`, `2`, `20260714` | ใช้ได้เลย |
 | `Language` ออกเป็น ISO 2 ตัว | `EN` | (ภายใน `E` — lookup text ทำใน ABAP แล้ว ไม่กระทบ) |

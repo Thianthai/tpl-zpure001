@@ -107,6 +107,7 @@
    <element name="Quantity" type="decimal"/>
    <element name="QuantityText" type="string"/>
    <element name="Unit" type="string"/>
+   <element name="UnitText" type="string"/>
    <element name="DocumentCurrency" type="string"/>
    <element name="NetPriceAmount" type="decimal"/>
    <element name="NetPriceQuantity" type="decimal"/>

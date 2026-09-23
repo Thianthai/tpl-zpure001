@@ -78,7 +78,7 @@ ref_map={
  # cells (relative to item node)
  '$.PurchaseOrderItem':            '$.ItemNumber',
  '$.PurchaseOrderQty':             '$.QuantityText',
- '$.PurchaseOrderQuantityUnit':    '$.Unit',
+ '$.PurchaseOrderQuantityUnit':    '$.UnitText',
  '$.PurchaseOrderNetPriceAmount':  '$.NetPriceAmount',
  '$.PurchaseOrderItemNetAmount':   '$.ItemAmount',
 }
@@ -134,7 +134,7 @@ DiscountAmount AmountBeforeTax TaxAmount NetAmount AmountInWords PreparedByUser 
 ApprovedByName ApprovedDate ApprovedDateText ApprovedByPosition ApprovedBySignMimeType ApprovedBySignFileName ApprovedBySignature
 IsApprovedAutomatically ApprovalNoteText""".split()]
 item_fields="""PurchaseOrder PurchaseOrderItem ItemNumber Material MaterialDescription ItemDescription ItemDescriptionText Quantity QuantityText Unit
-DocumentCurrency NetPriceAmount NetPriceQuantity ItemAmount TaxCode TaxRate TaxAmount DeliveryDate DeliveryDateText PerformancePeriodStartDate
+UnitText DocumentCurrency NetPriceAmount NetPriceQuantity ItemAmount TaxCode TaxRate TaxAmount DeliveryDate DeliveryDateText PerformancePeriodStartDate
 PerformancePeriodEndDate PurchaseRequisition GLAccount CostCenter OrderID WBSElement AccountAssignmentText Plant""".split()
 text_fields="PurchaseOrder PurchaseOrderItem TextSequence TextObjectType TextTypeName Text".split()
 decimals={'TotalAmount','DiscountAmount','AmountBeforeTax','TaxAmount','NetAmount','Quantity','NetPriceAmount','NetPriceQuantity','ItemAmount','TaxRate','ItemNumber','TextSequence'}
