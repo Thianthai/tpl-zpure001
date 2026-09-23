@@ -69,12 +69,20 @@
 
 ## Phase 3 — Print output
 
+**ฝั่ง front-end (คนละ repo — ผู้ใช้ดูแลเอง)** — โปรเจกต์ UI5 `zpure001` (generator-fiori, List Report, `ZUI_PURE001_O4`)
+
+| ไฟล์ | หน้าที่ | Status |
+|---|---|---|
+| `webapp/manifest.json` | ผูก controller extension เข้ากับ ListReport ของ FE | ✅ 09-23 |
+| `webapp/ext/controller/PrintPreview.controller.js` | ดัก action `PrintPOForm` แล้วเปิด PDF (D15) | ✅ 09-23 |
+| `webapp/ext/util/PrintUtils.js` | unwrap result · base64 เป็น blob · download | ✅ 09-23 |
+
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
-| `ZA_PURE001_FILE` | Abstract entity | โครงผลลัพธ์ของ action (base64 PDF) | ⬜ | ⬜ |
-| `ZR_PURE001` (bdef) | Behavior definition | `unmanaged` บน custom entity + `action PrintPOForm result[1] ZA_PURE001_FILE` | ⬜ | ⬜ |
-| `ZBP_R_PURE001` | Behavior pool | `lhc_ZR_PURE001` — implement action | ⬜ | ⬜ |
-| `ZCL_PURE001_PRINT` | Class | logic render PDF ที่ใช้ร่วมกันระหว่าง action กับ HTTP service | ⬜ | ⬜ |
+| `ZA_PURE001_FILE` | Abstract entity | โครงผลลัพธ์ของ action (base64 PDF) | ✅ 09-23 | ✅ ทดสอบผ่าน รอ push |
+| `ZR_PURE001` (bdef) | Behavior definition | `unmanaged` บน custom entity + `action PrintPOForm result[1] ZA_PURE001_FILE` | ✅ 09-23 | ✅ ทดสอบผ่าน รอ push |
+| `ZBP_R_PURE001` | Behavior pool | `lhc_zr_pure001` — รวม PO ที่เลือกเป็นไฟล์เดียว คืน base64 | ✅ 09-23 | ✅ ทดสอบผ่าน รอ push |
+| `ZCL_PURE001_PRINT` | Class | render PDF (FDP XML → ZPURF002 → ADS) · merge หลายใบ · ตั้งชื่อไฟล์ | ✅ 09-23 | ✅ ทดสอบผ่าน รอ push |
 | `ZCL_PURE001_HTTP` | Class | `if_http_service_extension` — preview/download | ⬜ | ⬜ |
 | `ZHS_PURE001` | HTTP service | endpoint `/sap/bc/http/sap/ZHS_PURE001` | ⬜ | ⬜ |
 

@@ -266,6 +266,30 @@ standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ต
 
 ---
 
+## D15 — ปุ่มพิมพ์ต้องมี UI5 controller extension คู่กับ RAP action (2026-09-23)
+
+**ปัญหา** — action `PrintPOForm` คืนไฟล์ผ่าน abstract entity ตาม pattern ของ demo แต่กดปุ่มบน Fiori แล้ว **ไม่เกิดอะไรขึ้น**
+· Fiori Elements V4 ไม่รู้ว่าต้องเอา base64 ใน result ไปทำอะไร มันเรียก action สำเร็จแล้วจบ
+
+**สาเหตุ** — demo ไม่ได้ทำงานด้วย RAP อย่างเดียว มี **UI5 project แยก** (generator-fiori template lrop) ที่ abapGit ไม่เห็น
+ข้างในมี controller extension ผูกกับ `sap.fe.templates.ListReport.ListReportController` ที่ monkey-patch `editFlow.invokeAction`
+แล้วแปลง base64 เป็น Blob URL เปิดแท็บใหม่เอง
+
+**ที่ทำ** — โปรเจกต์ UI5 ของเรา (`sap.app.id` = `zpure001`) เพิ่ม 3 จุด
+
+| ไฟล์ | ทำอะไร |
+|---|---|
+| `webapp/manifest.json` | เพิ่ม `sap.ui5.extends.extensions.sap.ui.controllerExtensions` ชี้ `zpure001.ext.controller.PrintPreview` |
+| `webapp/ext/controller/PrintPreview.controller.js` | ดัก action ชื่อ `PrintPOForm` เปิด BusyDialog แปลง base64 เป็น blob แล้ว `URLHelper.redirect` |
+| `webapp/ext/util/PrintUtils.js` | `unwrap( )` อ่าน result หลายรูปแบบ · `toBlobUrl( )` · `download( )` เผื่อต้องการชื่อไฟล์จาก ABAP |
+
+**ผล** — ทดสอบบน tenant 100 ผ่าน 2026-09-23 ได้ PDF เปิดแท็บใหม่เหมือน demo
+
+**สิ่งที่ต้องจำ** — ฝั่ง front-end อยู่คนละ repo กับ ABAP (`/Volumes/[C] Windows 11/Users/thianthai/projects/zpure001`)
+ผู้ใช้เป็นคนแก้เองทั้งหมด Claude ส่งเป็น code block ในแชทเท่านั้น เหมือนกฎของ ABAP object
+
+---
+
 ## ข้อจำกัดของ tenant ที่ค้นพบ (ใช้อ้างอิงเฟสต่อไป)
 
 | สิ่งที่พบ | วันที่ | ผล |
@@ -313,4 +337,5 @@ standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ต
 | `cl_fp_fdp_services=>get_instance( )` รับเฉพาะ **service definition (SRVD)** — standard FDP `FDP_EF_PURCHASE_ORDER_SRV` (classic Gateway) → "Service is not registered" | 2026-09-18 | เรียก standard FDP จาก custom code ไม่ได้ (D14) |
 | ฟอร์ม output management เดิมของลูกค้าใช้ custom field `YY1_*_PDH` (header) / `_PDI` (item) เติมค่าผ่าน custom logic ฝั่ง standard | 2026-09-18 | ค่าเหล่านั้นเราคำนวณเองใน `ZCL_PURE001_FDP` |
 | Designer (SAP build) ไม่มีแท็บ Preview PDF ถ้าเครื่องไม่มี Acrobat Reader · "Generate Preview Data" จะเขียนทับไฟล์ data ที่ตั้งไว้ (ห้ามกดถ้าชี้ไฟล์ข้อมูลจริง) | 2026-09-18 | |
+| RAP action ที่คืนไฟล์ผ่าน abstract entity ไม่ถูก Fiori Elements V4 จัดการให้ ต้องมี UI5 controller extension รับ result เอง | 2026-09-23 | D15 |
 | ADT: short dump ดูที่ Runtime Error Viewer · error ของ gateway (`/IWBEP/CX_GATEWAY`) ดูที่ `/sap/bc/adt/gw/errorlog` — `ZCX_PURE001_QUERY->get_text( )` โผล่ใน Error Context ทำให้ debug filter ได้โดยไม่ต้อง trace | 2026-09-14 | |
