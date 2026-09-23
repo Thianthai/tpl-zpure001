@@ -24,7 +24,7 @@
 | `ZI_PURE001_STATUS_VH` | CDS view entity (VH) | dropdown Status 7 ค่า จาก `I_PurchasingDocumentStatusText` · `#XS` | ✅ 09-13 | ✅ 25c6238 |
 | `ZI_PURE001_POTYPE_VH` | CDS view entity (VH) | dropdown doc type category `F` (15 ค่า) · warning search-help ปล่อยไว้ | ✅ 09-13 | ✅ 25c6238 |
 | `ZCL_PURE001_DATA` | Class | **ตัวกลาง** — `read_headers( selection )` อ่าน `I_PurchaseOrderAPI01` + EXISTS item + master text + ยอดรวม (ไม่นับที่ลบ) + follow-on (GR/IR) + workflow ล่าสุด → derive `PurchaseOrderStatus` / `ApprovalStatus` / criticality · `read_items( po )` | ✅ 09-13 | ✅ 742dd06 |
-| `ZCL_PURE001_QUERY` | Class | `if_rap_query_provider` ของ `ZR_PURE001` — เรียก DATA แล้ว filter Status/Approval/Search + count + sort + paging ใน memory + ต่อ string item | ✅ 09-11 | ✅ 742dd06 |
+| `ZCL_PURE001_QUERY` | Class | `if_rap_query_provider` ของ `ZR_PURE001` — เรียก DATA แล้ว filter Status/Approval/Search + count + sort + paging ใน memory + ต่อ string item | ✅ 09-11 | ✅ 742dd06 · 🔨 รอถอด `add_print_links` (D16) |
 | `ZCX_PURE001_QUERY` | Exception class | สืบทอด `cx_rap_query_provider` (abstract) — ห่อ `cx_rap_query_filter_no_range` | ✅ 09-13 | ✅ 25c6238 |
 | `ZUI_PURE001` | Service definition | expose `ZR_PURE001` as **`PrintPurchaseOrder`** | ✅ 09-11 | ✅ 25c6238 |
 | `ZUI_PURE001_O4` | Service binding | OData V4 — UI · published · `/sap/opu/odata4/sap/zui_pure001_o4/srvd/sap/zui_pure001/0001/PrintPurchaseOrder` | ✅ 09-11 | ✅ 2be05ab |
@@ -83,8 +83,8 @@
 | `ZR_PURE001` (bdef) | Behavior definition | `unmanaged` บน custom entity + `action PrintPOForm result[1] ZA_PURE001_FILE` | ✅ 09-23 | ✅ ทดสอบผ่าน รอ push |
 | `ZBP_R_PURE001` | Behavior pool | `lhc_zr_pure001` — รวม PO ที่เลือกเป็นไฟล์เดียว คืน base64 | ✅ 09-23 | ✅ ทดสอบผ่าน รอ push |
 | `ZCL_PURE001_PRINT` | Class | render PDF (FDP XML → ZPURF002 → ADS) · merge หลายใบ · ตั้งชื่อไฟล์ | ✅ 09-23 | ✅ ทดสอบผ่าน รอ push |
-| `ZCL_PURE001_HTTP` | Class | `if_http_service_extension` — preview/download | ⬜ | ⬜ |
-| `ZHS_PURE001` | HTTP service | endpoint `/sap/bc/http/sap/ZHS_PURE001` | ⬜ | ⬜ |
+| ~~`ZCL_PURE001_HTTP`~~ | Class | **ยกเลิก (D16)** — ปุ่มบน toolbar ใช้งานได้ครบแล้ว | — | ❌ ไม่ทำ |
+| ~~`ZHS_PURE001`~~ | HTTP service | **ยกเลิก (D16)** | — | ❌ ไม่ทำ |
 
 ## Phase 4 — Utility & master data → **รวมเข้า Phase 2 แล้ว** (`ZCL_PURE001_UTIL`) · graphics table เลื่อนรอเช็ค
 

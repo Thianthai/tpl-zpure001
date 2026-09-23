@@ -52,7 +52,7 @@ Fiori Elements generate ให้ entity ที่เปิด draft handling �
 
 ---
 
-## D4 — ปุ่ม Print ทำทั้ง RAP action และ HTTP service (2026-09-10)
+## D4 — ปุ่ม Print ทำทั้ง RAP action และ HTTP service (2026-09-10) — **ถูกแทนด้วย D16**
 
 **ตัดสินใจ** action `PrintPOForm` (เลือกหลายใบ → merge → download) + HTTP service `ZHS_PURE001`
 (preview inline ทีละใบ) — ตาม demo ที่พิสูจน์แล้วทั้ง 2 ทาง
@@ -287,6 +287,20 @@ standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ต
 
 **สิ่งที่ต้องจำ** — ฝั่ง front-end อยู่คนละ repo กับ ABAP (`/Volumes/[C] Windows 11/Users/thianthai/projects/zpure001`)
 ผู้ใช้เป็นคนแก้เองทั้งหมด Claude ส่งเป็น code block ในแชทเท่านั้น เหมือนกฎของ ABAP object
+
+---
+
+## D16 — พิมพ์ผ่านปุ่มบน toolbar อย่างเดียว ยกเลิก HTTP service (2026-09-23) — **แทน D4**
+
+**เดิม (D4)** ตกลงว่าทำ 2 ทาง คือ RAP action และ HTTP service สำหรับ preview ทีละใบ
+
+**ตัดสินใจใหม่ (ผู้ใช้)** — ปุ่ม `Print PO Form` บน toolbar ใช้งานได้ครบแล้วทั้งใบเดียวและหลายใบ (D15)
+จึง **ยกเลิกลิงก์ Preview / Download ในแถว** และไม่ทำ `ZCL_PURE001_HTTP` กับ `ZHS_PURE001`
+
+**ผลที่ตามมา**
+- `ZR_PURE001` ถอด 4 field ออก: `PrintUrl`, `DownloadUrl`, `PrintUrlBTN`, `DownloadBTN`
+- `ZCL_PURE001_QUERY` ถอด constant `gc_print_service`, method `add_print_links`, และบรรทัดที่เรียกใน `select`
+- Phase 3 จบที่ชุด A ไม่มีชุด B
 
 ---
 
