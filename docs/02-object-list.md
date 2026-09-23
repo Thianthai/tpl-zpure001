@@ -36,6 +36,9 @@
 
 **Object ที่ SAP สร้างให้เอง** — `997e86285e590b8e7841262ae639b7ht.sush.xml` (S_START ของ service binding)
 
+**Object ที่ abapGit serialize ไม่ได้** — **Form Object `ZPURF002`** (ยืนยัน 2026-09-23: push แล้วไม่มีไฟล์ใน `src/`)
+→ ถ้าย้าย package ไป tenant อื่น ต้องสร้าง Form Object เองแล้ว upload `form/ZPURF002.xdp` + ตั้ง Data Provider `ZAPI_PURE001_FDP`
+
 > ⚠️ ชื่อของ **Phase 2 เป็นต้นไปยังเป็นแค่ข้อเสนอ** — ต้องสรุปให้ผู้ใช้รีวิวและ confirm
 > ตอนขึ้นเฟสนั้นจริง ๆ อีกครั้ง ตาม `CLAUDE.md` ข้อ 8
 
@@ -53,7 +56,7 @@
 | `ZCL_PURE001_FDP` | Class | `if_rap_query_provider` ของ 3 entity — เรียก DATA → ประกอบ 3 node + VAT/ยอดรวม + วันที่ไทย + amount in words · filter ของ item text อ่านผ่าน **filter tree** (D13) · 09-18: `compose_item_description` / `get_ordered_item_texts` / service item `1 AU` / condense acct-assignment | ✅ 09-13 | ✅ 1b5205b |
 | `ZCL_PURE001_DATA` | Class | **ขยาย** ให้ครอบข้อมูลฟอร์ม: `read_schedule_lines` · `read_account_assignments` (+WBS) · `read_tax_rates` · `read_header_texts` / `read_item_texts` (range แทน FAE — STRING column) · `read_approvers` · `read_user_names` · payment terms / company / supplier master ใน `enrich_master_texts` | ✅ | ✅ c5b66b3 |
 | `ZCL_PURE001_TEST_FDP` | Class (ชั่วคราว) | `if_oo_adt_classrun` dump XML ด้วย `read_to_xml_v2( )` — หลุดขึ้น Git ใน 1b5205b · **ลบบน tenant แล้ว push ตอนจบ Phase 2** (abapGit จะลบไฟล์ให้) | — | ⚠️ 1b5205b (รอลบ) |
-| `ZPURF002` | Form object (ADT) | template `form/ZPURF002.xdp` — clone จากฟอร์ม output management เดิม `YY1_MM_PUR_PURCHASE_ORDER` re-bind กับ `ZAPI_PURE001_FDP` (D14) · Designer preview ผ่านทั้ง 1 หน้าและ 6 หน้า 2026-09-18 | ✅ 09-18 | 📝 ไฟล์ใน Git · **Form Object บน tenant ยังไม่สร้าง** |
+| `ZPURF002` | Form object (ADT) | template `form/ZPURF002.xdp` — clone จากฟอร์ม output management เดิม `YY1_MM_PUR_PURCHASE_ORDER` re-bind กับ `ZAPI_PURE001_FDP` (D14) · Designer preview ผ่านทั้ง 1 หน้าและ 6 หน้า 2026-09-18 · Data Provider = `ZAPI_PURE001_FDP` | ✅ 09-18 | 🔨 สร้าง+activate บน tenant 09-23 · **abapGit serialize ไม่ได้** (ไม่มีใน `src/`) master = `form/ZPURF002.xdp` |
 
 **ลบทิ้งระหว่างทาง (ไม่เคย push)** — `ZI_PURE001_FORM_HEADER`, `ZI_PURE001_FORM_ITEM`, `ZI_PURE001_FORM_APPROVER` (DCL inheritance ล้ม — D12)
 

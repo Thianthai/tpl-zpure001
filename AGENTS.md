@@ -1,6 +1,6 @@
 # ZPURE001 — Project Rules
 
-กฎเฉพาะโปรเจกต์นี้ ใช้ทับ global rules ใน `~/.claude/CLAUDE.md` เฉพาะข้อที่ระบุไว้
+กฎเฉพาะโปรเจกต์นี้ ใช้ทับ global rules ใน `~/.Codex/AGENTS.md` เฉพาะข้อที่ระบุไว้
 
 ## Namespace — ใช้ `Z` ไม่ใช่ `Y`
 
@@ -77,29 +77,28 @@ custom entity **ไม่ใช่ view** (ไม่มี data source ข้า
 - **D14: ฟอร์ม `ZPURF002` = clone ฟอร์มเดิม `YY1_MM_PUR_PURCHASE_ORDER` re-bind กับ `ZAPI_PURE001_FDP`** (master = `form/ZPURF002.xdp`,
   generate ด้วย `form/build_xdp.py`) · **ชื่อ object ในฟอร์มคงชื่อเดิม** · **script เท่าที่จำเป็น** — ค่าที่ต้อง derive/format ทำใน ABAP แล้วส่งเป็น field
   · เรียก standard FDP `FDP_EF_PURCHASE_ORDER_SRV` จาก `cl_fp_fdp_services` **ไม่ได้** (classic Gateway ไม่ใช่ SRVD)
-  · Form Object สร้างใน **ADT** (ไม่ใช่ Form Templates app) แล้ว upload `.xdp` + ตั้ง Data Provider = `ZAPI_PURE001_FDP` (ชื่อ service definition)
-  · **Form Object abapGit serialize ไม่ได้** (ยืนยัน 2026-09-23) — ไม่ต้องรอไฟล์ใน `src/` master คือ `form/ZPURF002.xdp`
+  · Form Object สร้างใน **ADT** (ไม่ใช่ Form Templates app) แล้ว upload `.xdp`
 - ทดสอบต้องทำบน **tenant 100** (`my427869`) — tenant 80 ไม่มี PO · service ทดสอบด้วย
   `.../zui_pure001/0001/PrintPurchaseOrder?$count=true`
 
 ## วิธีทำงาน (ตกลงกับผู้ใช้ไว้แล้ว)
 
 1. **implement ทีละเฟส** — จบเฟสหนึ่งแล้วค่อยขึ้นเฟสถัดไป
-2. **Claude implement บน local file / ผู้ใช้ implement บน tenant จริง**
-3. **Claude push เฉพาะเอกสาร** — ABAP object ผู้ใช้ push เองผ่าน abapGit จาก ADT
-4. **Claude ห้ามเขียนไฟล์ ABAP ลง repo** (`*.clas.abap`, `*.ddls.asddls`, `*.asbdef`,
+2. **Codex implement บน local file / ผู้ใช้ implement บน tenant จริง**
+3. **Codex push เฉพาะเอกสาร** — ABAP object ผู้ใช้ push เองผ่าน abapGit จาก ADT
+4. **Codex ห้ามเขียนไฟล์ ABAP ลง repo** (`*.clas.abap`, `*.ddls.asddls`, `*.asbdef`,
    `*.srvd.*`, `*.tabl.xml` ฯลฯ) → ส่งเป็น **code block ใน chat** ให้ผู้ใช้ copy ไปสร้างใน ADT
    ข้อยกเว้น: ร่าง ABAP ที่ยังไม่ขึ้น tenant เก็บได้ใน `docs/draft/` เท่านั้น
    (นามสกุล `.md` หรือ `.txt` — ห้ามใช้นามสกุลที่ abapGit รู้จัก)
 5. **provide commit message ให้ผู้ใช้ดูก่อน push เสมอ**
-6. หลังผู้ใช้ push object ขึ้น Git → Claude เช็ค `git log` / `git diff` เพื่อ
+6. หลังผู้ใช้ push object ขึ้น Git → Codex เช็ค `git log` / `git diff` เพื่อ
    ตรวจความถูกต้องและ sync code ในเอกสารให้ตรงกับของจริงบน tenant
 7. **ห้ามเขียน `.abapgit.xml` หรือ `src/**/package.devc.xml` เอง** — ปล่อยให้ SAP serialize
    ขึ้นมาเป็น baseline ตอนผู้ใช้ push ครั้งแรกจาก ADT
 
 ### 3 ข้อที่ผู้ใช้ย้ำว่าซีเรียสที่สุด
 
-ยกระดับเป็นกฎ global แล้วใน `~/.claude/CLAUDE.md` หัวข้อ "จังหวะการทำงาน" — ห้ามข้าม
+ยกระดับเป็นกฎ global แล้วใน `~/.Codex/AGENTS.md` หัวข้อ "จังหวะการทำงาน" — ห้ามข้าม
 
 8. **ก่อนเริ่มทุกเฟส ต้องสรุปชื่อ object ทั้งหมดของเฟสนั้นให้ผู้ใช้รีวิวก่อน**
    แล้ว **รอจนผู้ใช้ confirm** ถึงจะเริ่ม implement ได้
