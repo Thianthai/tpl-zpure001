@@ -91,7 +91,7 @@ ZUI_PURE001_O4 (binding)
 
 **เสร็จเมื่อ** — dump XML ออกมาแล้วมีครบทั้ง 3 ชั้น ข้อมูลตรงกับ PO จริงบน tenant 100 ✅ (ทดสอบ 99680198, 4500000080, 0099680019, 99680044, 0099680047, 0099680042 — ครอบ approved automatically / WBS / item ลบ / header text / item text 3 ชนิด) · เหลือปิด 2.8 + ลบ `ZCL_PURE001_TEST_FDP`
 
-## Phase 3 — Print output — ชุด A ใช้งานได้ 2026-09-23 · ชุด B ยกเลิก (D16)
+## Phase 3 — Print output ✅ เสร็จ 2026-09-23 (ชุด B ยกเลิกตาม D16)
 
 **เป้าหมาย** กดปุ่มแล้วได้ PDF จริง ทั้งแบบ preview และ download
 

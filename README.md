@@ -44,7 +44,7 @@ ZCL_PURE001_QUERY                                    ZCL_PURE001_FDP   ◄──
 Phase 3: ปุ่ม Print PO Form (RAP action) + ZHS_PURE001 (HTTP preview) → PDF
 ```
 
-**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (redesign D12 2026-09-13 ทดสอบซ้ำผ่าน · ⚠️ bug VH Material ข้อ 21) · Phase 5.1–5.3 ✅ · Phase 2 🔨 XML ผ่าน 6 PO (`c5b66b3`) + **ฟอร์ม `ZPURF002` Designer preview ผ่าน 2026-09-18** (`form/`) · field ใหม่ push แล้ว `1b5205b` · Form Object `ZPURF002` สร้างบน tenant แล้ว 09-23 (abapGit serialize ไม่ได้ — master อยู่ `form/`) · **Phase 3 ชุด A พิมพ์ PDF ได้จริงแล้ว 09-23** (ต้องมี UI5 controller extension คู่ด้วย — D15) · ค้าง: HTTP service (ชุด B), หน่วย ISO
+**สถานะ** — Phase 0 ✅ · Phase 1 ✅ (redesign D12 2026-09-13 ทดสอบซ้ำผ่าน · ⚠️ bug VH Material ข้อ 21) · Phase 5.1–5.3 ✅ · Phase 2 🔨 XML ผ่าน 6 PO (`c5b66b3`) + **ฟอร์ม `ZPURF002` Designer preview ผ่าน 2026-09-18** (`form/`) · field ใหม่ push แล้ว `1b5205b` · Form Object `ZPURF002` สร้างบน tenant แล้ว 09-23 (abapGit serialize ไม่ได้ — master อยู่ `form/`) · **Phase 3 ✅ เสร็จ 09-23** — ปุ่ม Print PO Form บน toolbar พิมพ์ได้ทั้งใบเดียวและหลายใบ (ต้องมี UI5 controller extension คู่ด้วย — D15 · ลิงก์ในแถวยกเลิกตาม D16) · ค้าง: หน่วย ISO, bug VH Material, Phase 5.4/6
 
 ## เอกสาร
 
