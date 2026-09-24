@@ -96,7 +96,7 @@ def bind(new_ref):
     return fn
 s=edit_field(s,'Cell2',        bind('$.ItemDescriptionText'))
 s=edit_field(s,'TextField6',   bind(H+'ShipVia'))
-s=edit_field(s,'ShiptoAddress',bind(H+'ShipToPlantName'))          # ⏸ until ShipToAddressLine1/2 have a source
+s=edit_field(s,'ShiptoAddress',bind(H+'ShipToAddressLine1'))       # ที่อยู่ของ plant จาก address master
 s=edit_field(s,'AmtInWord',    bind(H+'AmountInWords'))
 s=edit_field(s,'Create_date',  bind(H+'PreparedDateText'))
 s=edit_field(s,'Field_Date_Source', bind(H+'PurchaseOrderDate'))
