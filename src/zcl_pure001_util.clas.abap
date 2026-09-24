@@ -125,25 +125,30 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
     DATA(lv_integer)  = CONV int8( trunc( lv_amount ) ).
     DATA(lv_fraction) = CONV int8( ( lv_amount - trunc( lv_amount ) ) * 100 ).
 
+    DATA lv_words TYPE string.
+
     IF iv_currency = 'THB'.
 
-      rv_text = number_to_words_th( lv_integer ).
-      rv_text = COND #( WHEN lv_fraction = 0
-                        THEN |{ rv_text }บาทถ้วน|
-                        ELSE |{ rv_text }บาท{ number_to_words_th( lv_fraction ) }สตางค์| ).
+      lv_words = number_to_words_th( lv_integer ).
+      lv_words = COND #( WHEN lv_fraction = 0
+                         THEN |{ lv_words }บาทถ้วน|
+                         ELSE |{ lv_words }บาท{ number_to_words_th( lv_fraction ) }สตางค์| ).
 
     ELSE.
 
-      " สกุลอื่นเป็นภาษาอังกฤษตัวพิมพ์ใหญ่ ครอบด้วยวงเล็บ
+      " สกุลอื่นเป็นภาษาอังกฤษตัวพิมพ์ใหญ่
       " ทศนิยมเป็นศูนย์ลงท้ายด้วย ONLY
       " มีเศษให้แสดงเป็นเศษส่วนของร้อย และไม่ใส่ ONLY
-      DATA(lv_words) = to_upper( number_to_words_en( lv_integer ) ).
+      DATA(lv_number) = to_upper( number_to_words_en( lv_integer ) ).
 
-      rv_text = COND #( WHEN lv_fraction = 0
-                        THEN |( { lv_words } { iv_currency } ONLY )|
-                        ELSE |( { lv_words } AND { lv_fraction WIDTH = 2 ALIGN = RIGHT PAD = '0' }/100 { iv_currency } )| ).
+      lv_words = COND #( WHEN lv_fraction = 0
+                         THEN |{ lv_number } { iv_currency } ONLY|
+                         ELSE |{ lv_number } AND { lv_fraction WIDTH = 2 ALIGN = RIGHT PAD = '0' }/100 { iv_currency }| ).
 
     ENDIF.
+
+    " ฟอร์มครอบวงเล็บให้ทุกสกุลเงิน
+    rv_text = |( { lv_words } )|.
 
   ENDMETHOD.
 
