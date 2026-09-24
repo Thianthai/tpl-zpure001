@@ -134,8 +134,14 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
 
     ELSE.
 
-      " สกุลอื่น: ภาษาอังกฤษ เช่น "One Hundred Twenty-Three and 45/100 USD"
-      rv_text = |{ number_to_words_en( lv_integer ) } and { lv_fraction WIDTH = 2 ALIGN = RIGHT PAD = '0' }/100 { iv_currency }|.
+      " สกุลอื่นเป็นภาษาอังกฤษตัวพิมพ์ใหญ่ ครอบด้วยวงเล็บ
+      " ทศนิยมเป็นศูนย์ลงท้ายด้วย ONLY
+      " มีเศษให้แสดงเป็นเศษส่วนของร้อย และไม่ใส่ ONLY
+      DATA(lv_words) = to_upper( number_to_words_en( lv_integer ) ).
+
+      rv_text = COND #( WHEN lv_fraction = 0
+                        THEN |( { lv_words } { iv_currency } ONLY )|
+                        ELSE |( { lv_words } AND { lv_fraction WIDTH = 2 ALIGN = RIGHT PAD = '0' }/100 { iv_currency } )| ).
 
     ENDIF.
 

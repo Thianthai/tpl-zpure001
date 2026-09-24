@@ -58,6 +58,20 @@ CLASS zcl_pure001_data DEFINITION
             SupplierPostalCode             TYPE i_supplier-PostalCode,
             SupplierMasterPhone            TYPE i_supplier-PhoneNumber1,
             PaymentTermsText               TYPE i_paymenttermstext-PaymentTermsDescription,
+
+            "--- custom field ที่ผู้ใช้กรอกบน PO (Phase 3 เก็บตก) ---
+            ManualSupplierAddressID        TYPE i_purchaseorderapi01-ManualSupplierAddressID,
+            LastChangeDateTime             TYPE i_purchaseorderapi01-LastChangeDateTime,
+            PerformanceBondFlag            TYPE i_purchaseorderapi01-YY1_PerformanceBond_PO_PDH,
+            PerformanceBondCash            TYPE i_purchaseorderapi01-YY1_Retention_PO_Per_PDH,
+            PerformanceBondBG              TYPE i_purchaseorderapi01-YY1_BankGuarantee_PO_P_PDH,
+            InsuranceFlag                  TYPE i_purchaseorderapi01-YY1_Insurance_PO_PDH,
+            WarrantyBondFlag               TYPE i_purchaseorderapi01-YY1_WarrantyBond_PO_PDH,
+            WarrantyBondCash               TYPE i_purchaseorderapi01-YY1_Retention_PO_W_PDH,
+            WarrantyBondBG                 TYPE i_purchaseorderapi01-YY1_BankGuarantee_PO_W_PDH,
+            SupplierEmail                  TYPE i_purchaseorderapi01-YY1_Email_PO_PDH,
+            FrameworkStartDate             TYPE i_purchaseorderapi01-YY1_FrameworkStartDate_PDH,
+            FrameworkEndDate               TYPE i_purchaseorderapi01-YY1_FrameworkEndDate_PDH,
           END OF ty_header,
           tt_header TYPE STANDARD TABLE OF ty_header WITH EMPTY KEY.
 
@@ -152,6 +166,37 @@ CLASS zcl_pure001_data DEFINITION
       END OF ty_user_name,
       tt_user_name TYPE STANDARD TABLE OF ty_user_name WITH EMPTY KEY.
 
+    "! ค่าที่ฟอร์มต้องใช้แต่ต้องให้ custom class ของลูกค้าคำนวณ
+    "! เป็นชุดเดียวกับที่ BAdI MM_PUR_S4_PO_MODIFY_HEADER เติมให้ฟอร์มมาตรฐาน
+    TYPES:
+      BEGIN OF ty_form_detail,
+        PurchaseOrder      TYPE zr_pure001-PurchaseOrder,
+        ApproverName       TYPE zcl_get_approval_name=>gty_data,
+        ApproverPosition   TYPE zcl_get_approval_name=>gty_data,
+        ApprovalDateRaw    TYPE zcl_get_approval_name=>gty_po_rel_date,
+        ApprovalDateText   TYPE i_purchaseorderapi01-YY1_Approval_date_PDH,
+        RecipientContact   TYPE i_purchaseorderapi01-YY1_RecipientContact_PDH,
+        RecipientTelephone TYPE i_purchaseorderapi01-YY1_RecipientTelephone_PDH,
+        SumAmount          TYPE i_purchaseorderapi01-YY1_SumAmount_PDH,
+        SumNetAmount       TYPE i_purchaseorderapi01-YY1_SumNetAmt_PDH,
+        SumOtherExpense    TYPE i_purchaseorderapi01-YY1_SumOtherExpense_PDH,
+        SumTax             TYPE i_purchaseorderapi01-YY1_SumTax_PDH,
+        SumTotalNetAmount  TYPE i_purchaseorderapi01-YY1_SumTotalNetAmt_PDH,
+        SupplierCodeName   TYPE i_purchaseorderapi01-YY1_SuppCodeNameBranch_PDH,
+        SupplierAddress    TYPE i_purchaseorderapi01-YY1_SupplierAddress_PDH,
+        PreparedByName     TYPE zcl_get_fullname_th=>gty_data,
+        IssuedDateText     TYPE i_purchaseorderapi01-YY1_IssuedDateTH_PDH,
+      END OF ty_form_detail,
+      tt_form_detail TYPE STANDARD TABLE OF ty_form_detail WITH EMPTY KEY.
+
+    "! อ่านค่าที่ฟอร์มต้องใช้จาก custom class ของลูกค้า
+    "! เรียกทีละใบสั่งซื้อจึงใช้เฉพาะตอนพิมพ์ฟอร์ม ห้ามเรียกจาก list report
+    "! @parameter it_header | header ที่อ่านมาแล้วจาก read_headers
+    "! @parameter rt_detail | หนึ่งบรรทัดต่อหนึ่งใบสั่งซื้อ
+    METHODS read_form_details
+      IMPORTING it_header        TYPE tt_header
+      RETURNING VALUE(rt_detail) TYPE tt_form_detail.
+
     METHODS read_schedule_lines
       IMPORTING it_purchase_order        TYPE tt_po_key
       RETURNING VALUE(rt_schedule_line)  TYPE tt_schedule_line.
@@ -231,6 +276,12 @@ CLASS zcl_pure001_data DEFINITION
     METHODS enrich_workflow     CHANGING ct_header TYPE tt_header.
     METHODS derive_status       CHANGING ct_header TYPE tt_header.
 
+    "! ประกอบชื่อผู้ขายพร้อมสาขาและที่อยู่ ตามกติกาเดียวกับ BAdI ของฟอร์มมาตรฐาน
+    "! ใบที่ระบุที่อยู่เองจะอ่านที่อยู่จากใบสั่งซื้อแทนข้อมูลผู้ขาย
+    METHODS compose_supplier_info
+      IMPORTING is_header TYPE ty_header
+      CHANGING  cs_detail TYPE ty_form_detail.
+
 ENDCLASS.
 
 
@@ -262,7 +313,19 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
              po~SupplierPhoneNumber,
              po~PurchasingProcessingStatus,
              po~PurchasingCompletenessStatus,
-             po~PurchasingDocumentDeletionCode
+             po~PurchasingDocumentDeletionCode,
+             po~ManualSupplierAddressID,
+             po~LastChangeDateTime,
+             po~YY1_PerformanceBond_PO_PDH  AS PerformanceBondFlag,
+             po~YY1_Retention_PO_Per_PDH    AS PerformanceBondCash,
+             po~YY1_BankGuarantee_PO_P_PDH  AS PerformanceBondBG,
+             po~YY1_Insurance_PO_PDH        AS InsuranceFlag,
+             po~YY1_WarrantyBond_PO_PDH     AS WarrantyBondFlag,
+             po~YY1_Retention_PO_W_PDH      AS WarrantyBondCash,
+             po~YY1_BankGuarantee_PO_W_PDH  AS WarrantyBondBG,
+             po~YY1_Email_PO_PDH            AS SupplierEmail,
+             po~YY1_FrameworkStartDate_PDH  AS FrameworkStartDate,
+             po~YY1_FrameworkEndDate_PDH    AS FrameworkEndDate
       WHERE po~PurchaseOrder              IN @is_selection-purchase_order
       AND   po~PurchaseOrderType          IN @is_selection-po_type
       AND   po~Supplier                   IN @is_selection-supplier
@@ -716,6 +779,170 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
       FOR ALL ENTRIES IN @it_user
       WHERE UserID = @it_user-UserID
       INTO TABLE @rt_user_name.
+
+  ENDMETHOD.
+
+
+  METHOD read_form_details.
+
+    LOOP AT it_header INTO DATA(ls_header).
+
+      APPEND INITIAL LINE TO rt_detail ASSIGNING FIELD-SYMBOL(<lfs_detail>).
+      <lfs_detail>-PurchaseOrder = ls_header-PurchaseOrder.
+
+      " ชื่อ ตำแหน่ง และวันที่ของผู้อนุมัติ
+      zcl_get_approval_name=>get_data(
+        EXPORTING iv_po_no         = CONV #( ls_header-PurchaseOrder )
+        IMPORTING es_data_name     = <lfs_detail>-ApproverName
+                  es_data_position = <lfs_detail>-ApproverPosition
+                  es_data_date     = <lfs_detail>-ApprovalDateRaw ).
+
+      " class คืนวันที่มาแบบดิบ ต้องแปลงเป็นวันที่ไทยด้วย class เดียวกับฟอร์มมาตรฐาน
+      " iv_blank_date = X คือให้คืนเส้นประเมื่อยังไม่มีวันที่อนุมัติ
+      zcl_conv_date_to_th=>get_data( EXPORTING iv_approval_date = <lfs_detail>-ApprovalDateRaw
+                                               iv_blank_date    = 'X'
+                                     IMPORTING es_approval_date = <lfs_detail>-ApprovalDateText ).
+
+      " นามผู้รับสินค้าพร้อมเบอร์โทร และยอดรวมท้ายฟอร์มทั้งห้าช่อง
+      zcl_get_other_detail=>get_data(
+        EXPORTING iv_po_no            = ls_header-PurchaseOrder
+        IMPORTING es_recipientcontact = <lfs_detail>-RecipientContact
+                  es_recipienttel     = <lfs_detail>-RecipientTelephone
+                  es_sumamount        = <lfs_detail>-SumAmount
+                  es_sumnetamt        = <lfs_detail>-SumNetAmount
+                  es_sumotherexpense  = <lfs_detail>-SumOtherExpense
+                  es_sumtax           = <lfs_detail>-SumTax
+                  es_sumtotalnetamt   = <lfs_detail>-SumTotalNetAmount ).
+
+      compose_supplier_info( EXPORTING is_header = ls_header
+                             CHANGING  cs_detail = <lfs_detail> ).
+
+      " ชื่อภาษาไทยของผู้จัดทำ
+      IF ls_header-CreatedByUser IS NOT INITIAL.
+        zcl_get_fullname_th=>get_data( EXPORTING iv_createdby = ls_header-CreatedByUser
+                                       IMPORTING es_nameth    = <lfs_detail>-PreparedByName ).
+      ENDIF.
+
+      " วันที่ออกเอกสารใช้วันที่แก้ไขล่าสุด ไม่ใช่วันที่ของใบสั่งซื้อ
+      " เป็นกติกาเดียวกับฟอร์มมาตรฐาน
+      IF ls_header-LastChangeDateTime IS NOT INITIAL.
+
+        DATA lv_last_change TYPE i_purchaseorderapi01-YY1_IssuedDateTH_PDH.
+
+        zcl_get_lastchange_po=>get_data( EXPORTING iv_lastchangedatetime = ls_header-LastChangeDateTime
+                                         IMPORTING es_approval_date      = lv_last_change ).
+
+        zcl_conv_date_to_th=>get_data( EXPORTING iv_approval_date = lv_last_change
+                                                 iv_blank_date    = ''
+                                       IMPORTING es_approval_date = <lfs_detail>-IssuedDateText ).
+      ENDIF.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD compose_supplier_info.
+
+    DATA lv_room  TYPE string.
+    DATA lv_floor TYPE string.
+
+    " ชื่อผู้ขายมาจากสี่บรรทัดของ business partner ต่อท้ายรหัสที่ตัดศูนย์นำหน้าแล้ว
+    zcl_get_name_form_bp=>get_data( EXPORTING iv_businesspartner = CONV #( is_header-Supplier )
+                                    IMPORTING es_data            = DATA(ls_name) ).
+
+    IF ls_name IS NOT INITIAL.
+      CONDENSE: ls_name-BusinessPartner,
+                ls_name-OrganizationBPName1,
+                ls_name-OrganizationBPName2,
+                ls_name-OrganizationBPName3,
+                ls_name-OrganizationBPName4.
+
+      SHIFT ls_name-BusinessPartner LEFT DELETING LEADING '0'.
+
+      CONCATENATE ls_name-BusinessPartner
+                  ls_name-OrganizationBPName1
+                  ls_name-OrganizationBPName2
+                  ls_name-OrganizationBPName3
+                  ls_name-OrganizationBPName4
+                  INTO cs_detail-SupplierCodeName SEPARATED BY space.
+    ENDIF.
+
+    DATA ls_address TYPE zcl_get_address_form_bp=>gty_data_t.
+
+    IF is_header-ManualSupplierAddressID IS INITIAL.
+
+      zcl_get_address_form_bp=>get_data( EXPORTING iv_businesspartner = CONV #( is_header-Supplier )
+                                         IMPORTING es_data           = ls_address ).
+
+    ELSE.
+
+      " ใบที่พิมพ์ที่อยู่เอง ชื่อผู้ขายจะเป็นรหัสตามด้วยที่อยู่เต็มแทนชื่อจาก master
+      zcl_get_address_form_onetime=>get_data(
+        EXPORTING iv_supplieraddressid = CONV #( is_header-ManualSupplierAddressID )
+                  iv_purchaseorder     = CONV #( is_header-PurchaseOrder )
+        IMPORTING es_data              = ls_address ).
+
+      CLEAR cs_detail-SupplierCodeName.
+      CONCATENATE ls_name-BusinessPartner
+                  ls_address-CompleteAddress
+                  INTO cs_detail-SupplierCodeName SEPARATED BY space.
+
+    ENDIF.
+
+    IF ls_address IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    " คำนำหน้าห้องและชั้นเปลี่ยนตามประเทศของที่อยู่
+    IF ls_address-RoomNumber IS NOT INITIAL.
+      lv_room  = COND #( WHEN ls_address-Country = 'TH' THEN `ห้อง` ELSE `Room` ).
+      lv_room  = |{ lv_room } { ls_address-RoomNumber }|.
+    ENDIF.
+
+    IF ls_address-Floor IS NOT INITIAL.
+      lv_floor = COND #( WHEN ls_address-Country = 'TH' THEN `ชั้น` ELSE `Floor` ).
+      lv_floor = |{ lv_floor } { ls_address-Floor }|.
+    ENDIF.
+
+    CONDENSE: ls_address-HouseNumber,
+              ls_address-StreetPrefixName,
+              ls_address-StreetSuffixName,
+              ls_address-Building,
+              ls_address-AdditionalStreetPrefixName,
+              ls_address-StreetName,
+              ls_address-HomeCityName,
+              ls_address-District,
+              ls_address-CityName,
+              ls_address-Region,
+              ls_address-PostalCode,
+              ls_address-AdditionalStreetSuffixName,
+              lv_room,
+              lv_floor.
+
+    CONCATENATE ls_address-HouseNumber
+                ls_address-StreetPrefixName
+                ls_address-StreetSuffixName
+                ls_address-Building
+                lv_floor
+                lv_room
+                ls_address-AdditionalStreetPrefixName
+                ls_address-StreetName
+                ls_address-HomeCityName
+                ls_address-District
+                ls_address-CityName
+                ls_address-Region
+                ls_address-PostalCode
+                INTO cs_detail-SupplierAddress SEPARATED BY space.
+
+    CONDENSE cs_detail-SupplierAddress.
+
+    " สาขาของผู้ขายต่อท้ายชื่อ
+    IF ls_address-AdditionalStreetSuffixName IS NOT INITIAL.
+      CONCATENATE cs_detail-SupplierCodeName
+                  ls_address-AdditionalStreetSuffixName
+                  INTO cs_detail-SupplierCodeName SEPARATED BY space.
+    ENDIF.
 
   ENDMETHOD.
 ENDCLASS.

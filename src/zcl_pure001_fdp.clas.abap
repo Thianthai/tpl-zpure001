@@ -48,7 +48,8 @@ CLASS zcl_pure001_fdp DEFINITION
       gt_header_text      TYPE zcl_pure001_data=>tt_text,
       gt_item_text        TYPE zcl_pure001_data=>tt_text,
       gt_approver         TYPE zcl_pure001_data=>tt_approver,
-      gt_user_name        TYPE zcl_pure001_data=>tt_user_name.
+      gt_user_name        TYPE zcl_pure001_data=>tt_user_name,
+      gt_form_detail      TYPE zcl_pure001_data=>tt_form_detail.
 
     METHODS prepare_filter
       IMPORTING io_request TYPE REF TO if_rap_query_request
@@ -153,36 +154,10 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
 
   METHOD prepare_filter.
 
-*    TRY.
-*        DATA(lt_filter) = io_request->get_filter( )->get_as_ranges( ).
-*      CATCH cx_rap_query_filter_no_range INTO DATA(lx_no_range).
-*        " ชั่วคราว (diagnose): บอกว่า entity ไหน / filter หน้าตาอย่างไร ที่แปลงเป็น range ไม่ได้
-*        DATA lv_filter_sql TYPE string.
-*        TRY.
-*            lv_filter_sql = io_request->get_filter( )->get_as_sql_string( ).
-*          CATCH cx_root.
-*            lv_filter_sql = '(no sql string)'.
-*        ENDTRY.
-*        RAISE EXCEPTION NEW zcx_pure001_query(
-*          previous = lx_no_range
-*          text     = |{ io_request->get_entity_id( ) }: { lv_filter_sql }| ).
-*    ENDTRY.
-*
-*    " FDP ส่ง key ของ root มาเป็น filter ชื่อ PURCHASEORDER ให้ทุก entity (พิมพ์หลายใบ = หลายค่า)
-*    CLEAR gr_purchase_order.
-*    ASSIGN lt_filter[ name = 'PURCHASEORDER' ] TO FIELD-SYMBOL(<lfs_filter>).
-*    IF sy-subrc = 0.
-*      gr_purchase_order = CORRESPONDING #( <lfs_filter>-range ).
-*    ENDIF.
-*
-*    IF gr_purchase_order IS INITIAL.
-*      RAISE EXCEPTION NEW zcx_pure001_query( text = 'Purchase order key is required for form data' ).
-*    ENDIF.
-
     CLEAR gr_purchase_order.
 
     TRY.
-        " root / item: framework ส่ง PurchaseOrder = x (หรือ OR หลายค่า) → range ได้
+        " root / item: framework ส่ง PurchaseOrder = x (หรือ OR หลายค่า) -> range ได้
         DATA(lt_filter) = io_request->get_filter( )->get_as_ranges( ).
         ASSIGN lt_filter[ name = 'PURCHASEORDER' ] TO FIELD-SYMBOL(<lfs_filter>).
         IF sy-subrc = 0.
@@ -190,9 +165,9 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
         ENDIF.
 
       CATCH cx_rap_query_filter_no_range.
-        " item text (key PO+Item): framework ส่ง (PO = x AND Item = y) OR (PO = x AND Item = z) …
-        " range แยกต่อ field ผูกคู่กันไม่ได้ → เดิน tree เก็บเฉพาะค่า PO (ฟอร์มต้องการแค่รายการ PO
-        " และเราส่ง text ของ item ที่ไม่ลบทั้งหมดกลับไป ซึ่งตรงกับชุด key ที่ framework ขอ)
+        " item text มี key สองส่วน framework จึงส่ง (PO = x AND Item = y) OR (PO = x AND Item = z)
+        " range แยกต่อ field ผูกคู่กันไม่ได้ จึงเดิน filter tree เก็บเฉพาะเลขที่ใบสั่งซื้อ
+        " ฟอร์มต้องการแค่รายการใบสั่งซื้อ เพราะเราส่ง text ของ item ที่ไม่ถูกลบกลับไปทั้งหมดอยู่แล้ว
         DATA(lo_tree) = io_request->get_filter( )->get_as_tree( ).
         IF lo_tree IS BOUND.
           collect_po_from_tree( lo_tree->get_root_node( ) ).
@@ -265,6 +240,7 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
     gt_header_text    = go_data->read_header_texts( lt_po_key ).
     gt_item_text      = go_data->read_item_texts( lt_po_key ).
     gt_approver       = go_data->read_approvers( gt_header ).
+    gt_form_detail    = go_data->read_form_details( gt_header ).
     gt_tax_rate       = go_data->read_tax_rates( gt_header[ 1 ]-CompanyCountry ).
     gt_user_name      = go_data->read_user_names( VALUE #( FOR ls_c IN gt_header ( UserID = ls_c-CreatedByUser ) ) ).
 
@@ -312,73 +288,94 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
       <lfs_out>-HeaderNote = get_header_text( iv_purchase_order = <lfs_src>-PurchaseOrder iv_language = <lfs_src>-Language iv_text_type = gc_text_type-header_note ).
       " PerfGuarantee* / InsurancePolicyFlag / WarrantyGuarantee* = ⏸ custom field YY1_* (ว่าง)
 
+      " ค่าที่ฟอร์มมาตรฐานได้จาก BAdI เราอ่านผ่าน custom class ชุดเดียวกัน
+      ASSIGN gt_form_detail[ PurchaseOrder = <lfs_src>-PurchaseOrder ] TO FIELD-SYMBOL(<lfs_detail>).
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+
+      " วันที่ออกเอกสารใช้วันที่แก้ไขล่าสุดตามฟอร์มมาตรฐาน
+      <lfs_out>-PurchaseOrderDateText = <lfs_detail>-IssuedDateText.
+
+      " วันที่สัญญาอ่านจาก custom field ของใบสั่งซื้อ
+      <lfs_out>-ValidityStartDate     = <lfs_src>-FrameworkStartDate.
+      <lfs_out>-ValidityStartDateText = zcl_pure001_util=>to_thai_date( <lfs_src>-FrameworkStartDate ).
+      <lfs_out>-ValidityEndDate       = <lfs_src>-FrameworkEndDate.
+      <lfs_out>-ValidityEndDateText   = zcl_pure001_util=>to_thai_date( <lfs_src>-FrameworkEndDate ).
+
+      " ช่องหลักประกันเป็น custom field ที่ผู้ใช้ติ๊กบนใบสั่งซื้อ
+      <lfs_out>-PerfGuaranteeFlag     = <lfs_src>-PerformanceBondFlag.
+      <lfs_out>-PerfGuaranteeCash     = <lfs_src>-PerformanceBondCash.
+      <lfs_out>-PerfGuaranteeBG       = <lfs_src>-PerformanceBondBG.
+      <lfs_out>-InsurancePolicyFlag   = <lfs_src>-InsuranceFlag.
+      <lfs_out>-WarrantyGuaranteeFlag = <lfs_src>-WarrantyBondFlag.
+      <lfs_out>-WarrantyGuaranteeCash = <lfs_src>-WarrantyBondCash.
+      <lfs_out>-WarrantyGuaranteeBG   = <lfs_src>-WarrantyBondBG.
+
       "--- Supplier --------------------------------------------------------------
       <lfs_out>-Supplier           = <lfs_src>-Supplier.
       <lfs_out>-SupplierName       = <lfs_src>-SupplierName.
-      <lfs_out>-SupplierCodeName   = condense( |{ <lfs_src>-Supplier ALPHA = OUT } { <lfs_src>-SupplierName }| ).
+      <lfs_out>-SupplierCodeName   = <lfs_detail>-SupplierCodeName.
       <lfs_out>-SupplierTaxNumber  = <lfs_src>-SupplierTaxNumber.
       <lfs_out>-SupplierStreet     = <lfs_src>-SupplierStreet.
       <lfs_out>-SupplierDistrict   = <lfs_src>-SupplierDistrict.
       <lfs_out>-SupplierCity       = <lfs_src>-SupplierCity.
       <lfs_out>-SupplierPostalCode = <lfs_src>-SupplierPostalCode.
-      <lfs_out>-SupplierAddress    = compose_address( VALUE #( ( CONV #( <lfs_src>-SupplierStreet ) )
-                                                                ( CONV #( <lfs_src>-SupplierDistrict ) )
-                                                                ( CONV #( <lfs_src>-SupplierCity ) )
-                                                                ( CONV #( <lfs_src>-SupplierPostalCode ) ) ) ).
+      <lfs_out>-SupplierAddress    = <lfs_detail>-SupplierAddress.
       <lfs_out>-SupplierContactName = <lfs_src>-SupplierRespSalesPersonName.
       <lfs_out>-SupplierPhone       = COND #( WHEN <lfs_src>-SupplierPhoneNumber IS NOT INITIAL
                                               THEN <lfs_src>-SupplierPhoneNumber
                                               ELSE <lfs_src>-SupplierMasterPhone ).
-      " SupplierEmail = ⏸ custom field
+      <lfs_out>-SupplierEmail       = <lfs_src>-SupplierEmail.
 
       "--- Ship-to ---------------------------------------------------------------
       <lfs_out>-ShipToPlant     = ls_first_item-Plant.
       <lfs_out>-ShipToPlantName = ls_first_item-PlantName.
-      <lfs_out>-ShipToName      = <lfs_src>-CompanyCodeName.            " ผู้ใช้ตัดสินใจ: ชื่อบริษัท
+
+      " สถานที่จัดส่งใช้ชื่อและที่อยู่ของ plant ตามฟอร์มมาตรฐาน
+      " ชื่อภาษาไทยอยู่บรรทัดแรก ที่อยู่อยู่บรรทัดถัดมา
+      DATA(ls_ship_to) = zcl_pure001_address=>get_by_plant( ls_first_item-Plant ).
+
+      <lfs_out>-ShipToName         = COND #( WHEN ls_ship_to-Name2 IS NOT INITIAL
+                                             THEN ls_ship_to-Name2
+                                             ELSE ls_ship_to-Name1 ).
+      <lfs_out>-ShipToAddressLine1 = ls_ship_to-AddressText.
+
+      <lfs_out>-GoodsRecipientName  = <lfs_detail>-RecipientContact.
+      <lfs_out>-GoodsRecipientPhone = <lfs_detail>-RecipientTelephone.
       ASSIGN gt_account_assgmt[ PurchaseOrder     = ls_first_item-PurchaseOrder
                                 PurchaseOrderItem = ls_first_item-PurchaseOrderItem ] TO FIELD-SYMBOL(<lfs_first_aa>).
       IF sy-subrc = 0.
-        <lfs_out>-GoodsRecipientName = <lfs_first_aa>-GoodsRecipientName.
         <lfs_out>-UnloadingPointName = <lfs_first_aa>-UnloadingPointName.
       ENDIF.
-      " ShipToAddressLine* / GoodsRecipientPhone = ⏸ config
 
-      "--- Totals — คำนวณจาก item ที่ส่งออกจริง (ไม่ลบ) ------------------------------
+      "--- Totals — ใช้ยอดชุดเดียวกับฟอร์มมาตรฐาน ------------------------------------
       <lfs_out>-DocumentCurrency = <lfs_src>-DocumentCurrency.
-      LOOP AT lt_active_item ASSIGNING FIELD-SYMBOL(<lfs_item>).
-        <lfs_out>-TotalAmount += <lfs_item>-NetAmount.
-        <lfs_out>-TaxAmount   += round( val = <lfs_item>-NetAmount * get_tax_rate( <lfs_item>-TaxCode ) / 100
-                                        dec = 2 ).
-      ENDLOOP.
-      <lfs_out>-DiscountAmount  = 0.                                      " ⏸ ไม่มี source
-      <lfs_out>-AmountBeforeTax = <lfs_out>-TotalAmount - <lfs_out>-DiscountAmount.
-      <lfs_out>-NetAmount       = <lfs_out>-AmountBeforeTax + <lfs_out>-TaxAmount.
-      <lfs_out>-AmountInWords   = zcl_pure001_util=>amount_in_words( iv_amount   = <lfs_out>-NetAmount
-                                                                     iv_currency = <lfs_out>-DocumentCurrency ).
+      <lfs_out>-TotalAmount      = <lfs_detail>-SumNetAmount.
+      <lfs_out>-DiscountAmount   = <lfs_detail>-SumOtherExpense.
+      <lfs_out>-AmountBeforeTax  = <lfs_detail>-SumAmount.
+      <lfs_out>-TaxAmount        = <lfs_detail>-SumTax.
+      <lfs_out>-NetAmount        = <lfs_detail>-SumTotalNetAmount.
+      <lfs_out>-AmountInWords    = zcl_pure001_util=>amount_in_words( iv_amount   = <lfs_out>-NetAmount
+                                                                      iv_currency = <lfs_out>-DocumentCurrency ).
 
       "--- Signature -------------------------------------------------------------
       <lfs_out>-PreparedByUser   = <lfs_src>-CreatedByUser.
-      <lfs_out>-PreparedByName   = VALUE #( gt_user_name[ UserID = <lfs_src>-CreatedByUser ]-PersonFullName OPTIONAL ).
+      <lfs_out>-PreparedByName   = <lfs_detail>-PreparedByName.
       <lfs_out>-PreparedDate     = <lfs_src>-CreationDate.
-      <lfs_out>-PreparedDateText = zcl_pure001_util=>to_thai_date( <lfs_src>-CreationDate ).
+      <lfs_out>-PreparedDateText = <lfs_detail>-IssuedDateText.
 
-      ASSIGN gt_approver[ PurchaseOrder = <lfs_src>-PurchaseOrder ] TO FIELD-SYMBOL(<lfs_approver>).
-      IF sy-subrc = 0.
-        <lfs_out>-ApprovedByUser = <lfs_approver>-ApprovedByUser.
-        <lfs_out>-ApprovedByName = <lfs_approver>-ApprovedByName.
+      " วันที่อนุมัติว่างหมายถึงใบนี้ยังไม่ผ่านการอนุมัติ
+      " ใช้ค่าดิบเพราะข้อความที่แปลงแล้วจะเป็นเส้นประเมื่อยังไม่อนุมัติ
+      DATA(lv_approved) = xsdbool( <lfs_detail>-ApprovalDateRaw IS NOT INITIAL ).
 
-        " UTC timestamp (TIMESTAMPL) → วันที่ในเวลาไทย
-        CONVERT TIME STAMP <lfs_approver>-ApprovedDateTime
-          TIME ZONE gc_time_zone
-          INTO DATE <lfs_out>-ApprovedDate.
+      <lfs_out>-ApprovedByUser     = <lfs_src>-CreatedByUser.
+      <lfs_out>-ApprovedByName     = <lfs_detail>-ApproverName.
+      <lfs_out>-ApprovedByPosition = <lfs_detail>-ApproverPosition.
+      <lfs_out>-ApprovedDateText   = <lfs_detail>-ApprovalDateText.
 
-        <lfs_out>-ApprovedDateText = zcl_pure001_util=>to_thai_date( <lfs_out>-ApprovedDate ).
-      ENDIF.
       <lfs_out>-IsApprovedAutomatically = xsdbool( <lfs_src>-ApprovalStatus = zcl_pure001_data=>gc_approval-automatic ).
-      <lfs_out>-ApprovalNoteText = COND #( WHEN <lfs_src>-ApprovalStatus = zcl_pure001_data=>gc_approval-approved
-                                             OR <lfs_src>-ApprovalStatus = zcl_pure001_data=>gc_approval-automatic
-                                           THEN gc_approval_note ).
-      " ApprovedByPosition / ApprovedBySignature = ⏸ config / graphics
+      <lfs_out>-ApprovalNoteText        = COND #( WHEN lv_approved = abap_true THEN gc_approval_note ).
 
     ENDLOOP.
 
@@ -429,9 +426,9 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
         IF <lfs_out>-PurchaseRequisition IS INITIAL.
           <lfs_out>-PurchaseRequisition = <lfs_src>-PurchaseRequisition.
         ENDIF.
-        " ฟอร์มใช้ dd/mm/yyyy ค.ศ. ระดับ item (ต่างจาก header) — ตามตัวอย่างฟอร์ม
+        " ฟอร์มใช้ dd/mm/yyyy ค.ศ. ระดับ item ตามฟอร์มมาตรฐาน
         IF <lfs_out>-DeliveryDate IS NOT INITIAL.
-          <lfs_out>-DeliveryDateText = |Delivery Time : { zcl_pure001_util=>format_date_dmy( <lfs_out>-DeliveryDate ) }|.
+          <lfs_out>-DeliveryDateText = |Delivery Date : { zcl_pure001_util=>format_date_dmy( <lfs_out>-DeliveryDate ) }|.
         ENDIF.
 
         "--- account assignment --------------------------------------------------
@@ -505,10 +502,10 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
 
   METHOD get_ordered_item_texts.
 
-    " ลำดับตามฟอร์ม: Material PO Text → Item Text → Delivery Text · ภาษาของ PO · เฉพาะที่มีข้อความ
+    " ลำดับตามฟอร์มมาตรฐาน คือ Material PO Text แล้วตามด้วย Item Text
+    " Delivery Text ไม่พิมพ์ในฟอร์ม
     DATA(lt_type_order) = VALUE string_table( ( |{ gc_text_type-material_po_text }| )
-                                              ( |{ gc_text_type-item_text }| )
-                                              ( |{ gc_text_type-delivery_text }| ) ).
+                                              ( |{ gc_text_type-item_text }| ) ).
 
     LOOP AT lt_type_order INTO DATA(lv_type).
       ASSIGN gt_item_text[ PurchaseOrder     = iv_purchase_order
@@ -527,7 +524,8 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
 
     DATA lt_line TYPE string_table.
 
-    APPEND is_item-ItemDescription TO lt_line.                       " บรรทัด 1: "C01-216-0 desc" / desc อย่างเดียว
+    " บรรทัดแรกเป็นคำอธิบายรายการอย่างเดียว รหัสวัสดุอยู่บรรทัดล่างในวงเล็บ
+    APPEND is_item-MaterialDescription TO lt_line.
 
     DATA(lt_text) = get_ordered_item_texts( iv_purchase_order      = is_item-PurchaseOrder
                                             iv_purchase_order_item = is_item-PurchaseOrderItem
@@ -537,8 +535,14 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
     ENDLOOP.
 
     IF is_item-DeliveryDateText IS NOT INITIAL.
-      APPEND is_item-DeliveryDateText TO lt_line.                    " Delivery Time : dd/mm/yyyy
+      APPEND is_item-DeliveryDateText TO lt_line.                    " Delivery Date : dd/mm/yyyy
     ENDIF.
+
+    " รายการที่เป็นวัสดุจะมีรหัสต่อท้ายในวงเล็บ รายการข้อความล้วนไม่มี
+    IF is_item-Material IS NOT INITIAL.
+      APPEND |({ is_item-Material })| TO lt_line.
+    ENDIF.
+
     IF is_item-AccountAssignmentText IS NOT INITIAL.
       APPEND is_item-AccountAssignmentText TO lt_line.               " PR No.: …  Acc.Code: …  Order No.: …
     ENDIF.
