@@ -101,6 +101,8 @@ s=edit_field(s,'AmtInWord',    bind(H+'AmountInWords'))
 s=edit_field(s,'Create_date',  bind(H+'PreparedDateText'))
 s=edit_field(s,'Field_Date_Source', bind(H+'PurchaseOrderDate'))
 s=edit_field(s,'TextField7',   bind(H+'PurchaseOrderDateText'))
+# ต้นทางเปลี่ยน DeliveryDate เป็น calculate script จึงต้อง bind ตรงนี้เอง
+s=edit_field(s,'DeliveryDate',  bind(H+'DeliveryDateText'))
 
 # TextField8: approval note = value from ABAP (empty = nothing printed) -> drop caption + presence script, multiline
 def fix_note(b):
@@ -199,3 +201,45 @@ new_js='var cur = xfa.layout.page(this);\nvar total = xfa.layout.pageCount();\nt
 n3=s.count(old_js); s=s.replace(old_js,new_js)
 open('ZPURF002.xdp','w',encoding='utf-8').write(s)
 print(f"round1 fixes: bind pictures removed={n1}, nullTest removed={n2}, AmtInWord script replaced={n3}")
+
+
+# ---------- 10b. drop scripts that still read the standard data model ----------
+s=open('ZPURF002.xdp',encoding='utf-8').read()
+pattern=re.compile(r'\n[ \t]*<event activity="[^"]*"[^>]*>\s*<script[^>]*>(?:(?!</script>).)*?PurchaseOrderNode(?:(?!</script>).)*?</script>\s*</event>', re.S)
+n=len(pattern.findall(s))
+s=pattern.sub('', s)
+open('ZPURF002.xdp','w',encoding='utf-8').write(s)
+print(f"removed {n} event scripts that referenced the standard data model")
+
+# ---------- 11. hide the logo and the company address until the order is approved ----------
+s=open('ZPURF002.xdp',encoding='utf-8').read()
+LOGO_SCRIPT = """
+               <event activity="ready" ref="$layout" name="event__layout_ready">
+                  <script contentType="application/x-javascript">// โลโก้และที่อยู่บริษัทพิมพ์เฉพาะใบที่อนุมัติแล้ว
+// ABAP ส่ง ApprovalNoteText มาเมื่อสถานะอนุมัติเท่านั้น จึงใช้เป็นตัวชี้วัด
+var oNote = xfa.resolveNode("xfa.datasets.data.Form.PurchaseOrderHeader.ApprovalNoteText");
+var bApproved = (oNote !== null &amp;&amp; oNote.value !== null &amp;&amp; oNote.value !== "");
+var sPresence = bApproved ? "visible" : "hidden";
+
+// ทั้งสองตัวเป็น draw และ subform ที่ผูก script กับตัวเองไม่ได้
+// จึงสั่ง presence จาก field ที่อยู่บน master page เดียวกัน
+var aNames = ["Image1", "CompAddress"];
+
+for (var i = 0; i &lt; aNames.length; i++) {
+
+    var oTarget = null;
+    try { oTarget = this.parent.resolveNode(aNames[i]); } catch (oError) { }
+    if (oTarget === null) { try { oTarget = xfa.resolveNode(aNames[i]); } catch (oError) { } }
+
+    if (oTarget !== null) {
+        oTarget.presence = sPresence;
+    }
+}
+</script>
+               </event>"""
+m=re.search(r'<field name="PurchaseOrderNumber"[\s>]', s)
+end=s.find('</field>', m.start())
+assert end > 0
+s=s[:end]+LOGO_SCRIPT+"\n            "+s[end:]
+open('ZPURF002.xdp','w',encoding='utf-8').write(s)
+print("logo and company address visibility script added")

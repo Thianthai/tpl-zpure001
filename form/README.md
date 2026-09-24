@@ -11,6 +11,7 @@
 | `sample/99680056_multipage.xml` | XML สังเคราะห์ 25 รายการ + เติม approver / checkbox / Ship Via / Valid from-to — ทดสอบหลายหน้า |
 | `sample/0099680042_newfields.xml` | ชุดเดียวกับ 0099680042 แต่เติม Reference / Our Reference / Delivery Date / Ship Via / Valid from-to — ทดสอบ field ที่เพิ่ม 2026-09-23 |
 | `sample/99680056_multipage_newfields.xml` | ชุด 25 รายการ + Our Reference + Delivery Date |
+| `sample/0099680042_not_approved.xml` | ใบที่ยังไม่อนุมัติ (`ApprovalNoteText` ว่าง) — ใช้ดูว่าโลโก้กับที่อยู่บริษัทถูกซ่อน |
 | `build_xdp.py` | script ที่ใช้ generate `.xdp` จากฟอร์มเดิม (บันทึกว่าเปลี่ยนอะไรบ้าง: binding map, script ที่ถอด, subform ที่ลบ) — รันซ้ำได้ถ้ามีไฟล์ต้นฉบับ |
 
 ## หลักการของฟอร์มนี้ (D14)
@@ -34,3 +35,12 @@
 ลดฟอนต์กรอบขวาเป็น 6.9pt แล้วขยับตำแหน่ง) วิธี apply เข้ามาที่ `ZPURF002.xdp` คือ **rerun `build_xdp.py`** กับไฟล์ใหม่
 ไม่ใช่ไล่แก้มือใน Designer เพราะ script คง binding ของ FDP เราไว้ครบ
 field ที่ต้นทางเพิ่มใหม่ ให้เติม 1 บรรทัดใน `ref_map` ก่อนรัน
+
+**ข้อควรระวังที่เจอจริง (2026-09-24)** — ถ้าฟอร์มต้นทางเปลี่ยน field จาก binding เป็น calculate script
+(เช่น `DeliveryDate` ที่ต้องแปลงวันที่ไทยเอง) `ref_map` จะจับไม่ได้ และ script ก็ถูกถอดตามกฎ
+ผลคือช่องนั้น**ว่างเงียบ ๆ** ต้อง bind ตรงด้วย `edit_field( )` ในขั้นตอนที่ 4 แทน
+· ทุกครั้งที่ rerun ให้ไล่ดู log ว่าบรรทัด `ref ... -> ...` ครบเท่าเดิมไหม
+
+**สิ่งที่ script จัดการให้แล้ว**
+- ลบ `<calculate>` ทุกอัน และลบ `<event>` ที่ script อ้าง `PurchaseOrderNode` (data model ของ standard)
+- ใส่ script คุม presence ของ `Image1` กับ `CompAddress` ที่ field `PurchaseOrderNumber` (ซ่อนเมื่อยังไม่อนุมัติ)
