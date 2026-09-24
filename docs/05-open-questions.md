@@ -4,13 +4,13 @@
 |---|---|---|---|
 | 1 | **"Setting View" ใน prerequisite ข้อ 3 หมายถึงอะไร** เก็บ config อะไรบ้าง ใครเป็นคน maintain | 🔴 รอผู้ใช้คุยกับ functional | Phase 6 — ยังตัดสินใจไม่ได้ว่าจะทำเป็น Z table เฉย ๆ, RAP CRUD app หรือ Custom Business Configuration (MDO) |
 | 2 | **ที่มาของฟิลด์นอกมาตรฐาน PO** | 🟡 **มีเบาะแส** (2026-09-12): หน้า PO ใน Manage PO มี section *Custom Fields* — Performance Bond, Bank Guarantee, Retention, Framework Start/End Date, Email, Start Date → น่าจะเป็น custom field (extensibility) ที่ตรงกับช่องหลักประกัน/BG/วันที่สัญญาในฟอร์ม → Phase 2 ดึงผ่าน CDS extension ได้ · ต้องให้ functional ยืนยัน mapping | Phase 2/6 |
-| 2.1 | ☐ หลักประกันการดำเนินงาน / ☐ เงินค้ำประกัน / ☐ BG | 🔴 | |
-| 2.2 | ☐ กรมธรรม์ประกันภัย · ☐ หลักประกันผลงาน | 🔴 | |
-| 2.3 | วันที่เริ่มสัญญา / วันที่สิ้นสุดสัญญา (Valid from / Valid to) | 🔴 | |
+| 2.1 | ☐ หลักประกันการดำเนินงาน / ☐ เงินค้ำประกัน / ☐ BG | ✅ **ปิดแล้ว 09-25** — custom field `YY1_*` ใน `I_PurchaseOrderAPI01` (D19) | |
+| 2.2 | ☐ กรมธรรม์ประกันภัย · ☐ หลักประกันผลงาน | ✅ **ปิดแล้ว 09-25** — custom field `YY1_*` (D19) | |
+| 2.3 | วันที่เริ่มสัญญา / วันที่สิ้นสุดสัญญา | ✅ **ปิดแล้ว 09-25** — `YY1_FrameworkStartDate/EndDate_PDH` (D19) | |
 | 2.4 | จัดส่งโดย / Ship Via (`Truck`) | 🔴 | |
-| 2.5 | นามผู้รับสินค้า + เบอร์โทร | 🔴 | |
-| 2.6 | ผู้อนุมัติ (ชื่อ / ตำแหน่ง / วันที่ / รูปลายเซ็น) — มาจาก approval workflow หรือ config | 🟡 ชื่อ+วันที่ได้จาก `I_WorkflowStatusDetails` (task `RELEASED` → `WorkflowTaskProcessor`, `WrkflwTskCompletionUTCDateTime`) — ต้องหา released view แปลง user ID → ชื่อ · ตำแหน่ง/ลายเซ็นยังต้อง config | |
-| 2.7 | ส่วนลด/Discount | 🔴 | |
+| 2.5 | นามผู้รับสินค้า + เบอร์โทร | ✅ **ปิดแล้ว 09-25** — `zcl_get_other_detail` (D19) | |
+| 2.6 | ผู้อนุมัติ (ชื่อ / ตำแหน่ง / วันที่ / รูปลายเซ็น) | ✅ **ปิดแล้ว 09-25** — `zcl_get_approval_name` ให้ทั้งชื่อ ตำแหน่ง และวันที่ (D19) · เหลือรูปลายเซ็นที่ยังต้องใช้ตารางรูปภาพ | |
+| 2.7 | ส่วนลด/Discount (ค่าใช้จ่ายอื่นๆ) | ✅ **ปิดแล้ว 09-25** — `zcl_get_other_detail` คืน `SumOtherExpense` (D19) | |
 | 3 | **Output Management** — spec §2.5 แสดง Form Template `ZPURF001` ผูกกับ output type `PURCHASE_ORDER` ในแท็บ Output Management ของ Manage PO อยู่ด้วย ตกลงขอบเขตงานนี้รวมการตั้ง output type ด้วยไหม หรือทำแค่ RAP UI แยกอีกจอ | 🟡 ต้องยืนยัน | ถ้ารวม จะเพิ่มงาน config output determination ซึ่งไม่ใช่ ABAP object |
 | 4 | **ช่อง Search (filter ที่ 1)** | ✅ **แก้แล้ว** — `@Search.searchable` บน custom entity activate ผ่าน, query class รับ `$search` ผ่าน `get_search_expression( )` (ผลจริงรอทดสอบ preview) | Phase 1 |
 | 5 | **"Editing Status" (filter ที่ 2)** | ✅ **ตัดออกแล้ว** (ผู้ใช้ confirm 2026-09-10) — ยังควรแจ้ง functional ให้ทราบ | Phase 1 |
@@ -30,7 +30,7 @@
 | 19 | **หน่วยนับบนฟอร์ม** — XML ให้ ISO code (`C62` แทน `ST`) | ✅ **แก้แล้ว 2026-09-23** — ผู้ใช้เลือกพิมพ์รหัสหน่วยภายใน (`ST`, `EA`, `BX`) เหมือนฟอร์มเดิม ผ่าน field `UnitText` · ถ้าอยากได้ชื่อเต็ม (`ชิ้น`/`Piece`) ต้องอ่าน `I_UnitOfMeasureText` เพิ่ม | Phase 2 |
 | 20 | **line break ใน long text** — `PlainLongText` ของ `I_*NoteTP_2` ดูเหมือนยุบหลายบรรทัดเป็น space (99680042 `1. … 2. … 3. …`) ถ้าจริง ฟอร์มจัดย่อหน้าตามต้นฉบับไม่ได้ · ทดสอบด้วย `4500000021` F02 (`HD NOTE 1` / `HD NOTE 2`) | ⏳ ยังไม่ทดสอบ | Phase 2 |
 | 21 | **value help Material (`I_Product`) โหลด metadata ไม่ได้** — `CX_SADL_GW_V4_EXPOSURE_EXIT: Do not use conversion exit ATINN for property PRODCHARC1INTERNALNUMBER` | ✅ **แก้แล้ว 2026-09-23** — เปลี่ยนเป็น `I_ProductStdVH` (expose แค่ `Product` + `ProductExternalID` ไม่มี field ที่มี conversion exit ATINN) ทดสอบ F4 ผ่าน | Phase 1 |
-| 22 | **สาขาผู้ขาย** — ฟอร์มเดิมช่อง Supplier = "รหัส ชื่อ สาขา" (`YY1_SuppCodeNameBranch_PDH`) เรามี `SupplierCodeName` = รหัส + ชื่อ · สาขา (เช่น สำนักงานใหญ่/00000) ไม่มี source ใน `I_Supplier` — ต้องพิมพ์ไหม มาจากไหน | 🟡 | Phase 2 |
+| 22 | **สาขาผู้ขาย** | ✅ **ปิดแล้ว 09-25** — `zcl_get_name_form_bp` + `zcl_get_address_form_bp` ให้ชื่อสี่บรรทัดและสาขา (`AdditionalStreetSuffixName`) เหมือนฟอร์มมาตรฐาน (D19) | Phase 2 |
 | 9 | **`ZE_BSART`** — data element ที่ใช้แทน `esart` (ไม่ released) อยู่นอก package `ZPURE001` | ✅ ผู้ใช้ยืนยัน 2026-09-11: มีอยู่บน tenant ก่อนแล้ว → บันทึกเป็น **external dependency** ใน [02-object-list.md](02-object-list.md) | Phase 1 |
 
 **สีสถานะ** 🔴 = block งานในเฟสที่เกี่ยวข้อง · 🟡 = ทำต่อได้ด้วยสมมติฐาน แต่ควรยืนยัน ·

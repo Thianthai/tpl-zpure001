@@ -83,6 +83,7 @@
 | `ZR_PURE001` (bdef) | Behavior definition | `unmanaged` บน custom entity + `action PrintPOForm result[1] ZA_PURE001_FILE` · `strict ( 2 )` | ✅ 09-23 | ✅ 67222b9 |
 | `ZBP_R_PURE001` | Behavior pool | `lhc_zr_pure001` — รวม PO ที่เลือกเป็นไฟล์เดียว คืน base64 | ✅ 09-23 | ✅ 67222b9 |
 | `ZCL_PURE001_PRINT` | Class | render PDF (FDP XML → ZPURF002 → ADS) · merge หลายใบ · ตั้งชื่อไฟล์ (เวลาไทย) | ✅ 09-23 | ✅ 67222b9 |
+| `ZCL_PURE001_ADDRESS` | Class | ที่อยู่ plant / บริษัท จาก `I_OrganizationAddress` (privileged — D20) | ✅ 09-25 | ✅ 3a24fd6 |
 | ~~`ZCL_PURE001_HTTP`~~ | Class | **ยกเลิก (D16)** — ปุ่มบน toolbar ใช้งานได้ครบแล้ว | — | ❌ ไม่ทำ |
 | ~~`ZHS_PURE001`~~ | HTTP service | **ยกเลิก (D16)** | — | ❌ ไม่ทำ |
 

@@ -326,6 +326,53 @@ standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ต
 
 ---
 
+## D19 — ฟอร์มของเราใช้ค่าชุดเดียวกับฟอร์มมาตรฐาน โดยเรียก custom class ของลูกค้า (2026-09-25)
+
+**ที่มา** — ผู้ใช้ให้ดู custom logic ของฟอร์มมาตรฐาน (BAdI `MM_PUR_S4_PO_MODIFY_HEADER` / `..._ITEM`)
+พบว่า BAdI ไม่ได้คำนวณเอง แต่เรียก Z-class ของลูกค้าซึ่ง **released C1 และเป็น `CLASS-METHODS` public**
+จึงเรียกจากโปรแกรมเราได้ตรง ๆ · ผู้ใช้สั่งให้ทำตาม custom logic ทั้งหมด
+
+| custom class | ใช้เติมช่องไหน |
+|---|---|
+| `zcl_get_approval_name` | ชื่อ ตำแหน่ง และวันที่ผู้อนุมัติ (ปิด placeholder `ApprovedByPosition`) |
+| `zcl_get_other_detail` | นามผู้รับสินค้า เบอร์โทร และยอดรวมท้ายฟอร์มทั้งห้าช่อง |
+| `zcl_get_name_form_bp` | ชื่อผู้ขายพร้อมสาขา |
+| `zcl_get_address_form_bp` / `..._onetime` | ที่อยู่ผู้ขายแบบเต็ม รองรับใบที่พิมพ์ที่อยู่เอง |
+| `zcl_get_fullname_th` | ชื่อไทยของผู้จัดทำ (มาจากตาราง `ZTPURF001` ของลูกค้า) |
+| `zcl_get_lastchange_po` + `zcl_conv_date_to_th` | วันที่ออกเอกสาร ใช้วันที่แก้ไขล่าสุดไม่ใช่วันที่ PO |
+
+**สิ่งที่เปลี่ยนตามมา**
+- ยอดรวมท้ายฟอร์มไม่คำนวณเองแล้ว ใช้ `zcl_get_other_detail` -> ช่อง Other Expense มีค่าจริง ไม่ใช่ศูนย์
+  · `read_tax_rates` ยังใช้อยู่แต่เฉพาะอัตราภาษีรายบรรทัด
+- เกณฑ์ "อนุมัติแล้ว" ของฟอร์มใช้วันที่อนุมัติจาก class ไม่ใช่ `ApprovalStatus` ที่ derive เอง
+  · list report ยังใช้ของเดิม เพราะ custom class รับทีละใบ ใช้กับ 284 ใบไม่ไหว
+- `I_PurchaseOrderAPI01` มี custom field `YY1_*` ครบ จึงอ่าน checkbox หลักประกัน อีเมล และวันที่สัญญา ได้ตรงจาก view
+- ค่าที่ class คืนมาเป็นวันที่ดิบ ต้องส่งต่อ `zcl_conv_date_to_th` อีกทอดเสมอ
+
+---
+
+## D20 — ที่อยู่ของ plant ต้องอ่านแบบข้ามการตรวจสิทธิ์ (2026-09-25)
+
+ช่องสถานที่จัดส่งของฟอร์มมาตรฐานมาจาก node `ShipToParty` ที่ SAP สร้างให้ใน FDP มาตรฐาน ซึ่งเราเรียกไม่ได้ (D14)
+
+ผลทดสอบบน tenant (class ชั่วคราว `ZCL_PURE001_TEST_ADDR` ลบแล้ว)
+
+| view | อ่านปกติ | privileged |
+|---|---|---|
+| `I_OrganizationAddress` | 0 แถว | 1 แถว ข้อมูลครบ |
+| `I_Address_2` | 0 แถว | 1 แถว field น้อยกว่า |
+| `I_PlantAddressVH` | อ่านได้ | **ไม่ released** และไม่มี `StreetName` |
+
+**ตัดสินใจ** — สร้าง `ZCL_PURE001_ADDRESS` อ่าน `I_OrganizationAddress WITH PRIVILEGED ACCESS`
+· ผู้ใช้เป็นผู้ขอเอง · ข้อมูลเป็นที่อยู่ขององค์กรที่ปรากฏบนเอกสารอยู่แล้ว ไม่ใช่ข้อมูลส่วนบุคคล
+· จำกัดขอบเขตที่ `AddressID` ของ plant ในใบสั่งซื้อที่ผู้ใช้เปิดได้ และ `AddressPersonID` กับ `AddressRepresentationCode` ต้องว่าง
+· ใช้ได้กับที่อยู่บริษัทด้วย (`I_CompanyCode.AddressID`) ถ้าต้องการภายหลัง
+
+**หมายเหตุ** — `zcl_get_address_form_bp` ของลูกค้าอ่าน `I_BusinessPartnerAddressTP_3` แบบธรรมดาได้
+แปลว่าที่อยู่ของ business partner ไม่ติด DCL ต่างจากที่อยู่ระดับองค์กร
+
+---
+
 ## ข้อจำกัดของ tenant ที่ค้นพบ (ใช้อ้างอิงเฟสต่อไป)
 
 | สิ่งที่พบ | วันที่ | ผล |
@@ -375,4 +422,6 @@ standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ต
 | Designer (SAP build) ไม่มีแท็บ Preview PDF ถ้าเครื่องไม่มี Acrobat Reader · "Generate Preview Data" จะเขียนทับไฟล์ data ที่ตั้งไว้ (ห้ามกดถ้าชี้ไฟล์ข้อมูลจริง) | 2026-09-18 | |
 | RAP action ที่คืนไฟล์ผ่าน abstract entity ไม่ถูก Fiori Elements V4 จัดการให้ ต้องมี UI5 controller extension รับ result เอง | 2026-09-23 | D15 |
 | `I_Product` ใช้เป็น value help ใน OData V4 ไม่ได้ — `PRODCHARC1INTERNALNUMBER` มี conversion exit ATINN ทำให้ metadata ของ VH service พัง ใช้ `I_ProductStdVH` แทน | 2026-09-23 | |
+| custom field `YY1_*` ของลูกค้าอยู่ใน `I_PurchaseOrderAPI01` ครบ 36 field อ่านได้ตรง ๆ | 2026-09-25 | D19 |
+| `I_OrganizationAddress` และ `I_Address_2` released C1 แต่ DCL ปิดข้อมูลทั้งหมด ต้อง `WITH PRIVILEGED ACCESS` · `I_PlantAddressVH` ไม่ released | 2026-09-25 | D20 |
 | ADT: short dump ดูที่ Runtime Error Viewer · error ของ gateway (`/IWBEP/CX_GATEWAY`) ดูที่ `/sap/bc/adt/gw/errorlog` — `ZCX_PURE001_QUERY->get_text( )` โผล่ใน Error Context ทำให้ debug filter ได้โดยไม่ต้อง trace | 2026-09-14 | |

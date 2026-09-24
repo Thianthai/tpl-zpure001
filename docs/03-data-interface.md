@@ -85,6 +85,15 @@ XML ที่ได้จาก `read_to_xml_v2( )` — **ชื่อ node ร�
 > เพราะ XFA display pattern ทำปฏิทินพุทธไม่ได้ · ต้องระบุ index `[0]` ไม่ใช่ `[*]` ซึ่งใช้ได้เฉพาะ subform ที่ repeat
 > — ผู้ใช้ upload ฟอร์มเดิมเข้า *Maintain Form Templates* แล้วทดสอบกับ PO จริง **ผ่านแล้ว 2026-09-23**
 
+**2026-09-25 — ค่าส่วนใหญ่เปลี่ยนมาใช้ชุดเดียวกับฟอร์มมาตรฐาน (D19/D20)** ช่องที่ยังว่างเหลือเพียง
+
+| Node | เหตุผล |
+|---|---|
+| `CompanyAddressLine1/2` `CompanyPhone` `CompanyWebsite` | ฟอร์มพิมพ์เป็นข้อความคงที่อยู่แล้ว ไม่ต้องส่งข้อมูล |
+| `CompanyLogo` `ApprovedBySignature` | ต้องมีตารางรูปภาพ (Phase 6) |
+| `ShipToAddressLine2` | ที่อยู่ plant รวมอยู่ในบรรทัดเดียวที่ `ShipToAddressLine1` แล้ว |
+| `UnloadingPointName` | ยังไม่มีช่องบนฟอร์ม |
+
 **ข้อสังเกตที่ต้องให้ functional ตัดสิน** — ดู [05-open-questions.md](05-open-questions.md) ข้อ 14–22
 
 ---
