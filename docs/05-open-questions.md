@@ -9,7 +9,7 @@
 | 2.3 | วันที่เริ่มสัญญา / วันที่สิ้นสุดสัญญา | ✅ **ปิดแล้ว 09-25** — `YY1_FrameworkStartDate/EndDate_PDH` (D19) | |
 | 2.4 | จัดส่งโดย / Ship Via (`Truck`) | 🔴 | |
 | 2.5 | นามผู้รับสินค้า + เบอร์โทร | ✅ **ปิดแล้ว 09-25** — `zcl_get_other_detail` (D19) | |
-| 2.6 | ผู้อนุมัติ (ชื่อ / ตำแหน่ง / วันที่ / รูปลายเซ็น) | ✅ **ปิดแล้ว 09-25** — `zcl_get_approval_name` ให้ทั้งชื่อ ตำแหน่ง และวันที่ (D19) · เหลือรูปลายเซ็นที่ยังต้องใช้ตารางรูปภาพ | |
+| 2.6 | ผู้อนุมัติ (ชื่อ / ตำแหน่ง / วันที่ / รูปลายเซ็น) | ✅ **ปิดแล้ว 09-25** — `zcl_get_approval_name` ให้ทั้งชื่อ ตำแหน่ง และวันที่ (D19) · รูปลายเซ็นไม่ต้องทำ ฟอร์มมาตรฐานก็ไม่มี (D21) | |
 | 2.7 | ส่วนลด/Discount (ค่าใช้จ่ายอื่นๆ) | ✅ **ปิดแล้ว 09-25** — `zcl_get_other_detail` คืน `SumOtherExpense` (D19) | |
 | 3 | **Output Management** — spec §2.5 แสดง Form Template `ZPURF001` ผูกกับ output type `PURCHASE_ORDER` ในแท็บ Output Management ของ Manage PO อยู่ด้วย ตกลงขอบเขตงานนี้รวมการตั้ง output type ด้วยไหม หรือทำแค่ RAP UI แยกอีกจอ | 🟡 ต้องยืนยัน | ถ้ารวม จะเพิ่มงาน config output determination ซึ่งไม่ใช่ ABAP object |
 | 4 | **ช่อง Search (filter ที่ 1)** | ✅ **แก้แล้ว** — `@Search.searchable` บน custom entity activate ผ่าน, query class รับ `$search` ผ่าน `get_search_expression( )` (ผลจริงรอทดสอบ preview) | Phase 1 |

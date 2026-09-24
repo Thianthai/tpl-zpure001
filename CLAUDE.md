@@ -30,8 +30,8 @@ prefix parameter (`iv_`/`ev_`/`rv_`), pattern ของ RAP object — **ยั�
 | Service definition | `ZUI_PURE001` (UI), `ZAPI_PURE001_FDP` (form data) | `YUI_<APP>` / `YAPI_<APP>` |
 | Service binding | `ZUI_PURE001_O4` | `YUI_<APP>_O4` |
 | Global class | `ZCL_PURE001_DATA` (ตัวกลาง), `ZCL_PURE001_QUERY`, `ZCL_PURE001_FDP`, `ZCL_PURE001_UTIL`, `ZCL_PURE001_PRINT`, `ZCL_PURE001_HTTP` | `YCL_<APP>_<PURPOSE>` |
-| Database table | `ZPURE001_GRPH`, `ZPURE001_CFG` | `Y<APP>_<SUFFIX>` |
-| Data element | `ZE_PURE001_GRAPHIC_NAME` | `YE_<name>` |
+| Database table | *(ยกเลิกทั้งหมดแล้ว — D20/D21)* | `Y<APP>_<SUFFIX>` |
+| Data element | *(ไม่มี)* | `YE_<name>` |
 | HTTP service | `ZHS_PURE001` | *(กฎยังไม่ครอบคลุม — ตกลงกันเป็น case)* |
 | Adobe Form object | `ZPURF002` (ผู้ใช้สร้างเอง) | *(`ZPURF001` ใน spec §2.5 = ฟอร์ม output management ของ Manage PO — นอกขอบเขต)* |
 
@@ -121,4 +121,5 @@ custom entity **ไม่ใช่ view** (ไม่มี data source ข้า
 - key ที่ `get_keys( )` คืนมาเป็นตัวพิมพ์ใหญ่เสมอ (`'PURCHASEORDER'`)
 - ค่าที่ format ยาก (วันที่ พ.ศ. เดือนภาษาไทย จำนวนเงินเป็นตัวอักษร) ให้ **แปลงใน ABAP
   แล้วส่งเป็น string** อย่าไปพึ่ง locale ของ ADS
-- รูปภาพ (logo / ลายเซ็น) ส่งผ่าน field `@Semantics.largeObject` เป็น `abap.rawstring`
+- รูปภาพ: **โปรเจกต์นี้ไม่ส่งรูปผ่าน data เลย (D21)** โลโก้ฝังในไฟล์ `.xdp` และไม่มีรูปลายเซ็น
+  · ถ้าเจอโปรเจกต์อื่นที่ต้องส่งรูป ใช้ field `@Semantics.largeObject` เป็น `abap.rawstring`

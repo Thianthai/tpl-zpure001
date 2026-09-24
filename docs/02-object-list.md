@@ -64,8 +64,8 @@
 
 | Object | เหตุผล |
 |---|---|
-| `ZPURE001_GRPH`, `ZE_PURE001_GRAPHIC_NAME` | รอเช็คว่า tenant มี table กลางเก็บ logo/ลายเซ็นอยู่แล้วไหม |
-| `ZPURE001_CFG` | รอ functional confirm ว่าข้อมูลไหนต้องเป็น Setting View (ที่อยู่บริษัท/plant, โทร, เว็บ, ตำแหน่งผู้อนุมัติ) — view `I_Address*` ว่างทั้งหมด |
+| ~~`ZPURE001_GRPH`, `ZE_PURE001_GRAPHIC_NAME`~~ | **ยกเลิก (D21)** — โลโก้ฝังในฟอร์ม ลายเซ็นไม่มีในฟอร์มมาตรฐาน |
+| `ZPURE001_CFG` | **ไม่จำเป็นแล้ว** — ที่อยู่ plant อ่านได้ผ่าน `ZCL_PURE001_ADDRESS` (D20) ส่วนที่อยู่และโทรบริษัทฟอร์มพิมพ์เป็นข้อความคงที่ |
 
 ## Phase 3 — Print output
 
@@ -87,7 +87,7 @@
 | ~~`ZCL_PURE001_HTTP`~~ | Class | **ยกเลิก (D16)** — ปุ่มบน toolbar ใช้งานได้ครบแล้ว | — | ❌ ไม่ทำ |
 | ~~`ZHS_PURE001`~~ | HTTP service | **ยกเลิก (D16)** | — | ❌ ไม่ทำ |
 
-## Phase 4 — Utility & master data → **รวมเข้า Phase 2 แล้ว** (`ZCL_PURE001_UTIL`) · graphics table เลื่อนรอเช็ค
+## Phase 4 — Utility & master data → **รวมเข้า Phase 2 แล้ว** (`ZCL_PURE001_UTIL`) · graphics table ยกเลิก (D21)
 
 ## Phase 5 — Fiori launchpad & authorization (ทำล่วงหน้าแล้วบางส่วน)
 
@@ -104,7 +104,7 @@
 
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
-| `ZPURE001_CFG` | Table | ⏸ Setting View — ยังไม่สรุปขอบเขต | ⬜ | ⬜ |
+| ~~`ZPURE001_CFG`~~ | Table | **ไม่จำเป็นแล้ว** — ข้อมูลที่ตั้งใจเก็บได้จาก master ครบแล้ว (D19/D20/D21) | — | ❌ ไม่ทำ |
 | *(TBD)* | | ที่มาของฟิลด์นอกมาตรฐาน PO — **มีเบาะแส**: PO มี custom field (Performance Bond, Bank Guarantee, Retention, Framework Start/End Date, Email) ดู [05-open-questions.md](05-open-questions.md) | ⬜ | ⬜ |
 
 ---
@@ -115,7 +115,7 @@
 - custom entity ใช้ `ZR_` (root) / `ZI_` (child) ตามบทบาท **ไม่ใช้ `ZQ_`**
   ถึงกฎ global จะมี category `YQ_` สำหรับ custom entity อยู่ก็ตาม — ผู้ใช้ตัดสินใจแล้ว
 - VH view ใช้ `ZI_<APP>_<ENT>_VH` · (helper view `ZI_<APP>_<ENT>` เลิกใช้แล้วตาม D12 — logic อยู่ใน class)
-- ชื่อ table ต้อง ≤ 16 ตัวอักษร → `ZPURE001_GRPH` (13) และ `ZPURE001_CFG` (12) ผ่าน
+- ชื่อ table ต้อง ≤ 16 ตัวอักษร → `ZPURE001_GRPH` (13) และ `ZPURE001_CFG` (12) ผ่าน *(ทั้งคู่ยกเลิกแล้ว)*
 - ชื่อ CDS / class / data element ต้อง ≤ 30 ตัวอักษร → ยาวสุดคือ
   `ZE_PURE001_GRAPHIC_NAME` (23) ผ่าน
 - Adobe Form object ของโปรเจกต์นี้คือ **`ZPURF002`** (ฟอร์มใหม่ พิมพ์จาก ZPURE001 เท่านั้น) · `ZPURF001` ที่เห็นใน spec §2.5 คือฟอร์ม output management ของ Manage PO — **นอกขอบเขต**

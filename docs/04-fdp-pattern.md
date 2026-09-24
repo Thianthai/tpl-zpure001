@@ -184,7 +184,7 @@ demo เก็บ logo/ลายเซ็นในตาราง `ytbc_graphic 
 แล้ว select เข้ามาใส่ field `@Semantics.largeObject` ของ FDP entity
 → ฝั่ง LiveCycle Designer bind image field กับ node นั้น
 
-ZPURE001 จะใช้แนวเดียวกัน (ตาราง `ZPURE001_GRPH`) สำหรับโลโก้ THAPPLINE และลายเซ็นผู้อนุมัติ
+ZPURE001 **ไม่ใช้แนวนี้** (D21) — โลโก้ฝังในไฟล์ `.xdp` ของฟอร์มโดยตรง และฟอร์มมาตรฐานไม่มีรูปลายเซ็น
 
 ---
 

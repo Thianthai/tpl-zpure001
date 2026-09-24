@@ -145,7 +145,7 @@ ZAPI_PURE001_FDP (service def)
 | `CompanyAddressLine2` | `abap.char(120)` | ⏸ | config |
 | `CompanyPhone` | `abap.char(60)` | ⏸ | config — `02-034-9199,02-533-2190` |
 | `CompanyWebsite` | `abap.char(80)` | ⏸ | config — `www.thappline.co.th` |
-| `CompanyLogo` | `abap.rawstring(0)` `@Semantics.largeObject` | ⏸ | graphics table (รอเช็ค table กลางบน tenant) |
+| `CompanyLogo` | `abap.rawstring(0)` `@Semantics.largeObject` | ❌ | **ไม่ใช้ (D21)** — โลโก้ฝังในไฟล์ `.xdp` ของฟอร์ม |
 | `CompanyLogoMimeType` / `CompanyLogoFileName` | char | ⏸ | คู่กับ `CompanyLogo` |
 
 ### 2.2 PO block (กรอบขวาบน)
@@ -223,7 +223,7 @@ ZAPI_PURE001_FDP (service def)
 | `ApprovedByName` | `abap.char(80)` | ✅ | `I_BusinessUserBasic.PersonFullName` |
 | `ApprovedDate` / `ApprovedDateText` | dats / char(40) | ✅🔧 | `WrkflwTskCompletionUTCDateTime` → วันที่ (แปลง UTC → เวลาไทย) + วันที่ไทย |
 | `ApprovedByPosition` | `abap.char(80)` | ⏸ | config / HR — *ผู้จัดการฝ่ายสนับสนุนองค์กร* |
-| `ApprovedBySignature` | `abap.rawstring(0)` `@Semantics.largeObject` | ⏸ | graphics table |
+| `ApprovedBySignature` | `abap.rawstring(0)` `@Semantics.largeObject` | ❌ | **ไม่ใช้ (D21)** — ฟอร์มมาตรฐานไม่มีรูปลายเซ็น |
 | `ApprovedBySignMimeType` / `ApprovedBySignFileName` | char | ⏸ | คู่กับรูป |
 | `IsApprovedAutomatically` | `abap.char(1)` | ✅ | `ZI_PURE001_HEADER.ApprovalStatus = 'B'` — ให้ฟอร์มเลือกข้อความ *"เอกสารสั่งซื้อนี้ได้รับการอนุมัติจากผู้มีอำนาจผ่านระบบอิเล็กทรอนิกส์เรียบร้อยแล้ว"* |
 
@@ -316,7 +316,7 @@ WBS: C-19-OPD13-00CO-ME                                   ← §3 WBSElement (�
 |---|---|---|
 | Setting View (config) | `CompanyAddressLine1/2`, `CompanyPhone`, `CompanyWebsite`, `ShipToAddressLine1/2`, `ApprovedByPosition` (+ `CompanyName` ถ้าต้องการชื่อเต็ม) | ตาราง config + วิธี maintain |
 | Custom field บน PO | `PerfGuarantee*`, `InsurancePolicyFlag`, `WarrantyGuarantee*`, `SupplierEmail` | ชื่อ technical `YY1_*` + expose ใน `I_PurchaseOrderAPI01` |
-| Graphics | `CompanyLogo`, `ApprovedBySignature` | table กลางบน tenant หรือ `ZPURE001_GRPH` |
+| ~~Graphics~~ | ~~`CompanyLogo`, `ApprovedBySignature`~~ | **ยกเลิก (D21)** |
 | ไม่มี source | `DiscountAmount`, `GoodsRecipientPhone` | ตัดจากฟอร์ม หรือ config |
 
 ---

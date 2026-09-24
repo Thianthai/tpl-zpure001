@@ -87,7 +87,7 @@ ZUI_PURE001_O4 (binding)
 
 **แหล่งข้อมูลที่ยืนยันแล้ว (2026-09-13)** ดูตารางใน [03-data-interface.md](03-data-interface.md) และ tenant findings ใน [06-decisions.md](06-decisions.md)
 
-**placeholder ที่รอ functional** — ที่อยู่/โทร/เว็บบริษัทและ plant (config), custom field หลักประกัน/BG/Email (`YY1_*`), โลโก้/ลายเซ็น (graphics), ตำแหน่งผู้อนุมัติ
+**placeholder ทั้งหมดปิดแล้ว 2026-09-25** — ที่อยู่ plant ผ่าน `ZCL_PURE001_ADDRESS` (D20) · custom field และตำแหน่งผู้อนุมัติผ่าน custom class (D19) · โลโก้ฝังในฟอร์ม ลายเซ็นไม่มีในฟอร์มมาตรฐาน (D21) · ที่อยู่และโทรบริษัทเป็นข้อความคงที่ในฟอร์ม
 
 **เสร็จเมื่อ** — dump XML ออกมาแล้วมีครบทั้ง 3 ชั้น ข้อมูลตรงกับ PO จริงบน tenant 100 ✅ (ทดสอบ 99680198, 4500000080, 0099680019, 99680044, 0099680047, 0099680042 — ครอบ approved automatically / WBS / item ลบ / header text / item text 3 ชนิด) · เหลือปิด 2.8 + ลบ `ZCL_PURE001_TEST_FDP`
 
@@ -112,17 +112,17 @@ ZUI_PURE001_O4 (binding)
 
 ---
 
-## Phase 4 — Utility & master data → รวมเข้า Phase 2 แล้ว (`ZCL_PURE001_UTIL` ✅) · graphics table รอเช็ค
+## Phase 4 — Utility & master data → รวมเข้า Phase 2 แล้ว (`ZCL_PURE001_UTIL` ✅) · graphics table ยกเลิก (D21)
 
 **เป้าหมาย (เดิม)** เติมค่าที่ format ยากให้ครบ
 
 | # | งาน | Object |
 |---|---|---|
-| 4.1 | สร้างตารางเก็บรูป + data element | `ZPURE001_GRPH`, `ZE_PURE001_GRAPHIC_NAME` |
+| ~~4.1~~ | ~~สร้างตารางเก็บรูป + data element~~ **ยกเลิก (D21)** — โลโก้ฝังในฟอร์ม ลายเซ็นไม่มี | — |
 | 4.2 | `to_thai_date( )` — วันที่ พ.ศ. + ชื่อเดือนภาษาไทย (`21 พฤศจิกายน 2568`) | `ZCL_PURE001_UTIL` |
 | 4.3 | `amount_in_words_th( )` — จำนวนเงินเป็นตัวอักษรไทย + `บาทถ้วน` / `สตางค์` | `ZCL_PURE001_UTIL` |
-| 4.4 | `get_graphic( )` — อ่านรูปจากตาราง | `ZCL_PURE001_UTIL` |
-| 4.5 | upload โลโก้ THAPPLINE เข้าตาราง | ผู้ใช้ |
+| ~~4.4~~ | ~~`get_graphic( )` — อ่านรูปจากตาราง~~ **ยกเลิก (D21)** | — |
+| ~~4.5~~ | ~~upload โลโก้ THAPPLINE เข้าตาราง~~ **ยกเลิก (D21)** — รูปฝังใน `.xdp` แล้ว | — |
 
 > ⚠️ FM `SPELL_AMOUNT` **ไม่ released** บน Public Cloud → ต้องเขียนตัวแปลงเอง
 > และวันที่ พ.ศ. ก็ทำใน ABAP ไม่พึ่ง locale ของ ADS
