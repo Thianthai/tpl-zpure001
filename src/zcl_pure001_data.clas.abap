@@ -254,7 +254,8 @@ CLASS zcl_pure001_data DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
 
-    "! เติมชื่อผู้ขาย บริษัท กลุ่มจัดซื้อ ประเภทเอกสาร และเงื่อนไขการชำระเงิน
+    "! เติมชื่อประเภทเอกสารตามภาษาที่ login
+    "! ข้อมูล master อื่นอ่านมาพร้อม header ใน read_headers แล้ว
     METHODS enrich_master_texts CHANGING ct_header TYPE tt_header.
 
     "! เติมมูลค่าสุทธิทั้งใบ ไม่นับ item ที่ถูกลบ
@@ -285,7 +286,18 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
     " Material, Plant และ item text อยู่ระดับ item จึงกรองด้วย EXISTS เพื่อไม่ให้แถวของ header ซ้ำ
     " นับ item ที่ถูกลบด้วยตามแอปมาตรฐาน
+    " master ของผู้ขาย บริษัท กลุ่มจัดซื้อ และเงื่อนไขการชำระเงิน อ่านด้วย LEFT OUTER JOIN
+    " ใบสั่งซื้อที่ไม่มี master บางตัวจึงยังอยู่ในผลลัพธ์
     SELECT FROM I_PurchaseOrderAPI01 AS po
+           LEFT OUTER JOIN I_Supplier AS sup
+             ON sup~Supplier = po~Supplier
+           LEFT OUTER JOIN I_PurchasingGroup AS pgr
+             ON pgr~PurchasingGroup = po~PurchasingGroup
+           LEFT OUTER JOIN I_CompanyCode AS cmp
+             ON cmp~CompanyCode = po~CompanyCode
+           LEFT OUTER JOIN I_PaymentTermsText AS pmt
+             ON  pmt~PaymentTerms = po~PaymentTerms
+             AND pmt~Language     = po~Language
       FIELDS po~PurchaseOrder,
              po~PurchaseOrderType,
              po~CompanyCode,
@@ -318,7 +330,22 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
              po~YY1_BankGuarantee_PO_W_PDH  AS WarrantyBondBG,
              po~YY1_Email_PO_PDH            AS SupplierEmail,
              po~YY1_FrameworkStartDate_PDH  AS FrameworkStartDate,
-             po~YY1_FrameworkEndDate_PDH    AS FrameworkEndDate
+             po~YY1_FrameworkEndDate_PDH    AS FrameworkEndDate,
+             sup~SupplierName,
+             sup~TaxNumber3                 AS SupplierTaxNumber,
+             sup~StreetName                 AS SupplierStreet,
+             sup~DistrictName               AS SupplierDistrict,
+             sup~CityName                   AS SupplierCity,
+             sup~PostalCode                 AS SupplierPostalCode,
+             sup~PhoneNumber1               AS SupplierMasterPhone,
+             pgr~PurchasingGroupName,
+             cmp~CompanyCodeName,
+             cmp~VATRegistration            AS CompanyTaxNumber,
+             " ใช้ Description ก่อน ถ้าว่างจึงใช้ Name
+             CASE WHEN pmt~PaymentTermsDescription = @space
+                  THEN pmt~PaymentTermsName
+                  ELSE pmt~PaymentTermsDescription
+             END                            AS PaymentTermsText
       WHERE po~PurchaseOrder              IN @is_selection-purchase_order
       AND   po~PurchaseOrderType          IN @is_selection-po_type
       AND   po~Supplier                   IN @is_selection-supplier
@@ -340,6 +367,10 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    " กันแถวซ้ำกรณี view ที่ join มามีมากกว่าหนึ่งแถวต่อ key
+    SORT rt_header BY PurchaseOrder.
+    DELETE ADJACENT DUPLICATES FROM rt_header COMPARING PurchaseOrder.
+
     enrich_master_texts( CHANGING ct_header = rt_header ).
     enrich_totals(       CHANGING ct_header = rt_header ).
     enrich_follow_on(    CHANGING ct_header = rt_header ).
@@ -351,34 +382,7 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
   METHOD enrich_master_texts.
 
-    SELECT FROM I_Supplier
-      FIELDS Supplier,
-             SupplierName,
-             TaxNumber3,
-             StreetName,
-             DistrictName,
-             CityName,
-             PostalCode,
-             PhoneNumber1
-      FOR ALL ENTRIES IN @ct_header
-      WHERE Supplier = @ct_header-Supplier
-      INTO TABLE @DATA(lt_supplier).
-
-    SELECT FROM I_PurchasingGroup
-      FIELDS PurchasingGroup,
-             PurchasingGroupName
-      FOR ALL ENTRIES IN @ct_header
-      WHERE PurchasingGroup = @ct_header-PurchasingGroup
-      INTO TABLE @DATA(lt_pgroup).
-
-    SELECT FROM I_CompanyCode
-      FIELDS CompanyCode,
-             CompanyCodeName,
-             VATRegistration
-      FOR ALL ENTRIES IN @ct_header
-      WHERE CompanyCode = @ct_header-CompanyCode
-      INTO TABLE @DATA(lt_company).
-
+    " ชื่อประเภทเอกสารอ่านทั้งชุดครั้งเดียว เพราะมีไม่กี่แถวและไม่ขึ้นกับใบสั่งซื้อ
     SELECT FROM I_PurchasingDocumentTypeText
       FIELDS PurchasingDocumentType,
              PurchasingDocumentTypeName
@@ -386,46 +390,7 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
       AND   Language                   = @sy-langu
       INTO TABLE @DATA(lt_potype).
 
-    " ข้อความเงื่อนไขการชำระเงินใช้ภาษาของใบสั่งซื้อ
-    " ใช้ Description ก่อน ถ้าว่างจึงใช้ Name
-    SELECT FROM I_PaymentTermsText
-      FIELDS PaymentTerms,
-             Language,
-             PaymentTermsName,
-             PaymentTermsDescription
-      FOR ALL ENTRIES IN @ct_header
-      WHERE PaymentTerms = @ct_header-PaymentTerms
-      AND   Language     = @ct_header-Language
-      INTO TABLE @DATA(lt_payment_terms).
-
     LOOP AT ct_header ASSIGNING FIELD-SYMBOL(<lfs_header>).
-
-      ASSIGN lt_supplier[ Supplier = <lfs_header>-Supplier ] TO FIELD-SYMBOL(<lfs_supplier>).
-      IF sy-subrc = 0.
-        <lfs_header>-SupplierName        = <lfs_supplier>-SupplierName.
-        <lfs_header>-SupplierTaxNumber   = <lfs_supplier>-TaxNumber3.
-        <lfs_header>-SupplierStreet      = <lfs_supplier>-StreetName.
-        <lfs_header>-SupplierDistrict    = <lfs_supplier>-DistrictName.
-        <lfs_header>-SupplierCity        = <lfs_supplier>-CityName.
-        <lfs_header>-SupplierPostalCode  = <lfs_supplier>-PostalCode.
-        <lfs_header>-SupplierMasterPhone = <lfs_supplier>-PhoneNumber1.
-      ENDIF.
-
-      ASSIGN lt_company[ CompanyCode = <lfs_header>-CompanyCode ] TO FIELD-SYMBOL(<lfs_company>).
-      IF sy-subrc = 0.
-        <lfs_header>-CompanyCodeName  = <lfs_company>-CompanyCodeName.
-        <lfs_header>-CompanyTaxNumber = <lfs_company>-VATRegistration.
-      ENDIF.
-
-      ASSIGN lt_payment_terms[ PaymentTerms = <lfs_header>-PaymentTerms
-                               Language     = <lfs_header>-Language ] TO FIELD-SYMBOL(<lfs_terms>).
-      IF sy-subrc = 0.
-        <lfs_header>-PaymentTermsText = COND #( WHEN <lfs_terms>-PaymentTermsDescription IS NOT INITIAL
-                                                THEN <lfs_terms>-PaymentTermsDescription
-                                                ELSE <lfs_terms>-PaymentTermsName ).
-      ENDIF.
-
-      <lfs_header>-PurchasingGroupName   = VALUE #( lt_pgroup[ PurchasingGroup = <lfs_header>-PurchasingGroup ]-PurchasingGroupName OPTIONAL ).
       <lfs_header>-PurchaseOrderTypeName = VALUE #( lt_potype[ PurchasingDocumentType = <lfs_header>-PurchaseOrderType ]-PurchasingDocumentTypeName OPTIONAL ).
     ENDLOOP.
 
@@ -441,6 +406,10 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
       END OF ty_total.
 
     DATA lt_total TYPE STANDARD TABLE OF ty_total WITH NON-UNIQUE KEY PurchaseOrder.
+
+    IF ct_header IS INITIAL.
+      RETURN.
+    ENDIF.
 
     " ยอดรวมทั้งใบไม่นับ item ที่ถูกลบ ตรงกับ Net Order Value ของแอปมาตรฐาน
     " FOR ALL ENTRIES ใช้กับ GROUP BY ไม่ได้ จึงรวมยอดใน ABAP
@@ -465,6 +434,10 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
 
   METHOD enrich_follow_on.
+
+    IF ct_header IS INITIAL.
+      RETURN.
+    ENDIF.
 
     " มีใบรับของหรือใบแจ้งหนี้อ้างถึงใบสั่งซื้อ ถือว่ามีเอกสารต่อเนื่อง
     " นับทุกเอกสารรวมที่ถูก reverse ตามแอปมาตรฐาน
@@ -499,6 +472,10 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
         SAPBusinessObjectNodeKey1 TYPE i_workflowstatusoverview-SAPBusinessObjectNodeKey1,
       END OF ty_wf_key,
       tt_wf_key TYPE STANDARD TABLE OF ty_wf_key WITH EMPTY KEY.
+
+    IF ct_header IS INITIAL.
+      RETURN.
+    ENDIF.
 
     DATA(lt_wf_key) = VALUE tt_wf_key( FOR ls_header IN ct_header
                                        ( SAPBusinessObjectNodeKey1 = ls_header-PurchaseOrder ) ).
