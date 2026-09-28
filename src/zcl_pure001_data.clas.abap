@@ -5,10 +5,12 @@ CLASS zcl_pure001_data DEFINITION
 
   PUBLIC SECTION.
 
+    "! pattern ค้นใน item text แบบไม่สนตัวพิมพ์
     TYPES ty_text_pattern TYPE c LENGTH 80.
 
-    " เงื่อนไขค้นหา PO — range ทุกตัว optional (ว่าง = ไม่กรอง)
     TYPES:
+    "! เงื่อนไขค้นหาใบสั่งซื้อ
+    "! range ทุกตัวไม่บังคับ ว่างหมายถึงไม่กรอง
       BEGIN OF ty_selection,
         purchase_order   TYPE RANGE OF zr_pure001-PurchaseOrder,
         po_type          TYPE RANGE OF zr_pure001-PurchaseOrderType,
@@ -24,8 +26,9 @@ CLASS zcl_pure001_data DEFINITION
         external_ref     TYPE RANGE OF zr_pure001-ExternalReference,
       END OF ty_selection.
 
-    "! PO header + status / approval / ยอดรวม — field ชุดแรกชื่อเดียวกับ ZR_PURE001 (CORRESPONDING ได้ตรง ๆ)
-    "! + field เพิ่มที่ฟอร์มต้องใช้
+    "! header ของใบสั่งซื้อพร้อม status, approval และยอดรวม
+    "! field ชุดแรกชื่อตรงกับ ZR_PURE001 จึง CORRESPONDING ได้ตรง ๆ
+    "! field ชุดหลังเป็นค่าที่ฟอร์มต้องใช้เพิ่ม
     TYPES BEGIN OF ty_header.
             INCLUDE TYPE zr_pure001.
     TYPES:
@@ -46,12 +49,9 @@ CLASS zcl_pure001_data DEFINITION
             WorkflowExternalStatus         TYPE i_workflowstatusoverview-WorkflowExternalStatus,
             NmbrOfCmpltdWrkflwDialogTasks  TYPE i_workflowstatusoverview-NmbrOfCmpltdWrkflwDialogTasks,
 
-            "--- เพิ่มสำหรับฟอร์ม (Phase 2) ---
+            "--- ค่าที่ฟอร์มใช้ ---
             CompanyTaxNumber               TYPE i_companycode-VATRegistration,
-            CompanyCountry                 TYPE i_companycode-Country,
             SupplierTaxNumber              TYPE i_supplier-TaxNumber3,
-            SupplierName1                  TYPE i_supplier-BusinessPartnerName1,
-            SupplierName2                  TYPE i_supplier-BusinessPartnerName2,
             SupplierStreet                 TYPE i_supplier-StreetName,
             SupplierDistrict               TYPE i_supplier-DistrictName,
             SupplierCity                   TYPE i_supplier-CityName,
@@ -59,7 +59,7 @@ CLASS zcl_pure001_data DEFINITION
             SupplierMasterPhone            TYPE i_supplier-PhoneNumber1,
             PaymentTermsText               TYPE i_paymenttermstext-PaymentTermsDescription,
 
-            "--- custom field ที่ผู้ใช้กรอกบน PO (Phase 3 เก็บตก) ---
+            "--- custom field ที่ผู้ใช้กรอกบนใบสั่งซื้อ ---
             ManualSupplierAddressID        TYPE i_purchaseorderapi01-ManualSupplierAddressID,
             LastChangeDateTime             TYPE i_purchaseorderapi01-LastChangeDateTime,
             PerformanceBondFlag            TYPE i_purchaseorderapi01-YY1_PerformanceBond_PO_PDH,
@@ -75,8 +75,9 @@ CLASS zcl_pure001_data DEFINITION
           END OF ty_header,
           tt_header TYPE STANDARD TABLE OF ty_header WITH EMPTY KEY.
 
-    " PO item (รวม item ที่ลบ — ผู้เรียกกรองเอง) · Phase 2 จะเพิ่ม schedule / account assignment / tax rate
     TYPES:
+    "! item ของใบสั่งซื้อ รวม item ที่ถูกลบ
+    "! ผู้เรียกต้องกรอง item ที่ลบออกเอง
       BEGIN OF ty_item,
         PurchaseOrder                  TYPE i_purchaseorderitemapi01-PurchaseOrder,
         PurchaseOrderItem              TYPE i_purchaseorderitemapi01-PurchaseOrderItem,
@@ -97,13 +98,15 @@ CLASS zcl_pure001_data DEFINITION
       tt_item TYPE STANDARD TABLE OF ty_item WITH EMPTY KEY.
 
     TYPES:
+    "! key ของใบสั่งซื้อที่ส่งให้ method อ่านข้อมูล
       BEGIN OF ty_po_key,
         PurchaseOrder TYPE zr_pure001-PurchaseOrder,
       END OF ty_po_key,
       tt_po_key TYPE STANDARD TABLE OF ty_po_key WITH EMPTY KEY.
 
-    " schedule line แรก (0001) ของ item — วันส่ง / PR / performance period
     TYPES:
+    "! schedule line แรกของ item
+    "! ใช้หาวันส่งของ เลขที่ใบขอซื้อ และช่วง performance period
       BEGIN OF ty_schedule_line,
         PurchaseOrder              TYPE i_purordschedulelineapi01-PurchaseOrder,
         PurchaseOrderItem          TYPE i_purordschedulelineapi01-PurchaseOrderItem,
@@ -111,35 +114,27 @@ CLASS zcl_pure001_data DEFINITION
         PerformancePeriodStartDate TYPE i_purordschedulelineapi01-PerformancePeriodStartDate,
         PerformancePeriodEndDate   TYPE i_purordschedulelineapi01-PerformancePeriodEndDate,
         PurchaseRequisition        TYPE i_purordschedulelineapi01-PurchaseRequisition,
-        PurchaseRequisitionItem    TYPE i_purordschedulelineapi01-PurchaseRequisitionItem,
       END OF ty_schedule_line,
       tt_schedule_line TYPE STANDARD TABLE OF ty_schedule_line WITH EMPTY KEY.
 
-    " account assignment แรก (01) ของ item + WBS external ID
     TYPES:
+    "! account assignment แรกของ item พร้อมรหัส WBS แบบภายนอก
       BEGIN OF ty_account_assignment,
-        PurchaseOrder         TYPE i_purordaccountassignmentapi01-PurchaseOrder,
-        PurchaseOrderItem     TYPE i_purordaccountassignmentapi01-PurchaseOrderItem,
-        GLAccount             TYPE i_purordaccountassignmentapi01-GLAccount,
-        CostCenter            TYPE i_purordaccountassignmentapi01-CostCenter,
-        OrderID               TYPE i_purordaccountassignmentapi01-OrderID,
-        WBSElementInternalID  TYPE i_purordaccountassignmentapi01-WBSElementInternalID_2,
-        WBSElement            TYPE i_enterpriseprojectelement-ProjectElement,
-        GoodsRecipientName    TYPE i_purordaccountassignmentapi01-GoodsRecipientName,
-        UnloadingPointName    TYPE i_purordaccountassignmentapi01-UnloadingPointName,
+        PurchaseOrder        TYPE i_purordaccountassignmentapi01-PurchaseOrder,
+        PurchaseOrderItem    TYPE i_purordaccountassignmentapi01-PurchaseOrderItem,
+        GLAccount            TYPE i_purordaccountassignmentapi01-GLAccount,
+        CostCenter           TYPE i_purordaccountassignmentapi01-CostCenter,
+        OrderID              TYPE i_purordaccountassignmentapi01-OrderID,
+        WBSElementInternalID TYPE i_purordaccountassignmentapi01-WBSElementInternalID_2,
+        WBSElement           TYPE i_enterpriseprojectelement-ProjectElement,
+        UnloadingPointName   TYPE i_purordaccountassignmentapi01-UnloadingPointName,
       END OF ty_account_assignment,
       tt_account_assignment TYPE STANDARD TABLE OF ty_account_assignment WITH EMPTY KEY.
 
-    " อัตราภาษี input tax (MWVS) ต่อ tax code ที่มีผลวันนี้
     TYPES:
-      BEGIN OF ty_tax_rate,
-        TaxCode TYPE i_taxcoderate-TaxCode,
-        TaxRate TYPE i_taxcoderate-ConditionRateRatio,
-      END OF ty_tax_rate,
-      tt_tax_rate TYPE STANDARD TABLE OF ty_tax_rate WITH EMPTY KEY.
-
-    " text ของ PO header (item ว่าง) / item — จาก projection view (อ่านได้เฉพาะ ABAP SQL)
-    TYPES:
+    "! long text ของ header หรือ item
+    "! text ของ header มี PurchaseOrderItem ว่าง
+    "! อ่านจาก projection view ซึ่งอ่านได้ผ่าน ABAP SQL เท่านั้น
       BEGIN OF ty_text,
         PurchaseOrder     TYPE i_purchaseorderitemnotetp_2-PurchaseOrder,
         PurchaseOrderItem TYPE i_purchaseorderitemnotetp_2-PurchaseOrderItem,
@@ -149,26 +144,9 @@ CLASS zcl_pure001_data DEFINITION
       END OF ty_text,
       tt_text TYPE STANDARD TABLE OF ty_text WITH EMPTY KEY.
 
-    " ผู้อนุมัติ = คนกด RELEASED ล่าสุดใน workflow ล่าสุด (ไม่มีแถว = approved automatically / ยังไม่อนุมัติ)
     TYPES:
-      BEGIN OF ty_approver,
-        PurchaseOrder    TYPE zr_pure001-PurchaseOrder,
-        ApprovedByUser   TYPE i_workflowstatusdetails-WorkflowTaskProcessor,
-        ApprovedByName   TYPE i_businessuserbasic-PersonFullName,
-        ApprovedDateTime TYPE i_workflowstatusdetails-WrkflwTskCompletionUTCDateTime,
-      END OF ty_approver,
-      tt_approver TYPE STANDARD TABLE OF ty_approver WITH EMPTY KEY.
-
-    TYPES:
-      BEGIN OF ty_user_name,
-        UserID         TYPE i_businessuserbasic-UserID,
-        PersonFullName TYPE i_businessuserbasic-PersonFullName,
-      END OF ty_user_name,
-      tt_user_name TYPE STANDARD TABLE OF ty_user_name WITH EMPTY KEY.
-
     "! ค่าที่ฟอร์มต้องใช้แต่ต้องให้ custom class ของลูกค้าคำนวณ
     "! เป็นชุดเดียวกับที่ BAdI MM_PUR_S4_PO_MODIFY_HEADER เติมให้ฟอร์มมาตรฐาน
-    TYPES:
       BEGIN OF ty_form_detail,
         PurchaseOrder      TYPE zr_pure001-PurchaseOrder,
         ApproverName       TYPE zcl_get_approval_name=>gty_data,
@@ -197,36 +175,37 @@ CLASS zcl_pure001_data DEFINITION
       IMPORTING it_header        TYPE tt_header
       RETURNING VALUE(rt_detail) TYPE tt_form_detail.
 
+    "! อ่าน schedule line แรกของทุก item
+    "! @parameter it_purchase_order | ใบสั่งซื้อที่ต้องการ
+    "! @parameter rt_schedule_line | หนึ่งบรรทัดต่อหนึ่ง item
     METHODS read_schedule_lines
-      IMPORTING it_purchase_order        TYPE tt_po_key
-      RETURNING VALUE(rt_schedule_line)  TYPE tt_schedule_line.
+      IMPORTING it_purchase_order       TYPE tt_po_key
+      RETURNING VALUE(rt_schedule_line) TYPE tt_schedule_line.
 
+    "! อ่าน account assignment แรกของทุก item พร้อมแปลง WBS เป็นรหัสภายนอก
+    "! @parameter it_purchase_order | ใบสั่งซื้อที่ต้องการ
+    "! @parameter rt_account_assignment | หนึ่งบรรทัดต่อหนึ่ง item
     METHODS read_account_assignments
-      IMPORTING it_purchase_order             TYPE tt_po_key
-      RETURNING VALUE(rt_account_assignment)  TYPE tt_account_assignment.
+      IMPORTING it_purchase_order            TYPE tt_po_key
+      RETURNING VALUE(rt_account_assignment) TYPE tt_account_assignment.
 
-    METHODS read_tax_rates
-      IMPORTING iv_country         TYPE i_companycode-Country
-      RETURNING VALUE(rt_tax_rate) TYPE tt_tax_rate.
-
+    "! อ่าน long text ของ header ทุกภาษาและทุกประเภท
+    "! @parameter it_purchase_order | ใบสั่งซื้อที่ต้องการ
+    "! @parameter rt_text | ผู้เรียกเลือกภาษาและประเภทเอง
     METHODS read_header_texts
       IMPORTING it_purchase_order TYPE tt_po_key
       RETURNING VALUE(rt_text)    TYPE tt_text.
 
+    "! อ่าน long text ของ item ทุกภาษาและทุกประเภท
+    "! @parameter it_purchase_order | ใบสั่งซื้อที่ต้องการ
+    "! @parameter rt_text | เรียงตามใบสั่งซื้อ item และประเภท text
     METHODS read_item_texts
       IMPORTING it_purchase_order TYPE tt_po_key
       RETURNING VALUE(rt_text)    TYPE tt_text.
 
-    METHODS read_approvers
-      IMPORTING it_header          TYPE tt_header
-      RETURNING VALUE(rt_approver) TYPE tt_approver.
-
-    METHODS read_user_names
-      IMPORTING it_user             TYPE tt_user_name
-      RETURNING VALUE(rt_user_name) TYPE tt_user_name.
-
-    " รหัส Status = I_PurchasingDocumentStatus (ตรง standard app)
     CONSTANTS:
+    "! รหัส status ชุดเดียวกับ I_PurchasingDocumentStatus ตรงกับแอปมาตรฐาน
+    "! รหัส approval status และ criticality ที่ list report ใช้
       BEGIN OF gc_status,
         draft       TYPE zr_pure001-PurchaseOrderStatus VALUE '01',
         in_approval TYPE zr_pure001-PurchaseOrderStatus VALUE '02',
@@ -236,33 +215,38 @@ CLASS zcl_pure001_data DEFINITION
         created     TYPE zr_pure001-PurchaseOrderStatus VALUE '27',
         rejected    TYPE zr_pure001-PurchaseOrderStatus VALUE '38',
       END OF gc_status,
+
       BEGIN OF gc_approval,
         approved    TYPE zr_pure001-ApprovalStatus VALUE 'A',
         automatic   TYPE zr_pure001-ApprovalStatus VALUE 'B',
         in_approval TYPE zr_pure001-ApprovalStatus VALUE 'I',
         rejected    TYPE zr_pure001-ApprovalStatus VALUE 'R',
       END OF gc_approval,
+
       BEGIN OF gc_criticality,
         neutral  TYPE zr_pure001-PurchaseOrderStatusCriticality VALUE 0,
         negative TYPE zr_pure001-PurchaseOrderStatusCriticality VALUE 1,
         positive TYPE zr_pure001-PurchaseOrderStatusCriticality VALUE 3,
       END OF gc_criticality,
+
       "! PROCSTAT (I_PurgProcessingStatusText)
       BEGIN OF gc_procstat,
-        active            TYPE c LENGTH 2 VALUE '02',
-        in_release        TYPE c LENGTH 2 VALUE '03',
+        active             TYPE c LENGTH 2 VALUE '02',
+        in_release         TYPE c LENGTH 2 VALUE '03',
         partially_released TYPE c LENGTH 2 VALUE '04',
-        release_completed TYPE c LENGTH 2 VALUE '05',
-        rejected          TYPE c LENGTH 2 VALUE '08',
-        external_approval TYPE c LENGTH 2 VALUE '26',
+        release_completed  TYPE c LENGTH 2 VALUE '05',
+        rejected           TYPE c LENGTH 2 VALUE '08',
+        external_approval  TYPE c LENGTH 2 VALUE '26',
       END OF gc_procstat.
 
-    "! อ่าน PO header ตามเงื่อนไข พร้อม derive status / approval / ยอดรวม / follow-on
+    "! อ่าน header ของใบสั่งซื้อตามเงื่อนไข
+    "! พร้อม derive status, approval status, ยอดรวม และเอกสารต่อเนื่อง
     METHODS read_headers
       IMPORTING is_selection     TYPE ty_selection
       RETURNING VALUE(rt_header) TYPE tt_header.
 
-    "! อ่าน item ของ PO ที่ระบุ (รวม item ที่ลบ) เรียงตาม PO / item
+    "! อ่าน item ของใบสั่งซื้อที่ระบุ รวม item ที่ถูกลบ
+    "! ผลลัพธ์เรียงตามใบสั่งซื้อแล้วตาม item
     METHODS read_items
       IMPORTING it_purchase_order TYPE tt_po_key
       RETURNING VALUE(rt_item)    TYPE tt_item.
@@ -270,10 +254,19 @@ CLASS zcl_pure001_data DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
 
+    "! เติมชื่อผู้ขาย บริษัท กลุ่มจัดซื้อ ประเภทเอกสาร และเงื่อนไขการชำระเงิน
     METHODS enrich_master_texts CHANGING ct_header TYPE tt_header.
+
+    "! เติมมูลค่าสุทธิทั้งใบ ไม่นับ item ที่ถูกลบ
     METHODS enrich_totals       CHANGING ct_header TYPE tt_header.
+
+    "! ตั้ง flag เมื่อมีใบรับของหรือใบแจ้งหนี้อ้างถึงใบสั่งซื้อ
     METHODS enrich_follow_on    CHANGING ct_header TYPE tt_header.
+
+    "! เติมสถานะของ workflow instance ล่าสุด
     METHODS enrich_workflow     CHANGING ct_header TYPE tt_header.
+
+    "! derive status และ approval status จากข้อมูลที่เติมไว้แล้ว
     METHODS derive_status       CHANGING ct_header TYPE tt_header.
 
     "! ประกอบชื่อผู้ขายพร้อมสาขาและที่อยู่ ตามกติกาเดียวกับ BAdI ของฟอร์มมาตรฐาน
@@ -288,10 +281,10 @@ ENDCLASS.
 
 CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
-
   METHOD read_headers.
 
-    " Material / Plant / item text อยู่ระดับ item → EXISTS (semi-join) ไม่ให้แถวบาน · รวม item ที่ลบ (ตาม standard)
+    " Material, Plant และ item text อยู่ระดับ item จึงกรองด้วย EXISTS เพื่อไม่ให้แถวของ header ซ้ำ
+    " นับ item ที่ถูกลบด้วยตามแอปมาตรฐาน
     SELECT FROM I_PurchaseOrderAPI01 AS po
       FIELDS po~PurchaseOrder,
              po~PurchaseOrderType,
@@ -359,34 +352,47 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
   METHOD enrich_master_texts.
 
     SELECT FROM I_Supplier
-      FIELDS Supplier, SupplierName, TaxNumber3,
-             BusinessPartnerName1, BusinessPartnerName2,
-             StreetName, DistrictName, CityName, PostalCode, PhoneNumber1
+      FIELDS Supplier,
+             SupplierName,
+             TaxNumber3,
+             StreetName,
+             DistrictName,
+             CityName,
+             PostalCode,
+             PhoneNumber1
       FOR ALL ENTRIES IN @ct_header
       WHERE Supplier = @ct_header-Supplier
       INTO TABLE @DATA(lt_supplier).
 
     SELECT FROM I_PurchasingGroup
-      FIELDS PurchasingGroup, PurchasingGroupName
+      FIELDS PurchasingGroup,
+             PurchasingGroupName
       FOR ALL ENTRIES IN @ct_header
       WHERE PurchasingGroup = @ct_header-PurchasingGroup
       INTO TABLE @DATA(lt_pgroup).
 
     SELECT FROM I_CompanyCode
-      FIELDS CompanyCode, CompanyCodeName, VATRegistration, Country
+      FIELDS CompanyCode,
+             CompanyCodeName,
+             VATRegistration
       FOR ALL ENTRIES IN @ct_header
       WHERE CompanyCode = @ct_header-CompanyCode
       INTO TABLE @DATA(lt_company).
 
     SELECT FROM I_PurchasingDocumentTypeText
-      FIELDS PurchasingDocumentType, PurchasingDocumentTypeName
+      FIELDS PurchasingDocumentType,
+             PurchasingDocumentTypeName
       WHERE PurchasingDocumentCategory = 'F'
       AND   Language                   = @sy-langu
       INTO TABLE @DATA(lt_potype).
 
-    " payment terms text ภาษาของ PO — Description ก่อน ถ้าว่างใช้ Name
+    " ข้อความเงื่อนไขการชำระเงินใช้ภาษาของใบสั่งซื้อ
+    " ใช้ Description ก่อน ถ้าว่างจึงใช้ Name
     SELECT FROM I_PaymentTermsText
-      FIELDS PaymentTerms, Language, PaymentTermsName, PaymentTermsDescription
+      FIELDS PaymentTerms,
+             Language,
+             PaymentTermsName,
+             PaymentTermsDescription
       FOR ALL ENTRIES IN @ct_header
       WHERE PaymentTerms = @ct_header-PaymentTerms
       AND   Language     = @ct_header-Language
@@ -398,8 +404,6 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
       IF sy-subrc = 0.
         <lfs_header>-SupplierName        = <lfs_supplier>-SupplierName.
         <lfs_header>-SupplierTaxNumber   = <lfs_supplier>-TaxNumber3.
-        <lfs_header>-SupplierName1       = <lfs_supplier>-BusinessPartnerName1.
-        <lfs_header>-SupplierName2       = <lfs_supplier>-BusinessPartnerName2.
         <lfs_header>-SupplierStreet      = <lfs_supplier>-StreetName.
         <lfs_header>-SupplierDistrict    = <lfs_supplier>-DistrictName.
         <lfs_header>-SupplierCity        = <lfs_supplier>-CityName.
@@ -411,7 +415,6 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
       IF sy-subrc = 0.
         <lfs_header>-CompanyCodeName  = <lfs_company>-CompanyCodeName.
         <lfs_header>-CompanyTaxNumber = <lfs_company>-VATRegistration.
-        <lfs_header>-CompanyCountry   = <lfs_company>-Country.
       ENDIF.
 
       ASSIGN lt_payment_terms[ PaymentTerms = <lfs_header>-PaymentTerms
@@ -431,20 +434,23 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
   METHOD enrich_totals.
 
-    " ยอดรวมทั้งใบ ไม่นับ item ที่ลบ (ตรง Net Order Value ของ standard) — FAE ใช้กับ GROUP BY ไม่ได้ จึงรวมใน ABAP
+    TYPES:
+      BEGIN OF ty_total,
+        PurchaseOrder TYPE zr_pure001-PurchaseOrder,
+        NetAmount     TYPE zr_pure001-NetOrderValue,
+      END OF ty_total.
+
+    DATA lt_total TYPE STANDARD TABLE OF ty_total WITH NON-UNIQUE KEY PurchaseOrder.
+
+    " ยอดรวมทั้งใบไม่นับ item ที่ถูกลบ ตรงกับ Net Order Value ของแอปมาตรฐาน
+    " FOR ALL ENTRIES ใช้กับ GROUP BY ไม่ได้ จึงรวมยอดใน ABAP
     SELECT FROM I_PurchaseOrderItemAPI01
-      FIELDS PurchaseOrder, NetAmount
+      FIELDS PurchaseOrder,
+             NetAmount
       FOR ALL ENTRIES IN @ct_header
       WHERE PurchaseOrder                  = @ct_header-PurchaseOrder
       AND   PurchasingDocumentDeletionCode <> 'L'
       INTO TABLE @DATA(lt_item_amount).
-
-    TYPES: BEGIN OF ty_total,
-             PurchaseOrder TYPE zr_pure001-PurchaseOrder,
-             NetAmount     TYPE zr_pure001-NetOrderValue,
-           END OF ty_total.
-
-    DATA lt_total TYPE STANDARD TABLE OF ty_total WITH NON-UNIQUE KEY PurchaseOrder.
 
     LOOP AT lt_item_amount ASSIGNING FIELD-SYMBOL(<lfs_amount>).
       COLLECT VALUE ty_total( PurchaseOrder = <lfs_amount>-PurchaseOrder
@@ -460,7 +466,8 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
   METHOD enrich_follow_on.
 
-    " มี GR หรือ IR อ้างถึง PO = Follow-On Documents (นับทุก doc ไม่กรอง reverse ตาม standard)
+    " มีใบรับของหรือใบแจ้งหนี้อ้างถึงใบสั่งซื้อ ถือว่ามีเอกสารต่อเนื่อง
+    " นับทุกเอกสารรวมที่ถูก reverse ตามแอปมาตรฐาน
     SELECT DISTINCT PurchaseOrder
       FROM I_MaterialDocumentItem_2
       FOR ALL ENTRIES IN @ct_header
@@ -485,16 +492,19 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
   METHOD enrich_workflow.
 
-    " FAE ต้องใช้ field type เดียวกัน → แปลง PO (char 10) เป็น type ของ SAPBusinessObjectNodeKey1 ก่อน
-    TYPES: BEGIN OF ty_wf_key,
-             SAPBusinessObjectNodeKey1 TYPE i_workflowstatusoverview-SAPBusinessObjectNodeKey1,
-           END OF ty_wf_key,
-           tt_wf_key TYPE STANDARD TABLE OF ty_wf_key WITH EMPTY KEY.
+    " FOR ALL ENTRIES ต้องใช้ field type เดียวกัน
+    " จึงแปลงเลขที่ใบสั่งซื้อเป็น type ของ SAPBusinessObjectNodeKey1 ก่อน
+    TYPES:
+      BEGIN OF ty_wf_key,
+        SAPBusinessObjectNodeKey1 TYPE i_workflowstatusoverview-SAPBusinessObjectNodeKey1,
+      END OF ty_wf_key,
+      tt_wf_key TYPE STANDARD TABLE OF ty_wf_key WITH EMPTY KEY.
 
     DATA(lt_wf_key) = VALUE tt_wf_key( FOR ls_header IN ct_header
                                        ( SAPBusinessObjectNodeKey1 = ls_header-PurchaseOrder ) ).
 
-    " workflow instance ทั้งหมดของ PO → เอาตัวล่าสุด (ID สูงสุด) — PO ถูกแก้แล้ว restart ได้หลายรอบ
+    " ใบสั่งซื้อที่ถูกแก้แล้วเริ่ม workflow ใหม่ได้หลายรอบ
+    " จึงอ่านทุก instance แล้วเก็บเฉพาะตัวล่าสุดซึ่งมี ID สูงสุด
     SELECT FROM I_WorkflowStatusOverview
       FIELDS SAPBusinessObjectNodeKey1 AS PurchaseOrder,
              WorkflowInternalID,
@@ -522,22 +532,26 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
   METHOD derive_status.
 
-    " ชื่อ status ภาษาปัจจุบันจาก standard (33 code, ใช้ 7)
+    " ชื่อ status ตามภาษาที่ login จากตาราง text มาตรฐาน
     SELECT FROM I_PurchasingDocumentStatusText
-      FIELDS PurchasingDocumentStatus, PurchasingDocumentStatusName
+      FIELDS PurchasingDocumentStatus,
+             PurchasingDocumentStatusName
       WHERE Language = @sy-langu
       INTO TABLE @DATA(lt_status_text).
 
     LOOP AT ct_header ASSIGNING FIELD-SYMBOL(<lfs_header>).
 
       DATA(lv_procstat) = <lfs_header>-PurchasingProcessingStatus.
+
       DATA(lv_in_approval) = xsdbool( lv_procstat = gc_procstat-in_release
                                    OR lv_procstat = gc_procstat-partially_released
                                    OR lv_procstat = gc_procstat-external_approval ).
+
       DATA(lv_ordered)     = xsdbool( lv_procstat = gc_procstat-active
                                    OR lv_procstat = gc_procstat-release_completed ).
 
-      "--- Status (filter) — ลำดับสำคัญ ตัวบนชนะตัวล่าง (D5) -------------------------
+      "--- Status ใช้เป็น filter ---------------------------------------------------
+      " ลำดับของเงื่อนไขมีผล เงื่อนไขบนชนะเงื่อนไขล่าง
       <lfs_header>-PurchaseOrderStatus = COND #(
         WHEN <lfs_header>-PurchasingDocumentDeletionCode = 'L'        THEN gc_status-deleted
         WHEN <lfs_header>-PurchasingCompletenessStatus   = 'X'        THEN gc_status-draft
@@ -556,7 +570,8 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
         WHEN gc_status-follow_on OR gc_status-released   THEN gc_criticality-positive
         ELSE                                                  gc_criticality-neutral ).
 
-      "--- Approval Status (คอลัมน์) — PROCSTAT ก่อน แล้วค่อยดู workflow (D6) ----------
+      "--- Approval Status ใช้เป็นคอลัมน์ -------------------------------------------
+      " ดู processing status ก่อน แล้วจึงดูสถานะของ workflow
       <lfs_header>-ApprovalStatus = COND #(
         WHEN <lfs_header>-PurchasingCompletenessStatus = 'X'          THEN ''
         WHEN lv_procstat = gc_procstat-rejected                       THEN gc_approval-rejected
@@ -623,9 +638,12 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
     ENDIF.
 
     SELECT FROM I_PurOrdScheduleLineAPI01
-      FIELDS PurchaseOrder, PurchaseOrderItem, ScheduleLineDeliveryDate,
-             PerformancePeriodStartDate, PerformancePeriodEndDate,
-             PurchaseRequisition, PurchaseRequisitionItem
+      FIELDS PurchaseOrder,
+             PurchaseOrderItem,
+             ScheduleLineDeliveryDate,
+             PerformancePeriodStartDate,
+             PerformancePeriodEndDate,
+             PurchaseRequisition
       FOR ALL ENTRIES IN @it_purchase_order
       WHERE PurchaseOrder             = @it_purchase_order-PurchaseOrder
       AND   PurchaseOrderScheduleLine = '0001'
@@ -641,15 +659,19 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
     ENDIF.
 
     SELECT FROM I_PurOrdAccountAssignmentAPI01
-      FIELDS PurchaseOrder, PurchaseOrderItem, GLAccount, CostCenter, OrderID,
+      FIELDS PurchaseOrder,
+             PurchaseOrderItem,
+             GLAccount,
+             CostCenter,
+             OrderID,
              WBSElementInternalID_2 AS WBSElementInternalID,
-             GoodsRecipientName, UnloadingPointName
+             UnloadingPointName
       FOR ALL ENTRIES IN @it_purchase_order
       WHERE PurchaseOrder           = @it_purchase_order-PurchaseOrder
       AND   AccountAssignmentNumber = '01'
       INTO CORRESPONDING FIELDS OF TABLE @rt_account_assignment.
 
-    " WBS internal → external (C-2025-054) ผ่าน Enterprise Project
+    " แปลงรหัส WBS ภายในเป็นรหัสภายนอกผ่าน Enterprise Project
     DATA(lt_wbs_key) = VALUE tt_account_assignment( FOR ls_aa IN rt_account_assignment
                                                     WHERE ( WBSElementInternalID IS NOT INITIAL )
                                                     ( WBSElementInternalID = ls_aa-WBSElementInternalID ) ).
@@ -658,7 +680,8 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
     ENDIF.
 
     SELECT FROM I_EnterpriseProjectElement
-      FIELDS WBSElementInternalID, ProjectElement                       " TODO verify: ชื่อ field
+      FIELDS WBSElementInternalID,
+             ProjectElement
       FOR ALL ENTRIES IN @lt_wbs_key
       WHERE WBSElementInternalID = @lt_wbs_key-WBSElementInternalID
       INTO TABLE @DATA(lt_wbs).
@@ -670,36 +693,25 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD read_tax_rates.
-
-    DATA(lv_today) = cl_abap_context_info=>get_system_date( ).
-
-    " input tax (V) condition MWVS ประเทศของ company code ช่วงที่มีผลวันนี้ → 1 แถวต่อ tax code
-    SELECT FROM I_TaxCodeRate
-      FIELDS TaxCode, ConditionRateRatio AS TaxRate
-      WHERE Country                    = @iv_country
-      AND   TaxType                    = 'V'
-      AND   VATConditionType           = 'MWVS'
-      AND   CndnRecordValidityStartDate <= @lv_today
-      AND   CndnRecordValidityEndDate   >= @lv_today
-      INTO CORRESPONDING FIELDS OF TABLE @rt_tax_rate.
-
-  ENDMETHOD.
-
-
   METHOD read_header_texts.
 
     IF it_purchase_order IS INITIAL.
       RETURN.
     ENDIF.
 
-    " STRING column ใช้กับ FAE ไม่ได้ (implicit DISTINCT) → ใช้ range แทน (พิมพ์ทีละไม่กี่ใบ)
+    " column แบบ STRING ใช้กับ FOR ALL ENTRIES ไม่ได้เพราะมี DISTINCT แฝงอยู่
+    " จึงใช้ range แทน ซึ่งพอเพราะพิมพ์ครั้งละไม่กี่ใบ
     DATA(lr_purchase_order) = VALUE ty_selection-purchase_order(
       FOR ls_key IN it_purchase_order ( sign = 'I' option = 'EQ' low = ls_key-PurchaseOrder ) ).
 
-    " F01 Header Text · F02 Header Note · F06 Shipping Instructions (จัดส่งโดย)
+    " ประเภทที่ฟอร์มใช้คือ F01 Header Text
+    " F02 Header Note
+    " F06 Shipping Instructions สำหรับช่องจัดส่งโดย
     SELECT FROM I_PurchaseOrderNoteTP_2
-      FIELDS PurchaseOrder, TextObjectType, Language, PlainLongText
+      FIELDS PurchaseOrder,
+             TextObjectType,
+             Language,
+             PlainLongText
       WHERE PurchaseOrder IN @lr_purchase_order
       INTO CORRESPONDING FIELDS OF TABLE @rt_text.
 
@@ -715,9 +727,13 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
     DATA(lr_purchase_order) = VALUE ty_selection-purchase_order(
       FOR ls_key IN it_purchase_order ( sign = 'I' option = 'EQ' low = ls_key-PurchaseOrder ) ).
 
-    " F03 Material PO Text · F01 Item Text · F04 Delivery Text
+    " ประเภทที่ฟอร์มใช้คือ F03 Material PO Text และ F01 Item Text
     SELECT FROM I_PurchaseOrderItemNoteTP_2
-      FIELDS PurchaseOrder, PurchaseOrderItem, TextObjectType, Language, PlainLongText
+      FIELDS PurchaseOrder,
+             PurchaseOrderItem,
+             TextObjectType,
+             Language,
+             PlainLongText
       WHERE PurchaseOrder IN @lr_purchase_order
       INTO CORRESPONDING FIELDS OF TABLE @rt_text.
 
@@ -726,64 +742,9 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD read_approvers.
-
-    " เฉพาะ PO ที่มี workflow instance
-    DATA(lt_workflow) = VALUE tt_header( FOR ls_h IN it_header WHERE ( WorkflowInternalID IS NOT INITIAL ) ( ls_h ) ).
-    IF lt_workflow IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    SELECT FROM I_WorkflowStatusDetails
-      FIELDS WorkflowInternalID, WorkflowTaskInternalID, WorkflowTaskProcessor, WrkflwTskCompletionUTCDateTime
-      FOR ALL ENTRIES IN @lt_workflow
-      WHERE WorkflowInternalID         = @lt_workflow-WorkflowInternalID
-      AND   WorkflowTaskResult         = 'RELEASED'
-      AND   WorkflowTaskExternalStatus = 'COMPLETED'
-      INTO TABLE @DATA(lt_task).
-
-    " task RELEASED ล่าสุดต่อ workflow
-    SORT lt_task BY WorkflowInternalID ASCENDING WorkflowTaskInternalID DESCENDING.
-    DELETE ADJACENT DUPLICATES FROM lt_task COMPARING WorkflowInternalID.
-
-    LOOP AT lt_workflow ASSIGNING FIELD-SYMBOL(<lfs_header>).
-      ASSIGN lt_task[ WorkflowInternalID = <lfs_header>-WorkflowInternalID ] TO FIELD-SYMBOL(<lfs_task>).
-      IF sy-subrc = 0.
-        APPEND VALUE #( PurchaseOrder    = <lfs_header>-PurchaseOrder
-                        ApprovedByUser   = <lfs_task>-WorkflowTaskProcessor
-                        ApprovedDateTime = <lfs_task>-WrkflwTskCompletionUTCDateTime ) TO rt_approver.
-      ENDIF.
-    ENDLOOP.
-
-    IF rt_approver IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    DATA(lt_user) = read_user_names( VALUE #( FOR ls_a IN rt_approver ( UserID = ls_a-ApprovedByUser ) ) ).
-
-    LOOP AT rt_approver ASSIGNING FIELD-SYMBOL(<lfs_approver>).
-      <lfs_approver>-ApprovedByName = VALUE #( lt_user[ UserID = <lfs_approver>-ApprovedByUser ]-PersonFullName OPTIONAL ).
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
-  METHOD read_user_names.
-
-    IF it_user IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    SELECT FROM I_BusinessUserBasic
-      FIELDS UserID, PersonFullName
-      FOR ALL ENTRIES IN @it_user
-      WHERE UserID = @it_user-UserID
-      INTO TABLE @rt_user_name.
-
-  ENDMETHOD.
-
-
   METHOD read_form_details.
+
+    DATA lv_last_change TYPE i_purchaseorderapi01-YY1_IssuedDateTH_PDH.
 
     LOOP AT it_header INTO DATA(ls_header).
 
@@ -792,7 +753,7 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
       " ชื่อ ตำแหน่ง และวันที่ของผู้อนุมัติ
       zcl_get_approval_name=>get_data(
-        EXPORTING iv_po_no         = CONV #( ls_header-PurchaseOrder )
+        EXPORTING iv_po_no         = ls_header-PurchaseOrder
         IMPORTING es_data_name     = <lfs_detail>-ApproverName
                   es_data_position = <lfs_detail>-ApproverPosition
                   es_data_date     = <lfs_detail>-ApprovalDateRaw ).
@@ -826,9 +787,6 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
       " วันที่ออกเอกสารใช้วันที่แก้ไขล่าสุด ไม่ใช่วันที่ของใบสั่งซื้อ
       " เป็นกติกาเดียวกับฟอร์มมาตรฐาน
       IF ls_header-LastChangeDateTime IS NOT INITIAL.
-
-        DATA lv_last_change TYPE i_purchaseorderapi01-YY1_IssuedDateTH_PDH.
-
         zcl_get_lastchange_po=>get_data( EXPORTING iv_lastchangedatetime = ls_header-LastChangeDateTime
                                          IMPORTING es_approval_date      = lv_last_change ).
 
@@ -844,11 +802,12 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
   METHOD compose_supplier_info.
 
-    DATA lv_room  TYPE string.
-    DATA lv_floor TYPE string.
+    DATA lv_room    TYPE string.
+    DATA lv_floor   TYPE string.
+    DATA ls_address TYPE zcl_get_address_form_bp=>gty_data_t.
 
     " ชื่อผู้ขายมาจากสี่บรรทัดของ business partner ต่อท้ายรหัสที่ตัดศูนย์นำหน้าแล้ว
-    zcl_get_name_form_bp=>get_data( EXPORTING iv_businesspartner = CONV #( is_header-Supplier )
+    zcl_get_name_form_bp=>get_data( EXPORTING iv_businesspartner = is_header-Supplier
                                     IMPORTING es_data            = DATA(ls_name) ).
 
     IF ls_name IS NOT INITIAL.
@@ -865,28 +824,26 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
                   ls_name-OrganizationBPName2
                   ls_name-OrganizationBPName3
                   ls_name-OrganizationBPName4
-                  INTO cs_detail-SupplierCodeName SEPARATED BY space.
+             INTO cs_detail-SupplierCodeName SEPARATED BY space.
     ENDIF.
-
-    DATA ls_address TYPE zcl_get_address_form_bp=>gty_data_t.
 
     IF is_header-ManualSupplierAddressID IS INITIAL.
 
-      zcl_get_address_form_bp=>get_data( EXPORTING iv_businesspartner = CONV #( is_header-Supplier )
+      zcl_get_address_form_bp=>get_data( EXPORTING iv_businesspartner = is_header-Supplier
                                          IMPORTING es_data           = ls_address ).
 
     ELSE.
 
       " ใบที่พิมพ์ที่อยู่เอง ชื่อผู้ขายจะเป็นรหัสตามด้วยที่อยู่เต็มแทนชื่อจาก master
       zcl_get_address_form_onetime=>get_data(
-        EXPORTING iv_supplieraddressid = CONV #( is_header-ManualSupplierAddressID )
-                  iv_purchaseorder     = CONV #( is_header-PurchaseOrder )
+        EXPORTING iv_supplieraddressid = is_header-ManualSupplierAddressID
+                  iv_purchaseorder     = is_header-PurchaseOrder
         IMPORTING es_data              = ls_address ).
 
       CLEAR cs_detail-SupplierCodeName.
       CONCATENATE ls_name-BusinessPartner
                   ls_address-CompleteAddress
-                  INTO cs_detail-SupplierCodeName SEPARATED BY space.
+             INTO cs_detail-SupplierCodeName SEPARATED BY space.
 
     ENDIF.
 
@@ -933,7 +890,7 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
                 ls_address-CityName
                 ls_address-Region
                 ls_address-PostalCode
-                INTO cs_detail-SupplierAddress SEPARATED BY space.
+           INTO cs_detail-SupplierAddress SEPARATED BY space.
 
     CONDENSE cs_detail-SupplierAddress.
 
@@ -941,8 +898,9 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
     IF ls_address-AdditionalStreetSuffixName IS NOT INITIAL.
       CONCATENATE cs_detail-SupplierCodeName
                   ls_address-AdditionalStreetSuffixName
-                  INTO cs_detail-SupplierCodeName SEPARATED BY space.
+             INTO cs_detail-SupplierCodeName SEPARATED BY space.
     ENDIF.
 
   ENDMETHOD.
+
 ENDCLASS.

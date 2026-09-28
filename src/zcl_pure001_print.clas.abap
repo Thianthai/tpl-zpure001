@@ -1,5 +1,5 @@
 "! <p class="shorttext synchronized">Print Purchase Order - Render PDF</p>
-"! ตัวกลาง render PDF ที่ปุ่มใน list report และ HTTP service ใช้ร่วมกัน
+"! render PDF ของฟอร์มใบสั่งซื้อให้ action พิมพ์ใน list report
 CLASS zcl_pure001_print DEFINITION
   PUBLIC
   FINAL
@@ -26,7 +26,8 @@ CLASS zcl_pure001_print DEFINITION
     "! หลายใบมีแต่วันเวลา เพราะระบุเลขที่ใบใดใบหนึ่งไม่ได้
     "! วันเวลาเป็นเวลาประเทศไทย ไม่ใช่เวลาของ system
     "! @parameter it_purchase_order | เลขที่ใบสั่งซื้อชุดเดียวกับที่ส่งให้ render
-    "! @parameter rv_file_name | เช่น 99680042_20260923_143015.pdf
+    "! @parameter rv_file_name | ใบเดียวเป็น <เลขที่ใบสั่งซื้อ>_YYYYMMDD_hhmmss.pdf
+    "! หลายใบเป็น YYYYMMDD_hhmmss.pdf
     METHODS get_file_name
       IMPORTING it_purchase_order   TYPE tt_purchase_order
       RETURNING VALUE(rv_file_name) TYPE string.

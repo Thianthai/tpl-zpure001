@@ -6,23 +6,24 @@ define root custom entity ZR_PURE001_FDP
       //=== Key ===============================================================
   key PurchaseOrder            : ebeln;
 
-
-      //=== Company (2.1) =====================================================
+      //=== Company ===========================================================
       CompanyCode              : bukrs;
       CompanyName              : abap.char(80);
       CompanyTaxNumber         : abap.char(20);
-      CompanyAddressLine1      : abap.char(120);   // ⏸ config
-      CompanyAddressLine2      : abap.char(120);   // ⏸ config
-      CompanyPhone             : abap.char(60);    // ⏸ config
-      CompanyWebsite           : abap.char(80);    // ⏸ config
+      // ที่อยู่ โทรศัพท์ เว็บไซต์ และโลโก้ของบริษัทพิมพ์เป็นค่าคงที่ในฟอร์ม
+      // field กลุ่มนี้จึงไม่มีค่า
+      CompanyAddressLine1      : abap.char(120);
+      CompanyAddressLine2      : abap.char(120);
+      CompanyPhone             : abap.char(60);
+      CompanyWebsite           : abap.char(80);
       @Semantics.mimeType      : true
       CompanyLogoMimeType      : abap.char(128);
       CompanyLogoFileName      : abap.char(255);
       @Semantics.largeObject   : { mimeType: 'CompanyLogoMimeType', fileName: 'CompanyLogoFileName',
                                    acceptableMimeTypes: ['image/png', 'image/jpeg'], contentDispositionPreference: #INLINE }
-      CompanyLogo              : abap.rawstring(0); // ⏸ graphics
+      CompanyLogo              : abap.rawstring(0);
 
-      //=== PO (2.2) ==========================================================
+      //=== PO ================================================================
       PurchaseOrderType        : ze_bsart;
       PurchaseOrderTypeName    : abap.char(20);
       Language                 : abap.lang;
@@ -41,18 +42,20 @@ define root custom entity ZR_PURE001_FDP
       ShipVia                  : abap.char(80);
       HeaderText               : abap.string;
       HeaderNote               : abap.string;
-      PerfGuaranteeFlag        : abap.char(1);     // ⏸ custom field YY1_*
-      PerfGuaranteeCash        : abap.char(1);     // ⏸
-      PerfGuaranteeBG          : abap.char(1);     // ⏸
-      InsurancePolicyFlag      : abap.char(1);     // ⏸
-      WarrantyGuaranteeFlag    : abap.char(1);     // ⏸
-      WarrantyGuaranteeCash    : abap.char(1);     // ⏸
-      WarrantyGuaranteeBG      : abap.char(1);     // ⏸
+      // ช่องหลักประกันมาจาก custom field บนใบสั่งซื้อ
+      PerfGuaranteeFlag        : abap.char(1);
+      PerfGuaranteeCash        : abap.char(1);
+      PerfGuaranteeBG          : abap.char(1);
+      InsurancePolicyFlag      : abap.char(1);
+      WarrantyGuaranteeFlag    : abap.char(1);
+      WarrantyGuaranteeCash    : abap.char(1);
+      WarrantyGuaranteeBG      : abap.char(1);
 
-      //=== Supplier (2.3) ====================================================
+      //=== Supplier ==========================================================
       Supplier                 : lifnr;
       SupplierName             : abap.char(80);
-      SupplierCodeName         : abap.char(100);   // "10004 บริษัท นาคา…" (แทน YY1_SuppCodeNameBranch — สาขายังไม่มี source)
+      // รหัสผู้ขายตามด้วยชื่อและสาขา ค่าเดียวกับ YY1_SuppCodeNameBranch ของฟอร์มมาตรฐาน
+      SupplierCodeName         : abap.char(100);
       SupplierTaxNumber        : abap.char(20);
       SupplierAddress          : abap.char(255);
       SupplierStreet           : abap.char(60);
@@ -61,25 +64,26 @@ define root custom entity ZR_PURE001_FDP
       SupplierPostalCode       : abap.char(10);
       SupplierContactName      : abap.char(35);
       SupplierPhone            : abap.char(30);
-      SupplierEmail            : abap.char(241);   // ⏸ custom field
+      SupplierEmail            : abap.char(241);
 
-      //=== Ship-to (2.4) =====================================================
+      //=== Ship-to ===========================================================
       ShipToPlant              : werks_d;
       ShipToName               : abap.char(80);
       ShipToPlantName          : abap.char(30);
-      ShipToAddressLine1       : abap.char(120);   // ⏸ config
-      ShipToAddressLine2       : abap.char(120);   // ⏸ config
+      // ที่อยู่ของ plant รวมอยู่บรรทัดเดียว บรรทัดที่สองจึงไม่มีค่า
+      ShipToAddressLine1       : abap.char(120);
+      ShipToAddressLine2       : abap.char(120);
       GoodsRecipientName       : abap.char(35);
       UnloadingPointName       : abap.char(25);
-      GoodsRecipientPhone      : abap.char(30);    // ⏸
+      GoodsRecipientPhone      : abap.char(30);
 
-      //=== Totals (2.5) ======================================================
+      //=== Totals ============================================================
       @Semantics.currencyCode  : true
       DocumentCurrency         : waers;
       @Semantics.amount.currencyCode : 'DocumentCurrency'
       TotalAmount              : abap.curr(16,2);
       @Semantics.amount.currencyCode : 'DocumentCurrency'
-      DiscountAmount           : abap.curr(16,2);  // ⏸ = 0
+      DiscountAmount           : abap.curr(16,2);
       @Semantics.amount.currencyCode : 'DocumentCurrency'
       AmountBeforeTax          : abap.curr(16,2);
       @Semantics.amount.currencyCode : 'DocumentCurrency'
@@ -88,7 +92,7 @@ define root custom entity ZR_PURE001_FDP
       NetAmount                : abap.curr(16,2);
       AmountInWords            : abap.char(255);
 
-      //=== Signature (2.6) ===================================================
+      //=== Signature =========================================================
       PreparedByUser           : abap.char(12);
       PreparedByName           : abap.char(80);
       PreparedDate             : abap.dats;
@@ -97,15 +101,17 @@ define root custom entity ZR_PURE001_FDP
       ApprovedByName           : abap.char(80);
       ApprovedDate             : abap.dats;
       ApprovedDateText         : abap.char(40);
-      ApprovedByPosition       : abap.char(80);    // ⏸ config
+      ApprovedByPosition       : abap.char(80);
       @Semantics.mimeType      : true
       ApprovedBySignMimeType   : abap.char(128);
       ApprovedBySignFileName   : abap.char(255);
       @Semantics.largeObject   : { mimeType: 'ApprovedBySignMimeType', fileName: 'ApprovedBySignFileName',
                                    acceptableMimeTypes: ['image/png', 'image/jpeg'], contentDispositionPreference: #INLINE }
-      ApprovedBySignature      : abap.rawstring(0); // ⏸ graphics
+      // ฟอร์มมาตรฐานไม่มีรูปลายเซ็น field นี้จึงไม่มีค่า
+      ApprovedBySignature      : abap.rawstring(0);
       IsApprovedAutomatically  : abap.char(1);
-      ApprovalNoteText         : abap.char(120);   // ข้อความ "อนุมัติผ่านระบบอิเล็กทรอนิกส์" — ว่างถ้ายังไม่อนุมัติ
+      // ข้อความอนุมัติผ่านระบบอิเล็กทรอนิกส์ ว่างเมื่อยังไม่อนุมัติ
+      ApprovalNoteText         : abap.char(120);
       
       _Item                    : composition of exact one to many ZI_PURE001_ITEM_FDP;
 }

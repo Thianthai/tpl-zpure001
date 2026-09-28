@@ -14,11 +14,11 @@ CLASS zcl_pure001_query DEFINITION
     CONSTANTS gc_entity_id TYPE string VALUE 'ZR_PURE001'.
 
     DATA:
-      go_data             TYPE REF TO zcl_pure001_data,
-      gs_selection        TYPE zcl_pure001_data=>ty_selection,
-      gv_search           TYPE string,
-      gr_po_status        TYPE RANGE OF zr_pure001-PurchaseOrderStatus,
-      gr_approval_status  TYPE RANGE OF zr_pure001-ApprovalStatus.
+      go_data            TYPE REF TO zcl_pure001_data,
+      gs_selection       TYPE zcl_pure001_data=>ty_selection,
+      gv_search          TYPE string,
+      gr_po_status       TYPE RANGE OF zr_pure001-PurchaseOrderStatus,
+      gr_approval_status TYPE RANGE OF zr_pure001-ApprovalStatus.
 
     "! แปลง $filter / $search จาก request เป็นเงื่อนไข
     METHODS prepare_filter
@@ -32,10 +32,12 @@ CLASS zcl_pure001_query DEFINITION
     METHODS apply_memory_filters
       CHANGING ct_header TYPE zcl_pure001_data=>tt_header.
 
+    "! เรียงตาม $orderby ของ request ไม่ระบุจะเรียงเลขที่ใบสั่งซื้อจากมากไปน้อย
     METHODS apply_sorting
       IMPORTING io_request TYPE REF TO if_rap_query_request
       CHANGING  ct_header  TYPE zcl_pure001_data=>tt_header.
 
+    "! ตัดหน้าตาม $skip และ $top ของ request
     METHODS apply_paging
       IMPORTING io_request TYPE REF TO if_rap_query_request
       CHANGING  ct_header  TYPE zcl_pure001_data=>tt_header.
@@ -49,7 +51,6 @@ ENDCLASS.
 
 
 CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
-
 
   METHOD if_rap_query_provider~select.
 
@@ -133,15 +134,18 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
                           option = 'CP'
                           low    = |*{ to_upper( <lfs_material>-low ) }*|
                         ) TO gs_selection-item_text.
+
         WHEN 'CP'.
           APPEND VALUE #( sign   = 'I'
                           option = 'CP'
                           low    = to_upper( <lfs_material>-low )
                         ) TO gs_selection-item_text.
+
       ENDCASE.
     ENDLOOP.
 
-    " มี filter Material แต่ไม่มี pattern (ใช้แต่ exclude) → กัน range ว่างทำให้ OR เป็นจริงเสมอ
+    " มี filter Material แต่ไม่มี pattern เพราะใช้แต่ exclude
+    " ต้องใส่ pattern ที่ไม่มีวันตรง เพราะ range ว่างจะทำให้เงื่อนไข OR เป็นจริงเสมอ
     IF gs_selection-material IS NOT INITIAL AND gs_selection-item_text IS INITIAL.
       gs_selection-item_text = VALUE #( ( sign = 'E' option = 'CP' low = '*' ) ).
     ENDIF.
@@ -183,7 +187,7 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
     LOOP AT lt_sort ASSIGNING FIELD-SYMBOL(<lfs_sort>).
       DATA(lv_element) = to_upper( <lfs_sort>-element_name ).
 
-      " field ที่ประกอบหลัง paging / filter-only ยังไม่มีค่าตอนนี้ → ข้าม
+      " field ที่ประกอบหลัง paging และ field ที่ใช้กรองอย่างเดียวยังไม่มีค่าตอนนี้ จึงข้าม
       IF lv_element = 'MATERIALLIST' OR lv_element = 'PLANTLIST'
       OR lv_element = 'MATERIAL'     OR lv_element = 'PLANT'.
         CONTINUE.
@@ -247,7 +251,9 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
       LOOP AT lt_item ASSIGNING FIELD-SYMBOL(<lfs_item>)
         WHERE PurchaseOrder = <lfs_result>-PurchaseOrder.
 
-        " "ชื่อ (รหัส)" — text item (ไม่มี material) แสดงชื่ออย่างเดียว · string template ตัดช่องว่างท้ายให้
+        " รูปแบบคือ ชื่อ (รหัส)
+        " item ที่ไม่มีรหัสวัสดุแสดงชื่ออย่างเดียว
+        " string template ตัดช่องว่างท้ายให้เอง
         DATA(lv_material) = COND string( WHEN <lfs_item>-Material IS INITIAL
                                            THEN <lfs_item>-MaterialDescription
                                          ELSE |{ <lfs_item>-MaterialDescription } ({ <lfs_item>-Material })| ).

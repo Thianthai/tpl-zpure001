@@ -5,25 +5,32 @@ CLASS zcl_pure001_util DEFINITION
 
   PUBLIC SECTION.
 
+    "! แยกชุดคำจากค่าคงที่เป็น table ครั้งเดียวต่อ session
     CLASS-METHODS class_constructor.
 
-    "! วันที่ไทย พ.ศ. + ชื่อเดือนไทย เช่น 21 พฤศจิกายน 2568 · วันที่ว่าง → ''
+    "! วันที่ไทยแบบ พ.ศ. พร้อมชื่อเดือนภาษาไทย เช่น 21 พฤศจิกายน 2568
+    "! วันที่ว่างคืนค่าว่าง
     CLASS-METHODS to_thai_date
       IMPORTING iv_date        TYPE d
       RETURNING VALUE(rv_text) TYPE string.
 
-    "! dd/mm/yyyy ค.ศ. เช่น 26/06/2025 · วันที่ว่าง → ''
+    "! วันที่แบบ dd/mm/yyyy ปี ค.ศ. เช่น 26/06/2025
+    "! วันที่ว่างคืนค่าว่าง
     CLASS-METHODS format_date_dmy
       IMPORTING iv_date        TYPE d
       RETURNING VALUE(rv_text) TYPE string.
 
-    "! จำนวนเงินเป็นตัวอักษร — THB ภาษาไทย (…บาทถ้วน / …บาท…สตางค์) · สกุลอื่นภาษาอังกฤษ
+    "! จำนวนเงินเป็นตัวอักษรในวงเล็บ
+    "! THB เป็นภาษาไทย ลงท้ายด้วยบาทถ้วน หรือบาทตามด้วยสตางค์
+    "! สกุลอื่นเป็นภาษาอังกฤษตัวพิมพ์ใหญ่
     CLASS-METHODS amount_in_words
       IMPORTING iv_amount      TYPE numeric
                 iv_currency    TYPE waers
       RETURNING VALUE(rv_text) TYPE string.
 
-    "! จำนวนแบบตัดทศนิยมท้ายที่เป็น 0 — 12.000 → 12 · 1.500 → 1.5
+    "! จำนวนที่ตัดศูนย์ท้ายทศนิยมออก
+    "! เช่น 12.000 -> 12
+    "! เช่น 1.500 -> 1.5
     CLASS-METHODS format_quantity
       IMPORTING iv_quantity    TYPE numeric
       RETURNING VALUE(rv_text) TYPE string.
@@ -31,9 +38,11 @@ CLASS zcl_pure001_util DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
 
+    "! จำนวนเงินทศนิยมสองตำแหน่งที่ใช้แยกส่วนบาทกับสตางค์
     TYPES ty_amount TYPE p LENGTH 12 DECIMALS 2.
 
     CONSTANTS:
+    "! ชุดคำภาษาไทยและภาษาอังกฤษ คั่นด้วยจุลภาค
       BEGIN OF gc_thai,
         digits TYPE string VALUE 'ศูนย์,หนึ่ง,สอง,สาม,สี่,ห้า,หก,เจ็ด,แปด,เก้า',
         units  TYPE string VALUE ',สิบ,ร้อย,พัน,หมื่น,แสน',
@@ -68,13 +77,14 @@ ENDCLASS.
 
 CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
 
-
   METHOD class_constructor.
+
     SPLIT gc_thai-digits AT ',' INTO TABLE gt_thai_digits.
     SPLIT gc_thai-units  AT ',' INTO TABLE gt_thai_units.
     SPLIT gc_thai-months AT ',' INTO TABLE gt_thai_months.
     SPLIT gc_en-ones     AT ',' INTO TABLE gt_en_ones.
     SPLIT gc_en-tens     AT ',' INTO TABLE gt_en_tens.
+
   ENDMETHOD.
 
 
@@ -106,12 +116,12 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
 
   METHOD format_quantity.
 
-    " แปลงผ่าน decfloat34 แล้วให้ string template ตัด 0 ท้ายให้ (12.000 → 12)
+    " แปลงผ่าน decfloat34 แล้วให้ string template ตัดศูนย์ท้ายให้
     DATA(lv_quantity) = CONV decfloat34( iv_quantity ).
     rv_text = |{ lv_quantity NUMBER = USER }|.
 
-    " NUMBER = USER อาจใส่ตัวคั่นหลักพันตาม user setting → ตัดออกให้เหลือตัวเลขล้วน
-    " (ฟอร์มจัด format เอง ถ้าต้องการตัวคั่นหลักพัน)
+    " NUMBER = USER อาจใส่ตัวคั่นหลักพันตาม user setting จึงตัดออกให้เหลือตัวเลขล้วน
+    " ถ้าต้องการตัวคั่นหลักพันให้ฟอร์มจัด format เอง
     REPLACE ALL OCCURRENCES OF ',' IN rv_text WITH ''.
 
   ENDMETHOD.
@@ -121,7 +131,7 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
 
     DATA(lv_amount) = CONV ty_amount( iv_amount ).
 
-    " แยกส่วนจำนวนเต็มกับเศษ 2 ตำแหน่ง (ปัดตามค่าที่เก็บ ไม่ปัดเพิ่ม)
+    " แยกส่วนจำนวนเต็มกับเศษสองตำแหน่ง ใช้ค่าตามที่เก็บ ไม่ปัดเพิ่ม
     DATA(lv_integer)  = CONV int8( trunc( lv_amount ) ).
     DATA(lv_fraction) = CONV int8( ( lv_amount - trunc( lv_amount ) ) * 100 ).
 
@@ -160,19 +170,20 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    " เกินล้าน → อ่านส่วนล้านก่อน แล้ว recursion ส่วนที่เหลือ (หนึ่งล้านเอ็ด, สองล้านห้าแสน)
+    " ตั้งแต่หนึ่งล้านขึ้นไป อ่านส่วนที่เป็นล้านก่อน แล้วเรียกซ้ำกับส่วนที่เหลือ
+    " เช่น หนึ่งล้านเอ็ด และสองล้านห้าแสน
     IF iv_number >= 1000000.
       rv_text = |{ number_to_words_th( iv_number div 1000000 ) }ล้าน{
                    number_to_words_th( iv_number = iv_number mod 1000000 iv_has_higher = abap_true ) }|.
       RETURN.
     ENDIF.
 
-    " ต่ำกว่าล้าน: ไล่จากหลักแสน (pos 6) ถึงหลักหน่วย (pos 1)
+    " ต่ำกว่าล้าน ไล่จากหลักแสนซึ่งเป็นตำแหน่ง 6 ลงไปถึงหลักหน่วยซึ่งเป็นตำแหน่ง 1
     DATA(lv_remaining) = iv_number.
     DATA(lv_divisor)   = CONV int8( 100000 ).
 
     DO 6 TIMES.
-      DATA(lv_pos)   = 7 - sy-index.                    " 6 = แสน … 1 = หน่วย
+      DATA(lv_pos)   = 7 - sy-index.
       DATA(lv_digit) = CONV i( lv_remaining div lv_divisor ).
       lv_remaining   = lv_remaining mod lv_divisor.
       lv_divisor     = lv_divisor div 10.
@@ -182,18 +193,23 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
       ENDIF.
 
       CASE lv_pos.
-        WHEN 2.   " หลักสิบ: สิบ / ยี่สิบ / สามสิบ …
+        WHEN 2.
+          " หลักสิบอ่านเป็น สิบ ยี่สิบ สามสิบ และต่อไปตามปกติ
           rv_text = rv_text && SWITCH string( lv_digit
                                   WHEN 1 THEN 'สิบ'
                                   WHEN 2 THEN 'ยี่สิบ'
                                   ELSE gt_thai_digits[ lv_digit + 1 ] && 'สิบ' ).
-        WHEN 1.   " หลักหน่วย: เอ็ด เมื่อมีหลักที่สูงกว่านำหน้า (ในกลุ่มนี้หรือกลุ่มล้านก่อนหน้า)
+
+        WHEN 1.
+          " หลักหน่วยอ่านเป็นเอ็ด เมื่อมีหลักที่สูงกว่านำหน้าในกลุ่มนี้หรือกลุ่มล้านก่อนหน้า
           rv_text = rv_text && COND string(
                       WHEN lv_digit = 1 AND ( iv_number > 9 OR iv_has_higher = abap_true )
                       THEN 'เอ็ด'
                       ELSE gt_thai_digits[ lv_digit + 1 ] ).
+
         WHEN OTHERS.
           rv_text = rv_text && gt_thai_digits[ lv_digit + 1 ] && gt_thai_units[ lv_pos ].
+
       ENDCASE.
     ENDDO.
 
@@ -209,7 +225,7 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
 
     DATA(lv_remaining) = iv_number.
 
-    " กลุ่มละพัน: Billion / Million / Thousand / (none)
+    " อ่านทีละกลุ่มสามหลัก ได้แก่ Billion, Million, Thousand และกลุ่มสุดท้ายที่ไม่มีหน่วย
     DATA(lt_scale) = VALUE string_table( ( `Billion` ) ( `Million` ) ( `Thousand` ) ( `` ) ).
     DATA(lv_divisor) = CONV int8( 1000000000 ).
 
@@ -234,9 +250,12 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
         DATA(lv_tens_text) = COND string(
           WHEN lv_tens_part < 20
             THEN gt_en_ones[ lv_tens_part + 1 ]
+
           WHEN lv_tens_part mod 10 = 0
             THEN gt_en_tens[ lv_tens_part div 10 + 1 ]
+
           ELSE |{ gt_en_tens[ lv_tens_part div 10 + 1 ] }-{ gt_en_ones[ lv_tens_part mod 10 + 1 ] }| ).
+
         lv_group_text = COND #( WHEN lv_group_text IS INITIAL THEN lv_tens_text
                                 ELSE |{ lv_group_text } { lv_tens_text }| ).
       ENDIF.
@@ -250,4 +269,5 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
+
 ENDCLASS.

@@ -151,7 +151,7 @@ define root custom entity ZR_PURE001
       @Consumption.filter.hidden       : true
       ApprovalStatusCriticality        : abap.int1;
       
-      //=== Print (Phase 3) ===================================================
+      //=== Print =============================================================
       @EndUserText.label               : 'Print PO Form'
       @Consumption.filter.hidden       : true
       @UI.lineItem                     : [{ position: 220,
