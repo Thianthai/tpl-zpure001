@@ -346,7 +346,7 @@ standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ต
 
 **สิ่งที่เปลี่ยนตามมา**
 - ยอดรวมท้ายฟอร์มไม่คำนวณเองแล้ว ใช้ `zcl_get_other_detail` -> ช่อง Other Expense มีค่าจริง ไม่ใช่ศูนย์
-  · `read_tax_rates` ยังใช้อยู่แต่เฉพาะอัตราภาษีรายบรรทัด
+  · `read_tax_rates` เหลือไว้เฉพาะอัตราภาษีรายบรรทัด แต่ฟอร์มไม่ได้ bind จึงลบออกใน cleanup 2026-09-28 (`76c76dd`)
 - เกณฑ์ "อนุมัติแล้ว" ของฟอร์มใช้วันที่อนุมัติจาก class ไม่ใช่ `ApprovalStatus` ที่ derive เอง
   · list report ยังใช้ของเดิม เพราะ custom class รับทีละใบ ใช้กับ 284 ใบไม่ไหว
 - `I_PurchaseOrderAPI01` มี custom field `YY1_*` ครบ จึงอ่าน checkbox หลักประกัน อีเมล และวันที่สัญญา ได้ตรงจาก view
@@ -443,4 +443,5 @@ standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ต
 | `I_Product` ใช้เป็น value help ใน OData V4 ไม่ได้ — `PRODCHARC1INTERNALNUMBER` มี conversion exit ATINN ทำให้ metadata ของ VH service พัง ใช้ `I_ProductStdVH` แทน | 2026-09-23 | |
 | custom field `YY1_*` ของลูกค้าอยู่ใน `I_PurchaseOrderAPI01` ครบ 36 field อ่านได้ตรง ๆ | 2026-09-25 | D19 |
 | `I_OrganizationAddress` และ `I_Address_2` released C1 แต่ DCL ปิดข้อมูลทั้งหมด ต้อง `WITH PRIVILEGED ACCESS` · `I_PlantAddressVH` ไม่ released | 2026-09-25 | D20 |
+| ABAP Doc ของ `TYPES:` / `CONSTANTS:` แบบ chain ต้องวาง **หลังเครื่องหมาย `:`** (บรรทัดถัดจาก `TYPES:`) ถ้าวางเหนือ keyword ได้ warning `ABAP Doc comment is in the wrong position` · `CONV #( )` ที่ type ตรงกับ parameter อยู่แล้วได้ warning `Redundant conversion` | 2026-09-28 | cleanup `76c76dd` |
 | ADT: short dump ดูที่ Runtime Error Viewer · error ของ gateway (`/IWBEP/CX_GATEWAY`) ดูที่ `/sap/bc/adt/gw/errorlog` — `ZCX_PURE001_QUERY->get_text( )` โผล่ใน Error Context ทำให้ debug filter ได้โดยไม่ต้อง trace | 2026-09-14 | |
