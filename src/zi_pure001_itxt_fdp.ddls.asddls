@@ -12,6 +12,9 @@ define custom entity ZI_PURE001_ITXT_FDP
       TextTypeName      : abap.char(40);
       Text              : abap.string;
 
+      // query provider ไม่รองรับ filter และ sort ข้าม association
+      @ObjectModel.filter.enabled: false
+      @ObjectModel.sort.enabled: false
       _Item             : association to parent ZI_PURE001_ITEM_FDP
                             on  _Item.PurchaseOrder     = $projection.PurchaseOrder
                             and _Item.PurchaseOrderItem = $projection.PurchaseOrderItem;

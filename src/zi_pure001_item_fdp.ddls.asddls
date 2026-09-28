@@ -41,7 +41,13 @@ define custom entity ZI_PURE001_ITEM_FDP
       AccountAssignmentText      : abap.char(120);
       Plant                      : werks_d;
 
+      // query provider ไม่รองรับ filter และ sort ข้าม association
+      @ObjectModel.filter.enabled: false
+      @ObjectModel.sort.enabled: false
       _ItemText                  : composition of exact one to many ZI_PURE001_ITXT_FDP;
+
+      @ObjectModel.filter.enabled: false
+      @ObjectModel.sort.enabled: false
       _PurchaseOrder             : association to parent ZR_PURE001_FDP
                                      on _PurchaseOrder.PurchaseOrder = $projection.PurchaseOrder;
 }

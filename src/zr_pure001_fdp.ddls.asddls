@@ -113,5 +113,8 @@ define root custom entity ZR_PURE001_FDP
       // ข้อความอนุมัติผ่านระบบอิเล็กทรอนิกส์ ว่างเมื่อยังไม่อนุมัติ
       ApprovalNoteText         : abap.char(120);
       
+      // query provider ไม่รองรับ filter และ sort ข้าม association
+      @ObjectModel.filter.enabled: false
+      @ObjectModel.sort.enabled: false
       _Item                    : composition of exact one to many ZI_PURE001_ITEM_FDP;
 }
