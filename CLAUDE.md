@@ -119,6 +119,8 @@ custom entity **ไม่ใช่ view** (ไม่มี data source ข้า
 - FDP entity **ต้องเป็น custom entity** เท่านั้น + ต้องมี
   `@ObjectModel.supportedCapabilities: [ #OUTPUT_FORM_DATA_PROVIDER ]`
   และ `@ObjectModel.query.implementedBy: 'ABAP:<class>'`
+- association / composition ทุกตัวใน custom entity ต้องมี `@ObjectModel.filter.enabled: false`
+  และ `@ObjectModel.sort.enabled: false` ไม่งั้นติด ATC warning (เจอ 2026-09-28)
 - ชื่อที่ส่งให้ `cl_fp_fdp_services=>get_instance( )` คือชื่อ **service definition**
   ไม่ใช่ชื่อ entity
 - key ที่ `get_keys( )` คืนมาเป็นตัวพิมพ์ใหญ่เสมอ (`'PURCHASEORDER'`)
