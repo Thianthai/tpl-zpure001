@@ -444,4 +444,5 @@ standard FDP `FDP_EF_PURCHASE_ORDER_SRV` + custom field `YY1_*_PDH/_PDI` ~30 ต
 | custom field `YY1_*` ของลูกค้าอยู่ใน `I_PurchaseOrderAPI01` ครบ 36 field อ่านได้ตรง ๆ | 2026-09-25 | D19 |
 | `I_OrganizationAddress` และ `I_Address_2` released C1 แต่ DCL ปิดข้อมูลทั้งหมด ต้อง `WITH PRIVILEGED ACCESS` · `I_PlantAddressVH` ไม่ released | 2026-09-25 | D20 |
 | ABAP Doc ของ `TYPES:` / `CONSTANTS:` แบบ chain ต้องวาง **หลังเครื่องหมาย `:`** (บรรทัดถัดจาก `TYPES:`) ถ้าวางเหนือ keyword ได้ warning `ABAP Doc comment is in the wrong position` · `CONV #( )` ที่ type ตรงกับ parameter อยู่แล้วได้ warning `Redundant conversion` | 2026-09-28 | cleanup `76c76dd` |
+| ATC `Search SELECT .. FOR ALL ENTRIES-clauses to be transformed` ชี้ FAE ที่ใช้ table จาก SELECT ก่อนหน้า → รวมเป็น LEFT OUTER JOIN ใน SELECT หลักได้ · CASE ใน FIELDS ใช้แทน `COND` เลือก Description/Name ได้ | 2026-09-28 | `8012677` |
 | ADT: short dump ดูที่ Runtime Error Viewer · error ของ gateway (`/IWBEP/CX_GATEWAY`) ดูที่ `/sap/bc/adt/gw/errorlog` — `ZCX_PURE001_QUERY->get_text( )` โผล่ใน Error Context ทำให้ debug filter ได้โดยไม่ต้อง trace | 2026-09-14 | |
