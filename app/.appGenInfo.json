@@ -1,0 +1,29 @@
+{
+  "generationParameters": {
+    "generationDate": "Sat Sep 12 2026 18:38:10 GMT+0700 (Indochina Time)",
+    "generatorPlatform": "Visual Studio Code",
+    "serviceType": "SAP System (ABAP Cloud)",
+    "metadataFilename": "",
+    "serviceUrl": "https://my427869-api.s4hana.cloud.sap/sap/opu/odata4/sap/zui_pure001_o4/srvd/sap/zui_pure001/0001/",
+    "appName": "zpure001",
+    "appTitle": "Print Purchase Order",
+    "appDescription": "Print Purchase Order",
+    "appNamespace": "",
+    "ui5Theme": "sap_horizon",
+    "ui5Version": "1.148.8",
+    "enableEslint": true,
+    "enableTypeScript": false,
+    "showMockDataInfo": true,
+    "generatorVersion": "1.31.1",
+    "template": "List Report Page V4",
+    "generatorName": "SAP Fiori Application Generator",
+    "entityRelatedConfig": [
+      {
+        "type": "Main Entity",
+        "value": "PrintPurchaseOrder"
+      }
+    ],
+    "launchText": "To launch the generated application, run the following from the generated application root folder:\n\n```\n    npm start\n```",
+    "valueHelpDownloaded": true
+  }
+}
