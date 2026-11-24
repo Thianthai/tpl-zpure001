@@ -243,3 +243,68 @@ assert end > 0
 s=s[:end]+LOGO_SCRIPT+"\n            "+s[end:]
 open('ZPURF002.xdp','w',encoding='utf-8').write(s)
 print("logo and company address visibility script added")
+
+
+# ---------- 12. amount in words on two lines (2026-11-25) ----------
+# The footer cannot grow downwards: EndOfPage ends at 282.8mm and CompAddress starts at 283.5mm.
+# So the footer grows upwards by DELTA: the item table and the content area become DELTA shorter,
+# the footer and the totals column move up by DELTA, and the amount in words and net amount rows
+# become DELTA taller. Everything from EndOfPage down stays where it was.
+s=open('ZPURF002.xdp',encoding='utf-8').read()
+DELTA=3.3
+pa_start=s.index('<pageArea name="mstDummy"'); pa_end=s.index('</pageArea>',pa_start)
+pa=s[pa_start:pa_end]
+assert 'name="Footer" y="221.5mm"' in pa or 'name="Footer" y="218.2mm"' in pa
+
+if 'name="Footer" y="218.2mm"' in pa:
+    print("step 12 already applied")
+else:
+    def mm(v): return float(v[:-2])
+    def fmt(v): return ('%.3f' % v).rstrip('0').rstrip('.') + 'mm'
+
+    def shift(block, tag, name, attr, delta, indent=None):
+        # change one numeric attribute of the element <tag name="name" ...> (exactly one match)
+        tags = list(re.finditer(r'<%s\b[^>]*\bname="%s"[^>]*>' % (tag, re.escape(name)), block))
+        assert len(tags) == 1, (name, len(tags))
+        t = tags[0]
+        new_tag, n = re.subn(r'(\b%s=")([0-9.]+mm)(")' % attr,
+                             lambda m: m.group(1) + fmt(mm(m.group(2)) + delta) + m.group(3), t.group(0))
+        assert n == 1, (name, attr, n)
+        return block[:t.start()] + new_tag + block[t.end():]
+
+    # page level: item grid, content area, totals column, footer
+    pa = re.sub(r'(<contentArea\b[^>]*\bh=")([0-9.]+mm)(")', lambda m: m.group(1)+fmt(mm(m.group(2))-DELTA)+m.group(3), pa, count=1)
+    for i in range(1, 7):
+        pa = shift(pa, 'draw', 'Rectangle%d' % i, 'h', -DELTA)
+    for name in ['Total', 'Discount', 'SumAmt', 'TaxAmt', 'NetAmt']:
+        pa = shift(pa, 'field', name, 'y', -DELTA)
+    pa = shift(pa, 'field', 'NetAmt', 'h', DELTA)
+    pa = shift(pa, 'subform', 'Footer', 'y', -DELTA)
+    pa = shift(pa, 'subform', 'Footer', 'h', DELTA)
+
+    # inside the footer: the amount in words row and the net amount label row grow by DELTA
+    f_start = re.search(r'<subform\b[^>]*\bname="Footer"', pa).start()
+    f_end = pa.index('</subform>', f_start)
+    ft = pa[f_start:f_end]
+    ft = shift(ft, 'field', 'AmtInWord', 'h', DELTA)
+    ft = shift(ft, 'draw', 'Text8', 'h', DELTA)
+
+    a = ft.index('<field name="AmtInWord"'); b = ft.index('</field>', a)
+    fld = ft[a:b]
+    # wrap long text onto the second line
+    assert fld.count('<textEdit/>') == 1
+    fld = fld.replace('<textEdit/>', '<textEdit multiLine="1"/>')
+    # value uses the same font as the caption "Amount in words"
+    assert fld.count('<font typeface="Tahoma" size="7.5pt"/>') == 1
+    fld = fld.replace('<font typeface="Tahoma" size="7.5pt"/>', '<font typeface="Tahoma" size="7.5pt" fontHorizontalScale="98%"/>')
+    # caption and value centred vertically so one or two lines both look aligned
+    assert fld.count('<para vAlign="bottom" hAlign="justify"') == 1
+    fld = fld.replace('<para vAlign="bottom" hAlign="justify"', '<para vAlign="middle" hAlign="justify"')
+    assert fld.count('<para spaceAbove="0pt" vAlign="bottom"/>') == 1
+    fld = fld.replace('<para spaceAbove="0pt" vAlign="bottom"/>', '<para spaceAbove="0pt" vAlign="middle"/>')
+    ft = ft[:a] + fld + ft[b:]
+
+    pa = pa[:f_start] + ft + pa[f_end:]
+    s = s[:pa_start] + pa + s[pa_end:]
+    open('ZPURF002.xdp','w',encoding='utf-8').write(s)
+    print("step 12 applied: footer grows upwards by %.1fmm, amount in words on two lines" % DELTA)

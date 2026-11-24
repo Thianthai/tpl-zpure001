@@ -8,7 +8,7 @@
    <subform name="Form" layout="tb" locale="ambient" restoreState="auto">
       <pageSet>
          <pageArea name="mstDummy" id="Page1">
-            <contentArea x="9.92mm" w="187.325mm" h="126.017mm" name="cntArea" id="cntArea_ID" y="93.763mm"/>
+            <contentArea x="9.92mm" w="187.325mm" h="122.717mm" name="cntArea" id="cntArea_ID" y="93.763mm"/>
             <medium stock="a4" short="210mm" long="297mm"/>
             <draw name="TaxID" y="24.692mm" x="10mm" w="72.42mm" h="5.967mm">
                <ui>
@@ -1426,7 +1426,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                   <corner/>
                </border>
             </draw>
-            <draw name="Rectangle1" y="85.725mm" w="10.45mm" h="135mm" x="9.79mm">
+            <draw name="Rectangle1" y="85.725mm" w="10.45mm" h="131.7mm" x="9.79mm">
                <value>
                   <rectangle>
                      <edge/>
@@ -1434,7 +1434,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                   </rectangle>
                </value>
             </draw>
-            <draw name="Rectangle2" y="85.725mm" x="20.215mm" w="89.338mm" h="135mm">
+            <draw name="Rectangle2" y="85.725mm" x="20.215mm" w="89.338mm" h="131.7mm">
                <value>
                   <rectangle>
                      <edge/>
@@ -1442,7 +1442,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                   </rectangle>
                </value>
             </draw>
-            <draw name="Rectangle3" y="85.725mm" x="109.64mm" w="21.035mm" h="135mm">
+            <draw name="Rectangle3" y="85.725mm" x="109.64mm" w="21.035mm" h="131.7mm">
                <value>
                   <rectangle>
                      <edge/>
@@ -1450,7 +1450,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                   </rectangle>
                </value>
             </draw>
-            <draw name="Rectangle4" y="85.725mm" x="130.79mm" w="15.345mm" h="135mm">
+            <draw name="Rectangle4" y="85.725mm" x="130.79mm" w="15.345mm" h="131.7mm">
                <value>
                   <rectangle>
                      <edge/>
@@ -1458,7 +1458,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                   </rectangle>
                </value>
             </draw>
-            <draw name="Rectangle5" y="85.725mm" x="146.14mm" w="23.15mm" h="135mm">
+            <draw name="Rectangle5" y="85.725mm" x="146.14mm" w="23.15mm" h="131.7mm">
                <value>
                   <rectangle>
                      <edge/>
@@ -1466,7 +1466,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                   </rectangle>
                </value>
             </draw>
-            <draw name="Rectangle6" y="85.725mm" x="169.29mm" w="28.18mm" h="135mm">
+            <draw name="Rectangle6" y="85.725mm" x="169.29mm" w="28.18mm" h="131.7mm">
                <value>
                   <rectangle>
                      <edge/>
@@ -1824,7 +1824,7 @@ Amount</text>
                </caption>
                <bind match="dataRef" ref="$.PurchaseOrderHeader.PurchaseOrderDateText"/>
             </field>
-            <field name="Total" y="221.705mm" x="162.315mm" w="34.855mm" h="5.285mm" access="readOnly">
+            <field name="Total" y="218.405mm" x="162.315mm" w="34.855mm" h="5.285mm" access="readOnly">
                <ui>
                   <numericEdit>
                      <border presence="hidden"/>
@@ -1854,7 +1854,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
 </script>
                </event>
             </field>
-            <field name="Discount" y="227.13mm" x="173.924mm" w="23.146mm" h="5.3mm" access="readOnly">
+            <field name="Discount" y="223.83mm" x="173.924mm" w="23.146mm" h="5.3mm" access="readOnly">
                <ui>
                   <numericEdit>
                      <border presence="hidden"/>
@@ -1887,7 +1887,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
 </script>
                </event>
             </field>
-            <field name="SumAmt" y="232.555mm" x="162.315mm" w="34.855mm" h="5.555mm" access="readOnly">
+            <field name="SumAmt" y="229.255mm" x="162.315mm" w="34.855mm" h="5.555mm" access="readOnly">
                <ui>
                   <numericEdit>
                      <border presence="hidden"/>
@@ -1920,7 +1920,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
 </script>
                </event>
             </field>
-            <field name="TaxAmt" y="238.175mm" x="162.315mm" w="34.855mm" h="5.555mm" access="readOnly">
+            <field name="TaxAmt" y="234.875mm" x="162.315mm" w="34.855mm" h="5.555mm" access="readOnly">
                <ui>
                   <numericEdit>
                      <border presence="hidden"/>
@@ -1953,7 +1953,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
 </script>
                </event>
             </field>
-            <field name="NetAmt" y="243.725mm" x="162.315mm" w="34.755mm" h="5.555mm" access="readOnly">
+            <field name="NetAmt" y="240.425mm" x="162.315mm" w="34.755mm" h="8.855mm" access="readOnly">
                <ui>
                   <numericEdit>
                      <border presence="hidden"/>
@@ -2092,7 +2092,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                   <corner thickness="0.176mm"/>
                </border>
                <?templateDesigner expand 0?></subform>
-            <subform w="187.72mm" h="27.78mm" name="Footer" y="221.5mm" x="9.79mm">
+            <subform w="187.72mm" h="31.08mm" name="Footer" y="218.2mm" x="9.79mm">
                <bind match="none"/>
                <draw name="TextLine1_1" y="0.135mm" usehref=".#som($template.#subform.designer__stylesheet.TextStyle5)" x="0in" w="50mm">
                   <ui>
@@ -2171,9 +2171,9 @@ this.presence = (cur === total) ? "visible" : "invisible"
                   </font>
                   <margin leftInset="1mm"/>
                </draw>
-               <field name="AmtInWord" y="22.095mm" usehref=".#som($template.#subform.designer__stylesheet.TextFieldStyle4)" x="0in" access="readOnly" w="125.2mm" h="5.685mm">
+               <field name="AmtInWord" y="22.095mm" usehref=".#som($template.#subform.designer__stylesheet.TextFieldStyle4)" x="0in" access="readOnly" w="125.2mm" h="8.985mm">
                   <ui>
-                     <textEdit/>
+                     <textEdit multiLine="1"/>
                   </ui>
                   <caption reserve="44.32mm">
                      <value>
@@ -2184,11 +2184,11 @@ this.presence = (cur === total) ? "visible" : "invisible"
                            <color value="0,0,0"/>
                         </fill>
                      </font>
-                     <para vAlign="bottom" hAlign="justify" lineHeight="0pt" spaceAbove="1pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"/>
+                     <para vAlign="middle" hAlign="justify" lineHeight="0pt" spaceAbove="1pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"/>
                   </caption>
                   <bind match="dataRef" ref="$.PurchaseOrderHeader.AmountInWords"/>
-                  <font typeface="Tahoma" size="7.5pt"/>
-                  <para spaceAbove="0pt" vAlign="bottom"/>
+                  <font typeface="Tahoma" size="7.5pt" fontHorizontalScale="98%"/>
+                  <para spaceAbove="0pt" vAlign="middle"/>
                   <event activity="ready" ref="$layout" name="event__layout_ready">
                      <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
 var total = xfa.layout.pageCount();
@@ -2277,7 +2277,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                   <margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"/>
                   <para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"/>
                </draw>
-               <draw name="Text8" y="22.225mm" x="125.324mm" w="25.099mm" h="5.555mm">
+               <draw name="Text8" y="22.225mm" x="125.324mm" w="25.099mm" h="8.855mm">
                   <ui>
                      <textEdit/>
                   </ui>

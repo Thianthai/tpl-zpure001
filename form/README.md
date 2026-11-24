@@ -12,6 +12,7 @@
 | `sample/0099680042_newfields.xml` | ชุดเดียวกับ 0099680042 แต่เติม Reference / Our Reference / Delivery Date / Ship Via / Valid from-to — ทดสอบ field ที่เพิ่ม 2026-09-23 |
 | `sample/99680056_multipage_newfields.xml` | ชุด 25 รายการ + Our Reference + Delivery Date |
 | `sample/0099680042_not_approved.xml` | ใบที่ยังไม่อนุมัติ (`ApprovalNoteText` ว่าง) — ใช้ดูว่าโลโก้กับที่อยู่บริษัทถูกซ่อน |
+| `sample/0099680042_usd_long_words.xml` | ใบเดิมแต่เป็น USD และ amount in words ยาวสุดที่คาดว่าจะเจอ — ใช้ดูว่าช่อง Amount in words ตัดขึ้นบรรทัดที่ 2 ครบ (2026-11-25) |
 | `build_xdp.py` | script ที่ใช้ generate `.xdp` จากฟอร์มเดิม (บันทึกว่าเปลี่ยนอะไรบ้าง: binding map, script ที่ถอด, subform ที่ลบ) — รันซ้ำได้ถ้ามีไฟล์ต้นฉบับ |
 
 ## หลักการของฟอร์มนี้ (D14)
@@ -44,3 +45,16 @@ field ที่ต้นทางเพิ่มใหม่ ให้เติ�
 **สิ่งที่ script จัดการให้แล้ว**
 - ลบ `<calculate>` ทุกอัน และลบ `<event>` ที่ script อ้าง `PurchaseOrderNode` (data model ของ standard)
 - ใส่ script คุม presence ของ `Image1` กับ `CompAddress` ที่ field `PurchaseOrderNumber` (ซ่อนเมื่อยังไม่อนุมัติ)
+
+## 2026-11-25 — Amount in words สองบรรทัด (ขั้นตอนที่ 12 ใน `build_xdp.py`)
+
+functional แจ้งว่าใบสกุลต่างประเทศ ข้อความ Amount in words ยาวจนชื่อสกุลเงินถูกตัด จึงขยายช่องเป็น 2 บรรทัด
+
+- footer **ขยายขึ้นด้านบน** 3.3 มม. ไม่ได้ดันลง เพราะด้านล่างไม่มีที่ว่าง
+  (`EndOfPage` จบที่ 282.8 มม. และ `CompAddress` เริ่มที่ 283.5 มม.) — ผู้ใช้เลือกทางนี้
+- ตารางรายการ (`Rectangle1`–`6`) และ `contentArea` สั้นลง 3.3 มม. · ช่องยอดเงิน `Total`–`NetAmt` และ `Footer` ยกขึ้น 3.3 มม.
+- `AmtInWord` สูง 8.985 มม. เปิด multi-line · font เท่ากับ caption (Tahoma 7.5pt ย่อแนวนอน 98%) · caption และค่าจัดกลางแนวตั้ง
+- ช่อง สุทธิ/Net Amount (`Text8`, `NetAmt`) สูงขึ้นเท่ากันให้เส้นกรอบตรงกัน · ตั้งแต่ `EndOfPage` ลงไปไม่ขยับ
+
+**ไฟล์ต้นฉบับที่ `SRC` ชี้ไม่อยู่ในเครื่องแล้ว** — ขั้นตอนที่ 9 เป็นต้นไปอ่าน `ZPURF002.xdp` ตรง จึงรันแยกได้
+ขั้นตอนที่ 12 เช็คเองว่า apply ไปแล้วหรือยัง รันซ้ำได้ไม่เพี้ยน
