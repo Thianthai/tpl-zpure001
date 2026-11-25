@@ -109,6 +109,7 @@ ENDCLASS.
 
 CLASS ZCL_PURE001_FDP IMPLEMENTATION.
 
+
   METHOD if_rap_query_provider~select.
 
     go_data = NEW #( ).
@@ -363,8 +364,16 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
       <lfs_out>-AmountBeforeTax  = <lfs_detail>-SumAmount.
       <lfs_out>-TaxAmount        = <lfs_detail>-SumTax.
       <lfs_out>-NetAmount        = <lfs_detail>-SumTotalNetAmount.
-      <lfs_out>-AmountInWords    = zcl_pure001_util=>amount_in_words( iv_amount   = <lfs_out>-NetAmount
-                                                                      iv_currency = <lfs_out>-DocumentCurrency ).
+
+      " ใบเงินบาทอ่านยอดสุทธิตามฟอร์มมาตรฐาน
+      " สกุลต่างประเทศอ่านยอดรวมเงินก่อนภาษีตามที่ functional กำหนด
+      DATA(lv_word_amount) = <lfs_out>-NetAmount.
+      IF <lfs_out>-DocumentCurrency <> zcl_pure001_util=>gc_thai_currency.
+        lv_word_amount = <lfs_out>-AmountBeforeTax.
+      ENDIF.
+
+      <lfs_out>-AmountInWords = zcl_pure001_util=>amount_in_words( iv_amount   = lv_word_amount
+                                                                    iv_currency = <lfs_out>-DocumentCurrency ).
 
       "--- Signature -------------------------------------------------------------
       <lfs_out>-PreparedByUser   = <lfs_src>-CreatedByUser.
@@ -585,5 +594,4 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
                                        Language       = iv_language ]-PlainLongText OPTIONAL ).
 
   ENDMETHOD.
-
 ENDCLASS.

@@ -43,7 +43,8 @@ CLASS zcl_pure001_address DEFINITION
 ENDCLASS.
 
 
-CLASS zcl_pure001_address IMPLEMENTATION.
+
+CLASS ZCL_PURE001_ADDRESS IMPLEMENTATION.
 
 
   METHOD get_by_plant.
@@ -100,5 +101,4 @@ CLASS zcl_pure001_address IMPLEMENTATION.
     rs_address-AddressText = concat_lines_of( table = lt_part sep = ` ` ).
 
   ENDMETHOD.
-
 ENDCLASS.

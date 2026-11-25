@@ -5,6 +5,9 @@ CLASS zcl_pure001_util DEFINITION
 
   PUBLIC SECTION.
 
+    "! สกุลเงินบาท อ่านเป็นภาษาไทยในวงเล็บ
+    CONSTANTS gc_thai_currency TYPE waers VALUE 'THB'.
+
     "! แยกชุดคำจากค่าคงที่เป็น table ครั้งเดียวต่อ session
     CLASS-METHODS class_constructor.
 
@@ -20,9 +23,10 @@ CLASS zcl_pure001_util DEFINITION
       IMPORTING iv_date        TYPE d
       RETURNING VALUE(rv_text) TYPE string.
 
-    "! จำนวนเงินเป็นตัวอักษรในวงเล็บ
-    "! THB เป็นภาษาไทย ลงท้ายด้วยบาทถ้วน หรือบาทตามด้วยสตางค์
-    "! สกุลอื่นเป็นภาษาอังกฤษตัวพิมพ์ใหญ่
+    "! จำนวนเงินเป็นตัวอักษร
+    "! THB เป็นภาษาไทยในวงเล็บ ลงท้ายด้วยบาทถ้วน หรือบาทตามด้วยสตางค์
+    "! สกุลอื่นเป็นภาษาอังกฤษขึ้นต้นด้วยตัวใหญ่ตัวเดียว ไม่มีวงเล็บ
+    "! สกุลอื่นที่ไม่มีเศษลงท้ายด้วย Only มีเศษตามด้วย and ตามด้วยหน่วยย่อย
     CLASS-METHODS amount_in_words
       IMPORTING iv_amount      TYPE numeric
                 iv_currency    TYPE waers
@@ -40,6 +44,15 @@ CLASS zcl_pure001_util DEFINITION
 
     "! จำนวนเงินทศนิยมสองตำแหน่งที่ใช้แยกส่วนบาทกับสตางค์
     TYPES ty_amount TYPE p LENGTH 12 DECIMALS 2.
+
+    TYPES:
+      "! ชื่อสกุลเงินภาษาอังกฤษ ทั้งหน่วยหลักและหน่วยย่อย รูปเอกพจน์และพหูพจน์
+      BEGIN OF ty_currency_name,
+        major_singular TYPE string,
+        major_plural   TYPE string,
+        minor_singular TYPE string,
+        minor_plural   TYPE string,
+      END OF ty_currency_name.
 
     CONSTANTS:
     "! ชุดคำภาษาไทยและภาษาอังกฤษ คั่นด้วยจุลภาค
@@ -71,11 +84,20 @@ CLASS zcl_pure001_util DEFINITION
       IMPORTING iv_number      TYPE int8
       RETURNING VALUE(rv_text) TYPE string.
 
+    "! ชื่อสกุลเงินสำหรับอ่านจำนวนเงินเป็นภาษาอังกฤษ
+    "! สกุลที่ไม่อยู่ในรายการใช้รหัสสกุลเงินแทนชื่อ และใช้ cent เป็นหน่วยย่อย
+    "! @parameter iv_currency | รหัสสกุลเงิน
+    "! @parameter rs_name | ชื่อหน่วยหลักและหน่วยย่อย
+    CLASS-METHODS get_currency_name
+      IMPORTING iv_currency    TYPE waers
+      RETURNING VALUE(rs_name) TYPE ty_currency_name.
+
 ENDCLASS.
 
 
 
 CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
+
 
   METHOD class_constructor.
 
@@ -135,30 +157,35 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
     DATA(lv_integer)  = CONV int8( trunc( lv_amount ) ).
     DATA(lv_fraction) = CONV int8( ( lv_amount - trunc( lv_amount ) ) * 100 ).
 
-    DATA lv_words TYPE string.
+    IF iv_currency = gc_thai_currency.
 
-    IF iv_currency = 'THB'.
-
-      lv_words = number_to_words_th( lv_integer ).
+      DATA(lv_words) = number_to_words_th( lv_integer ).
       lv_words = COND #( WHEN lv_fraction = 0
                          THEN |{ lv_words }บาทถ้วน|
                          ELSE |{ lv_words }บาท{ number_to_words_th( lv_fraction ) }สตางค์| ).
 
-    ELSE.
-
-      " สกุลอื่นเป็นภาษาอังกฤษตัวพิมพ์ใหญ่
-      " ทศนิยมเป็นศูนย์ลงท้ายด้วย ONLY
-      " มีเศษให้แสดงเป็นเศษส่วนของร้อย และไม่ใส่ ONLY
-      DATA(lv_number) = to_upper( number_to_words_en( lv_integer ) ).
-
-      lv_words = COND #( WHEN lv_fraction = 0
-                         THEN |{ lv_number } { iv_currency } ONLY|
-                         ELSE |{ lv_number } AND { lv_fraction WIDTH = 2 ALIGN = RIGHT PAD = '0' }/100 { iv_currency }| ).
+      " เงินบาทครอบวงเล็บตามฟอร์มมาตรฐาน
+      rv_text = |( { lv_words } )|.
+      RETURN.
 
     ENDIF.
 
-    " ฟอร์มครอบวงเล็บให้ทุกสกุลเงิน
-    rv_text = |( { lv_words } )|.
+    " สกุลอื่นเป็นภาษาอังกฤษ ขึ้นต้นด้วยตัวใหญ่ตัวเดียว ตามด้วยชื่อสกุลเงินเต็ม
+    DATA(ls_name)   = get_currency_name( iv_currency ).
+    DATA(lv_number) = to_lower( number_to_words_en( lv_integer ) ).
+    lv_number = |{ to_upper( substring( val = lv_number len = 1 ) ) }{ substring( val = lv_number off = 1 ) }|.
+
+    DATA(lv_major) = COND string( WHEN lv_integer = 1 THEN ls_name-major_singular ELSE ls_name-major_plural ).
+
+    " ไม่มีเศษลงท้ายด้วย Only
+    IF lv_fraction = 0.
+      rv_text = |{ lv_number } { lv_major } Only|.
+      RETURN.
+    ENDIF.
+
+    " มีเศษให้อ่านเป็นคำแล้วตามด้วยหน่วยย่อย เช่น and forty-six cents
+    DATA(lv_minor) = COND string( WHEN lv_fraction = 1 THEN ls_name-minor_singular ELSE ls_name-minor_plural ).
+    rv_text = |{ lv_number } { lv_major } and { to_lower( number_to_words_en( lv_fraction ) ) } { lv_minor }|.
 
   ENDMETHOD.
 
@@ -270,4 +297,32 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
 
   ENDMETHOD.
 
+
+  METHOD get_currency_name.
+
+    " เพิ่มสกุลใหม่ตามรายการที่ functional ส่งมาได้ที่นี่
+    CASE iv_currency.
+
+      WHEN 'USD'.
+        rs_name = VALUE #( major_singular = `US dollar`
+                           major_plural   = `US dollars`
+                           minor_singular = `cent`
+                           minor_plural   = `cents` ).
+
+      WHEN 'SGD'.
+        rs_name = VALUE #( major_singular = `Singapore dollar`
+                           major_plural   = `Singapore dollars`
+                           minor_singular = `cent`
+                           minor_plural   = `cents` ).
+
+      WHEN OTHERS.
+        " ยังไม่มีชื่อสกุลเงิน จึงใช้รหัสสกุลเงินแทน
+        rs_name = VALUE #( major_singular = iv_currency
+                           major_plural   = iv_currency
+                           minor_singular = `cent`
+                           minor_plural   = `cents` ).
+
+    ENDCASE.
+
+  ENDMETHOD.
 ENDCLASS.

@@ -52,6 +52,7 @@ ENDCLASS.
 
 CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
 
+
   METHOD if_rap_query_provider~select.
 
     IF io_request->get_entity_id( ) <> gc_entity_id.
@@ -274,5 +275,4 @@ CLASS ZCL_PURE001_QUERY IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
-
 ENDCLASS.

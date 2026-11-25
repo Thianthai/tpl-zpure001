@@ -282,6 +282,7 @@ ENDCLASS.
 
 CLASS ZCL_PURE001_DATA IMPLEMENTATION.
 
+
   METHOD read_headers.
 
     " Material, Plant และ item text อยู่ระดับ item จึงกรองด้วย EXISTS เพื่อไม่ให้แถวของ header ซ้ำ
@@ -879,5 +880,4 @@ CLASS ZCL_PURE001_DATA IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
 ENDCLASS.
