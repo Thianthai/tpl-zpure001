@@ -31,6 +31,7 @@
 | 20 | **line break ใน long text** — `PlainLongText` ของ `I_*NoteTP_2` ดูเหมือนยุบหลายบรรทัดเป็น space (99680042 `1. … 2. … 3. …`) ถ้าจริง ฟอร์มจัดย่อหน้าตามต้นฉบับไม่ได้ · ทดสอบด้วย `4500000021` F02 (`HD NOTE 1` / `HD NOTE 2`) | ⏳ ยังไม่ทดสอบ | Phase 2 |
 | 21 | **value help Material (`I_Product`) โหลด metadata ไม่ได้** — `CX_SADL_GW_V4_EXPOSURE_EXIT: Do not use conversion exit ATINN for property PRODCHARC1INTERNALNUMBER` | ✅ **แก้แล้ว 2026-09-23** — เปลี่ยนเป็น `I_ProductStdVH` (expose แค่ `Product` + `ProductExternalID` ไม่มี field ที่มี conversion exit ATINN) ทดสอบ F4 ผ่าน | Phase 1 |
 | 22 | **สาขาผู้ขาย** | ✅ **ปิดแล้ว 09-25** — `zcl_get_name_form_bp` + `zcl_get_address_form_bp` ให้ชื่อสี่บรรทัดและสาขา (`AdditionalStreetSuffixName`) เหมือนฟอร์มมาตรฐาน (D19) | Phase 2 |
+| 23 | **รายชื่อสกุลเงินต่างประเทศที่ใช้กับ PO จริง** — ใช้ทำชื่อเต็มใน Amount in words (D22) · ตอนนี้มี USD และ SGD สกุลอื่นพิมพ์เป็นรหัส + cents · ต้องการหน่วยย่อยของแต่ละสกุลด้วย (เช่น GBP = pence, JPY ไม่มี) | ⬜ **รอ functional** (2026-11-25) — ได้แล้วเพิ่ม `WHEN` ใน `ZCL_PURE001_UTIL=>get_currency_name` | Phase 2 |
 | 9 | **`ZE_BSART`** — data element ที่ใช้แทน `esart` (ไม่ released) อยู่นอก package `ZPURE001` | ✅ ผู้ใช้ยืนยัน 2026-09-11: มีอยู่บน tenant ก่อนแล้ว → บันทึกเป็น **external dependency** ใน [02-object-list.md](02-object-list.md) | Phase 1 |
 
 **สีสถานะ** 🔴 = block งานในเฟสที่เกี่ยวข้อง · 🟡 = ทำต่อได้ด้วยสมมติฐาน แต่ควรยืนยัน ·

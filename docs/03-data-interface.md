@@ -214,7 +214,7 @@ ZAPI_PURE001_FDP (service def)
 | `AmountBeforeTax` | `abap.curr(16,2)` | 🟦 | `zcl_get_other_detail` → `SumAmount` — รวมเงิน/Amount |
 | `TaxAmount` | `abap.curr(16,2)` | 🟦 | `zcl_get_other_detail` → `SumTax` — ภาษี/Tax |
 | `NetAmount` | `abap.curr(16,2)` | 🟦 | `zcl_get_other_detail` → `SumTotalNetAmount` — สุทธิ/Net Amount |
-| `AmountInWords` | `abap.char(255)` | 🔧 | `amount_in_words( NetAmount, DocumentCurrency )` ในวงเล็บทุกสกุล — THB `( …บาทถ้วน )` · สกุลอื่น `( … USD ONLY )` / `( … AND nn/100 USD )` |
+| `AmountInWords` | `abap.char(255)` | 🔧 | `amount_in_words( )` (D22) — THB อ่าน `NetAmount` ภาษาไทยในวงเล็บ `( …บาทถ้วน )` · สกุลต่างประเทศอ่าน `AmountBeforeTax` ไม่มีวงเล็บ `Sixty-five thousand seven hundred twenty Singapore dollars and forty-six cents` / `… US dollars Only` |
 
 ### 2.6 Signature block
 

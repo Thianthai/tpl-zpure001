@@ -48,7 +48,7 @@
 
 | Object | Type | หน้าที่ | Confirmed | Status |
 |---|---|---|---|---|
-| `ZCL_PURE001_UTIL` | Class | `to_thai_date( )` · `format_date_dmy( )` · `amount_in_words( )` TH/EN · `format_quantity( )` | ✅ 09-13 | ✅ 742dd06 |
+| `ZCL_PURE001_UTIL` | Class | `to_thai_date( )` · `format_date_dmy( )` · `amount_in_words( )` TH/EN · `format_quantity( )` · 11-25: `get_currency_name` + รูปแบบสกุลต่างประเทศใหม่ (D22) | ✅ 09-13 | ✅ 7c9bde0 |
 | `ZR_PURE001_FDP` | Custom entity (root) | form header — `#OUTPUT_FORM_DATA_PROVIDER` · XML node `PurchaseOrderHeader` · +`SupplierCodeName`, `ApprovalNoteText` (09-18) · association ปิด filter/sort ตาม ATC (09-28) | ✅ 09-13 | ✅ d6a44f6 |
 | `ZI_PURE001_ITEM_FDP` | Custom entity (child) | form item · XML node `PurchaseOrderItem` (ใต้ `_Item`) · +`ItemDescriptionText` (09-18) · +`UnitText` (09-23) · association ปิด filter/sort ตาม ATC (09-28) | ✅ 09-13 | ✅ d6a44f6 |
 | `ZI_PURE001_ITXT_FDP` | Custom entity (child ของ item) | ข้อความใต้รายการ 1 node/text type (แบบ B) · XML node `PurchaseOrderItemText` (ใต้ `_ItemText`) · association ปิด filter/sort ตาม ATC (09-28) | ✅ 09-13 | ✅ d6a44f6 |
