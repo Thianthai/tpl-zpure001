@@ -417,7 +417,7 @@ functional แจ้ง 2 เรื่องจากใบ 99680351 (SGD)
 
 **รายชื่อสกุลเงิน (2026-11-26)** — functional ยืนยันว่าใช้ THB USD EUR GBP SGD
 ผู้ใช้เลือก EUR = euros / cents และ GBP = pounds / pence (เอกพจน์ penny)
-สกุลนอกรายการคงใช้รหัสสกุลเงิน + cents ตามเดิม
+สกุลนอกรายการคงใช้รหัสสกุลเงิน + cents ตามเดิม · implement แล้วใน `9b037ad`
 
 ---
 
