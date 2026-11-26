@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xfa generator="AdobeLiveCycleDesigner_V11.0.9.20250609.2.65_SAP" APIVersion="3.6.25157.0"?>
-<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" timeStamp="2026-09-24T17:04:03Z" uuid="74705116-5837-4483-a248-4881e0cc50f3">
+<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" timeStamp="2026-11-26T14:44:01Z" uuid="74705116-5837-4483-a248-4881e0cc50f3">
 <template xmlns:xliff="urn:oasis:names:tc:xliff:document:1.1" xmlns="http://www.xfa.org/schema/xfa-template/3.3/">
    <?formServer defaultPDFRenderFormat acrobat10.0static?>
    <?formServer allowRenderCaching 0?>
@@ -10,7 +10,6 @@
          <pageArea name="mstDummy" id="Page1">
             <contentArea x="9.92mm" w="187.325mm" h="122.717mm" name="cntArea" id="cntArea_ID" y="93.763mm"/>
             <medium stock="a4" short="210mm" long="297mm"/>
-            <occur max="-1"/>
             <draw name="TaxID" y="24.692mm" x="10mm" w="72.42mm" h="5.967mm">
                <ui>
                   <textEdit/>
@@ -66,7 +65,6 @@
                   <corner/>
                   <corner/>
                </border>
-            
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">// โลโก้และที่อยู่บริษัทพิมพ์เฉพาะใบที่อนุมัติแล้ว
 // ABAP ส่ง ApprovalNoteText มาเมื่อสถานะอนุมัติเท่านั้น จึงใช้เป็นตัวชี้วัด
@@ -1199,7 +1197,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                </caption>
                <items>
                   <text xliff:rid="14E4EF48-AC4B-4A73-A1E4-CEC67C0E2455">X</text>
-                  <text xliff:rid="41B69061-9D59-438D-B827-FE7882D9CDA9"></text>
+                  <text xliff:rid="41B69061-9D59-438D-B827-FE7882D9CDA9"/>
                </items>
                <bind match="dataRef" ref="$.PurchaseOrderHeader.PerfGuaranteeFlag"/>
             </field>
@@ -1227,7 +1225,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                </caption>
                <items>
                   <text xliff:rid="BC0FBB53-E96A-4989-9DB5-67E288FC4D35">X</text>
-                  <text xliff:rid="52252328-6B19-43F5-9FC0-AC9454D1E65F"></text>
+                  <text xliff:rid="52252328-6B19-43F5-9FC0-AC9454D1E65F"/>
                </items>
                <bind match="dataRef" ref="$.PurchaseOrderHeader.PerfGuaranteeBG"/>
                <border>
@@ -1262,7 +1260,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                </caption>
                <items>
                   <text xliff:rid="FD8D73E9-6473-4E05-8F6B-73AC69FEDECC">X</text>
-                  <text xliff:rid="92CFBB36-5378-4979-9117-C9E2A23FF770"></text>
+                  <text xliff:rid="92CFBB36-5378-4979-9117-C9E2A23FF770"/>
                </items>
                <bind match="dataRef" ref="$.PurchaseOrderHeader.PerfGuaranteeCash"/>
             </field>
@@ -1290,7 +1288,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                </caption>
                <items>
                   <text xliff:rid="4CA0E9AF-794D-4673-A1F9-5B6900E9E893">X</text>
-                  <text xliff:rid="A577457F-6040-4F53-BE82-C50D54C09B30"></text>
+                  <text xliff:rid="A577457F-6040-4F53-BE82-C50D54C09B30"/>
                </items>
                <bind match="dataRef" ref="$.PurchaseOrderHeader.InsurancePolicyFlag"/>
                <border>
@@ -1325,7 +1323,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                </caption>
                <items>
                   <text xliff:rid="D614A294-7CF3-467D-857A-57E0E2BCA816">X</text>
-                  <text xliff:rid="C05405C2-BBCB-4DF2-9222-BB276FEFC732"></text>
+                  <text xliff:rid="C05405C2-BBCB-4DF2-9222-BB276FEFC732"/>
                </items>
                <bind match="dataRef" ref="$.PurchaseOrderHeader.WarrantyGuaranteeFlag"/>
                <border>
@@ -1360,7 +1358,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                </caption>
                <items>
                   <text xliff:rid="1151412B-42B0-4E37-84DC-149EDFD35CD4">X</text>
-                  <text xliff:rid="0E0D1759-9095-4800-9B1A-B19C01658BAE"></text>
+                  <text xliff:rid="0E0D1759-9095-4800-9B1A-B19C01658BAE"/>
                </items>
                <bind match="dataRef" ref="$.PurchaseOrderHeader.WarrantyGuaranteeCash"/>
                <border>
@@ -1395,7 +1393,7 @@ lEoqqaSSglMqqaSSglMqqaSSSgpOqaSSSipN8v8PADMn9/r7jC6uAAAAAElFTkSuQmCC</image>
                </caption>
                <items>
                   <text xliff:rid="61F43F03-187F-46A7-8F44-0EC0E3290C73">X</text>
-                  <text xliff:rid="D9321F71-8980-44DF-A30D-6BEA060DF81B"></text>
+                  <text xliff:rid="D9321F71-8980-44DF-A30D-6BEA060DF81B"/>
                </items>
                <bind match="dataRef" ref="$.PurchaseOrderHeader.WarrantyGuaranteeBG"/>
                <border>
@@ -2294,8 +2292,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
          <pageArea name="mstTerms" id="mstTerms_ID">
             <contentArea x="15.03mm" y="12.63mm" w="179.95mm" h="274mm" name="cntTerms" id="cntTerms_ID"/>
             <medium stock="a4" short="210mm" long="297mm"/>
-            <occur min="0" max="-1"/>
-         </pageArea>
+            <?templateDesigner expand 1?></pageArea>
          <?templateDesigner expand 1?></pageSet>
       <subform w="187.06mm" name="Main" layout="tb">
          <bind match="none"/>
@@ -3064,113 +3061,704 @@ this.presence = (cur === total) ? "visible" : "invisible"
             <?templateDesigner expand 0?></subform>
          <?templateDesigner expand 1?></subform>
       <subform name="Terms" layout="tb" w="179.95mm">
-      <bind match="none"/>
-      <breakBefore targetType="pageArea" target="mstTerms" startNew="1"/>
-      <draw name="Title" w="179.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>GENERAL CONDITIONS</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Subtitle" w="179.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>คำแปลเงื่อนไขทั่วไป</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="9.4pt"/></draw>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>1.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>All purchase of goods or services over baht 10,000 per order must be on BUYER’s Purchase Order form, BUYER will neither take responsibility nor make payment for any goods/services which are delivered without BUYER’s purchase order form.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">การสั่งซื้อสินค้าที่มีราคาเกิน<span style="font-family:Arial"> </span>10,000<span style="font-family:Arial"> </span>บาท<span style="font-family:Arial"> </span>ต้องมีใบสั่งซื้อจากผู้ซื้อเสมอ<span style="font-family:Arial"> </span>ผู้ซื้อจะไม่รับผิดชอบ<span style="font-family:Arial"> </span>และไม่จ่ายเงินถ้าการสั่งซื้อนั้นไม่มีใบสั่งซื้อของผู้ซื้อ</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>2.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>An order shall not be assigned of subcontracted without consent of the BUYER</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ใบสั่งซื้อนี้จะโอนหรือทำสัญญามอบช่วงให้แก่ผู้อื่นโดยมิได้รับความยินยอมเป็นหนังสือจากผู้ซื้อไม่ได้</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>3.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Goods/services must not be in excess of order and must be of the required quality and fully meet the BUYER’s specifications/drawing; otherwise they may be returned or rejected at SUPPLIER’s expense upon delivery or after receipt.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">สินค้า/บริการ<span style="font-family:Arial"> </span>จะต้องมีปริมาณไม่เกินกว่าที่สั่ง<span style="font-family:Arial"> </span>และจะต้องมีคุณภาพตามที่ต้องการและตรงตามรายละเอียดในใบสั่งซื้อ<span style="font-family:Arial"> </span>มิฉะนั้น<span style="font-family:Arial"> </span>สินค้า/บริการดังกล่าว<span style="font-family:Arial"> </span>อาจถูกส่งคืน<span style="font-family:Arial"> </span>หรือปฏิเสธการรับทั้งขณะส่งมอบหรือหลังจากส่งมอบแล้ว<span style="font-family:Arial"> </span>โดยที่ผู้ขายจะต้องเสียค่าใช้จ่ายเอง</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>4.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Charges and expenses related to packing and transporting the goods to the place of delivery of the BUYER shall be borne by the SUPPLIER. Unless otherwise specified in the Purchase Order, no other extra charges are allowed without specific approval from BUYER.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ค่าใช้จ่ายต่างๆ<span style="font-family:Arial"> </span>เกี่ยวกับการบรรจุหีบห่อ<span style="font-family:Arial"> </span>และขนส่งถึงสถานที่รับมอบของผู้ซื้อ<span style="font-family:Arial"> </span>ผู้ขายจะเป็นผู้ออกเองทั้งหมด<span style="font-family:Arial"> </span>เว้นแต่จะได้กำหนดเป็นอย่างอื่นในใบสั่งซื้อ<span style="font-family:Arial"> </span>ผู้ซื้อจะไม่ชำระค่าใช้จ่ายอื่นใดที่ผู้ซื้อมิได้เห็นชอบเป็นการเฉพาะเรื่อง</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>5.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Goods must be delivered in good condition and it packing is necessary it must be strong enough to prevent damage during transport. Damage to goods caused by insufficient or improper packing shall be for account of SUPPLIER.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">สินค้าจะต้องส่งมอบในสภาพที่ดีและถ้าจำเป็นต้องบรรจุหีบห่อจะต้องเป็นหีบห่อที่แข็งแรงพอที่จะป้องกันการเสียหายระหว่างขนส่ง<span style="font-family:Arial"> </span>ผู้ขายจะต้องเป็นผู้รับผิดชอบในความเสียหายที่เกิดขึ้นแก่สินค้าเนื่องจากการบรรจุหีบห่อไม่ดีพอ</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>6.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>The property and risk in GOODS shall remain in SUPPLIER until they are deliverd in accordance with Purchase Order, provided that where progress payments are made by BUYER to SUPPLIER in respect of part of GOODS then title therein shall pass to BUYER upon such payment but risk therein shall remain in SUPPLIER until GOODS are delivered in accordance with Purchase Order.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">กรรมสิทธิ์และความเสี่ยงภัยในสินค้า<span style="font-family:Arial"> </span>จะยังอยู่กับผู้ขายจนกว่าได้มีการส่งมอบสินค้าตามวิธีการที่กำหนดในใบสั่งซื้อ<span style="font-family:Arial"> </span>ทั้งนี้<span style="font-family:Arial"> </span>โดยมีเงื่อนไขว่า<span style="font-family:Arial"> </span>ถ้าผู้ซื้อจ่ายเงินให้ผู้ขายเป็นงวดๆ<span style="font-family:Arial"> </span>สำหรับสินค้าเป็นบางส่วน<span style="font-family:Arial"> </span>กรรมสิทธิ์ในสินค้าให้ตกเป็นของผู้ซื้อ<span style="font-family:Arial"> </span>เมื่อได้มีการจ่ายเงินนั้นแล้ว<span style="font-family:Arial"> </span>แต่ความเสี่ยงภัยในสินค้าดังกล่าว<span style="font-family:Arial"> </span>จะยังอยู่กับผู้ขาย<span style="font-family:Arial"> </span>จนกระทั่งได้มีการส่งมอบสินค้าครบถ้วนตามวิธีการที่กำหนดในใบสั่งซื้อ</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>7.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Invoices shall specify the order number, release numbers (if any) and line item number of Purchase Order, otherwise payment will be delayed.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ใบอินวอยซ์จะต้องระบุเลขที่ใบสั่งซื้อ<span style="font-family:Arial"> </span>เลขที่ใบเบิกย่อย<span style="font-family:Arial"> </span>(ถ้ามี)<span style="font-family:Arial"> </span>และลำดับรายการของตามใบสั่งซื้อ<span style="font-family:Arial"> </span>มิฉะนั้น<span style="font-family:Arial"> </span>จะทำให้การจ่ายเงินล่าช้า</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>8.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Any correction in invoices without proper certification shall not be accepted. Invoices written in pencil will not be accepted.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ผู้ซื้อไม่รับอินวอยซ์ที่เขียนด้วยดินสอ<span style="font-family:Arial"> </span>หรือมีรอยแก้ไขที่มิได้เซ็นรับรองอย่างถูกต้อง</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>9.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Separate Invoices, original plus 2 copies or more as specified are required for each order and for each partial delivery approved by BUYER. Payment will be made 30 days after submission of invoice unless otherwise specified in the Purchase Order. In case of FOB deliveries, invoices must be accompanied by a signed Bill of Lading.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ผู้ขายจะต้องยื่นอินวอยซ์ที่มีต้นฉบับหนึ่งใบ<span style="font-family:Arial"> </span>กับสำเนาสองใบ<span style="font-family:Arial"> </span>หรือมากกว่านั้นตามที่ผู้ซื้อต้องการ<span style="font-family:Arial"> </span>สำหรับใบสั่งแต่ละฉบับ<span style="font-family:Arial"> </span>หรือการส่งมอบบางส่วนแต่ละครั้งตามที่ตกลงกับผู้ซื้อ<span style="font-family:Arial"> </span>การชำระเงินจะกระทำใน<span style="font-family:Arial"> </span>30<span style="font-family:Arial"> </span>วัน<span style="font-family:Arial"> </span>หลังจากได้รับอินวอยซ์<span style="font-family:Arial"> </span>เว้นแต่จะได้ระบุเป็นอย่างอื่นในใบสั่งซื้อ<span style="font-family:Arial"> </span>ในกรณีการส่งมอบ<span style="font-family:Arial"> </span>เอฟ<span style="font-family:Arial"> </span>โอ<span style="font-family:Arial"> </span>บี<span style="font-family:Arial"> </span>จะต้องมีใบส่งสินค้า<span style="font-family:Arial"> </span>(B/L)<span style="font-family:Arial"> </span>ที่ได้ลงนามแล้ว<span style="font-family:Arial"> </span>กำกับไปกับใบอินวอยซ์ด้วย</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>10.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>In Case Value Added Tax is applicable to this purchase, the SUPPLIER must provide to the BUYER/the Tax Invoice Substantially in the form as required by VAT law.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ในกรณีที่ใบสั่งซื้อนี้<span style="font-family:Arial"> </span>ต้องเสียภาษีมูลค่าเพิ่ม<span style="font-family:Arial"> </span>ผู้ขายจะต้องออกใบกำกับภาษีตามแบบที่กฎหมายกำหนดให้แก่ผู้ซื้อ</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>11.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>SUPPLIER shall notify BUYER at once if order cannot be completely executed immediately stating reasons and dates of completion. BUYER reserves the right to cancel this order wholly or partially if delivery is not effected on the date mentioned in the order, or in case the goods are purchased for export, export permit is not granted.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ผู้ขายจะต้องแจ้งให้ผู้ซื้อทราบทันที<span style="font-family:Arial"> </span>ถ้าไม่สามารถจะปฏิบัติตามใบสั่งอย่างสมบูรณ์โดยระบุเหตุผลและวันที่ที่จะปฏิบัติให้ครบถ้วนได้<span style="font-family:Arial"> </span>ผู้ซื้อสงวนสิทธิ์ที่จะบอกเลิกใบสั่งนี้ทั้งหมดหรือบางส่วน<span style="font-family:Arial"> </span>ถ้าการส่งมอบมิได้กระทำในวันที่แจ้งไว้ในใบสั่ง<span style="font-family:Arial"> </span>หรือในกรณีที่สินค้าสั่งซื้อเพื่อส่งออก<span style="font-family:Arial"> </span>แต่ไม่ได้รับอนุญาตให้ทำการส่งออก</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>12.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>If any of the above conditions or instructions cannot be executed by the SUPPLIER the SUPPLIER must notify the BUYER at BUYER’s office immediately or before delivery is made, stating complete details or reason why the conditions and instructions cannot be complied with. If no notification is received before delivery is scheduled, it will be assumed that all the conditions and instructions mentioned on this form will be carried out by the SUPPLIER.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ถ้าหากผู้ขายไม่สามารถปฏิบัติตามเงื่อนไขหรือคำสั่งข้อหนึ่งข้อใดดังกล่าวข้างต้น<span style="font-family:Arial"> </span>ผู้ขายจะต้องมีหนังสือแจ้งไปยังผู้ซื้อทันที<span style="font-family:Arial"> </span>หรือก่อนทำการส่งมอบโดยแจ้งรายละเอียดว่า<span style="font-family:Arial"> </span>เพราะเหตุใดจึงไม่สามารถปฏิบัติตามเงื่อนไขและคำสั่งได้<span style="font-family:Arial"> </span>ถ้าผู้ซื้อไม่ได้รับหนังสือแจ้งก่อนทำการส่งมอบ<span style="font-family:Arial"> </span>จะเป็นที่เข้าใจว่าเงื่อนไขและคำสั่งทั้งมวลตามที่ระบุไว้ในแบบพิมพ์<span style="font-family:Arial"> </span>จะได้รับการปฏิบัติตามโดยผู้ขาย</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>13.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>All billings submitted to BUYER are to properly reflect the facts concerning the transaction including the nature of any costs incurred for the account by BUYER. SUPPLIER is not expected or authorized to take any action on BUYER’s behalf, which would violate applicable laws.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ใบเก็บเงินทุกใบที่ยื่นต่อผู้ซื้อ<span style="font-family:Arial"> </span>จะต้องระบุข้อเท็จจริงในเรื่องนั้นอย่างถูกต้องตามความเป็นจริง<span style="font-family:Arial"> </span>รวมตลอดถึงประเภทของค่าใช้จ่ายที่เกิดขึ้น<span style="font-family:Arial"> </span>เพื่อการลงบัญชีของผู้ซื้อ<span style="font-family:Arial"> </span>ผู้ซื้อไม่หวังให้ผู้ขายทำหรืออนุญาตให้ผู้ขายกระทำการใดๆ<span style="font-family:Arial"> </span>ที่เป็นการฝ่าฝืนกฎหมายที่ใช้บังคับอยู่แทนผู้ซื้อ</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>14.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>SUPPLIER shall exercise reasonable care and diligence to prevent any actions or conditions, which could result in a conflict with BUYER’s best interest. SUPPLIER efforts shall include but not be limited to establishing precautions to prevent BUYER employees, families or agents from receiving substantial gifts, entertainment, payments, loans or other considerations for the purpose of influencing individuals to act contrary to BUYER’s best interests arising form this Purchase Order or agreement.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ผู้ขายจะต้องระมัดระวังไม่กระทำสิ่งหนึ่งสิ่งใดที่จะขัดต่อผลประโยชน์ของผู้ซื้อที่พึงจะได้<span style="font-family:Arial"> </span>ผู้ขายจะต้องยึดเป็นหลักปฏิบัติในการไม่มอบ<span style="font-family:Arial"> </span>ของขวัญ<span style="font-family:Arial"> </span>ค่ารับรอง<span style="font-family:Arial"> </span>เงิน<span style="font-family:Arial"> </span>เงินกู้<span style="font-family:Arial"> </span>และสิ่งอื่นๆ<span style="font-family:Arial"> </span>แก่พนักงาน<span style="font-family:Arial"> </span>เครือญาติ<span style="font-family:Arial"> </span>หรือตัวแทนพนักงาน<span style="font-family:Arial"> </span>ของผู้ซื้ออันจะก่อให้บุคคลนั้นกระทำการใดๆ<span style="font-family:Arial"> </span>อันเป็นการขัดกับผลประโยชน์ของผู้ซื้อ</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>15.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>BUYER’s method of payment is by crossed checks showing Supplier as Payee. In case of importation, payment shall be made by T/T unless otherwise agreed upon.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">การชำระเงินค่าสินค้า<span style="font-family:Arial"> </span>จะชำระเป็นเช็คขีดคร่อมจ่ายในนามของผู้ขาย<span style="font-family:Arial"> </span>ในกรณีของการนำเข้าจากต่างประเทศ<span style="font-family:Arial"> </span>ผู้ซื้อจะชำระด้วยวิธี<span style="font-family:Arial"> </span>T/T<span style="font-family:Arial"> </span>หากมิได้ระบุเป็นอย่างอื่น</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>16.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Without specific written consent SUPPLIER agrees NOT to use BUYER’s trademarks or BUYER’s names information about BUYER’s use of the products or facilities in any advertisements, brochures, publicity releases, newsletters, other materials, or oral statements.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">นอกเสียจากจะได้รับความยินยอมเป็นลายลักษณ์อักษรโดยชัดแจ้ง<span style="font-family:Arial"> </span>ผู้ขายตกลง<span style="font-family:Arial"> </span>ว่าจะไม่นำเอาเครื่องหมายการค้าหรือชื่อของบริษัทของผู้ซื้อ<span style="font-family:Arial"> </span>หรือข้อมูลเกี่ยวกับการใช้ผลิตภัณฑ์<span style="font-family:Arial"> </span>หรือบริการโดยผู้ซื้อ<span style="font-family:Arial"> </span>หรือรูปภาพของเครื่องอุปกรณ์<span style="font-family:Arial"> </span>บุคคล<span style="font-family:Arial"> </span>ผลิตภัณฑ์<span style="font-family:Arial"> </span>หรือสถานที่ของผู้ซื้อไปใช้ในการโฆษณา<span style="font-family:Arial"> </span>แผ่นใบปลิว<span style="font-family:Arial"> </span>การแถลงข่าว<span style="font-family:Arial"> </span>จดหมายข่าว<span style="font-family:Arial"> </span>หรือสิ่งอื่นใด<span style="font-family:Arial"> </span>หรือในการแถลงด้วยวาจา</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
-      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>17.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
-      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>SUPPLIER/CONTRACTOR shall permit and cause its subcontractors to permit, at reasonable time during the performance of services and for two(2) years thereafter, authorize BUYER’S representative to review SUPPLIER’S/CONTRACTOR’S and subcontractors’ accounting and cost control systems, and inspect books, records, accounts and other documents, and to make copies thereof, as necessary to audit and verify the completeness and accuracy of costs of GOODS/SERVICES contained in SUPPLIER’S/CONTRACTOR’S invoices. If an audit indicates errors in SUPPLIER’S/CONTRACTOR’S invoices, SUPPLIER/⁠CONTRACTOR shall make appropriate invoice adjustments or promptly refund BUYER the overpayments.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ในระหว่างการให้บริการและหลังจากงานแล้วเสร็จสมบูรณ์อีก<span style="font-family:Arial"> </span>2<span style="font-family:Arial"> </span>(สอง)<span style="font-family:Arial"> </span>ปี<span style="font-family:Arial"> </span>ผู้ขาย/ผู้รับเหมารวมทั้งผู้รับเหมาช่วงของผู้ขาย/ผู้รับเหมา<span style="font-family:Arial"> </span>จะยินดีเก็บหลักฐานและอนุญาตให้ตัวแทนผู้ได้รับมอบหมายของผู้ซื้อ/ผู้ว่าจ้าง<span style="font-family:Arial"> </span>เข้าตรวจดูหลักฐาน<span style="font-family:Arial"> </span>บันทึก<span style="font-family:Arial"> </span>เอกสารทางบัญชีของผู้รับจ้าง<span style="font-family:Arial"> </span>ซึ่งเกี่ยวข้องกับความถูกต้องของราคาและการเรียกเก็บค่าใช้จ่ายต่าง<span style="font-family:Arial"> </span>ๆ<span style="font-family:Arial"> </span>ได้ตามสมควร<span style="font-family:Arial"> </span>ทั้งนี้ผู้ว่าจ้างมีสิทธิถ่ายภาพ/คัดลอกเอกสารใด<span style="font-family:Arial"> </span>ๆ<span style="font-family:Arial"> </span>ดังกล่าว<span style="font-family:Arial"> </span>หากผู้ว่าจ้างพบหลักฐานความผิดพลาดเกี่ยวกับการชำระเงิน<span style="font-family:Arial"> </span>และ/หรือค่าบริการ<span style="font-family:Arial"> </span>ผู้รับจ้างยินดีแก้ไขและชำระเงินคืนให้แก่ผู้ว่าจ้างทันที</p></body></exData></value><font typeface="DokChampa" size="6.5pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
-      </subform></subform>
-      </subform>
+         <bind match="none"/>
+         <breakBefore targetType="pageArea" target="mstTerms" startNew="1"/>
+         <draw name="Title" w="179.95mm" minH="3.3mm">
+            <ui>
+               <textEdit/>
+            </ui>
+            <value>
+               <text xliff:rid="9C852192-1079-4695-BE13-E686B2453A5D">GENERAL CONDITIONS</text>
+            </value>
+            <font typeface="DokChampa" size="7pt"/>
+            <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+            <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+         </draw>
+         <draw name="Subtitle" w="179.95mm" minH="3.3mm">
+            <ui>
+               <textEdit/>
+            </ui>
+            <value>
+               <text xliff:rid="C39422CD-7F94-4647-AA66-39EC77B7F737">คำแปลเงื่อนไขทั่วไป</text>
+            </value>
+            <font typeface="DokChampa" size="7pt"/>
+            <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+            <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="9.4pt"/>
+         </draw>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="024535A7-3BA5-47D5-8E4C-707F8B2CDFE2">1.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="3192ABBD-0A8E-45C4-8D24-54B19C0EF5B9">All purchase of goods or services over baht 10,000 per order must be on BUYER’s Purchase Order form, BUYER will neither take responsibility nor make payment for any goods/services which are delivered without BUYER’s purchase order form.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="FD7A9286-DD76-4BCD-B5D5-DDDDB6BE5EAB">การสั่งซื้อสินค้าที่มีราคาเกิน 10,000 บาท ต้องมีใบสั่งซื้อจากผู้ซื้อเสมอ ผู้ซื้อจะไม่รับผิดชอบ และไม่จ่ายเงินถ้าการสั่งซื้อนั้นไม่มีใบสั่งซื้อของผู้ซื้อ</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt" baselineShift="0pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="D0DBA542-A725-4516-BAEA-992805678682">2.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="63994F1D-C969-43BF-8E71-3D5E298CA2C7">An order shall not be assigned of subcontracted without consent of the BUYER</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="F4C339DC-4300-49FD-BFA0-48C63F341A91">ใบสั่งซื้อนี้จะโอนหรือทำสัญญามอบช่วงให้แก่ผู้อื่นโดยมิได้รับความยินยอมเป็นหนังสือจากผู้ซื้อไม่ได้</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt" baselineShift="0pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="90F8693A-22C3-46F9-98B8-7A99373D6398">3.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="ADC93B50-9BB9-4AAE-8B23-29EF931EDED1">Goods/services must not be in excess of order and must be of the required quality and fully meet the BUYER’s specifications/drawing; otherwise they may be returned or rejected at SUPPLIER’s expense upon delivery or after receipt.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="E2D6CF56-441C-4F6F-82B2-63948E5D7559">สินค้า/บริการ จะต้องมีปริมาณไม่เกินกว่าที่สั่ง และจะต้องมีคุณภาพตามที่ต้องการและตรงตามรายละเอียดในใบสั่งซื้อ มิฉะนั้น สินค้า/บริการดังกล่าว อาจถูกส่งคืน หรือปฏิเสธการรับทั้งขณะส่งมอบหรือหลังจากส่งมอบแล้ว โดยที่ผู้ขายจะต้องเสียค่าใช้จ่ายเอง</text>
+                  </value>
+                  <font typeface="DokChampa" size="6.7pt" baselineShift="0pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="D2D2DDDE-6E3F-43EE-9DB9-38282AB947E0">4.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="54E2DA32-4FB0-4C5F-8C72-9E6AB530E0A4">Charges and expenses related to packing and transporting the goods to the place of delivery of the BUYER shall be borne by the SUPPLIER. Unless otherwise specified in the Purchase Order, no other extra charges are allowed without specific approval from BUYER.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="167B2721-E414-4307-9DAF-8674A75DD4B0">ค่าใช้จ่ายต่างๆ เกี่ยวกับการบรรจุหีบห่อ และขนส่งถึงสถานที่รับมอบของผู้ซื้อ ผู้ขายจะเป็นผู้ออกเองทั้งหมด เว้นแต่จะได้กำหนดเป็นอย่างอื่นในใบสั่งซื้อ ผู้ซื้อจะไม่ชำระค่าใช้จ่ายอื่นใดที่ผู้ซื้อมิได้เห็นชอบเป็นการเฉพาะเรื่อง</text>
+                  </value>
+                  <font typeface="DokChampa" size="6.7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="45B11C5F-FCC9-429C-B2DA-266F81AD4C8A">5.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="41F6836B-87D3-4780-BB54-6486A445DCC8">Goods must be delivered in good condition and it packing is necessary it must be strong enough to prevent damage during transport. Damage to goods caused by insufficient or improper packing shall be for account of SUPPLIER.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="8A722D24-86F1-4695-B0B1-56FDC0D7FED7">สินค้าจะต้องส่งมอบในสภาพที่ดีและถ้าจำเป็นต้องบรรจุหีบห่อจะต้องเป็นหีบห่อที่แข็งแรงพอที่จะป้องกันการเสียหายระหว่างขนส่ง ผู้ขายจะต้องเป็นผู้รับผิดชอบในความเสียหายที่เกิดขึ้นแก่สินค้าเนื่องจากการบรรจุหีบห่อไม่ดีพอ</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="B085D5ED-1D8C-4A1C-805E-230AF8E00813">6.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="400564C2-D34C-4E32-9671-DD0C55080E52">The property and risk in GOODS shall remain in SUPPLIER until they are deliverd in accordance with Purchase Order, provided that where progress payments are made by BUYER to SUPPLIER in respect of part of GOODS then title therein shall pass to BUYER upon such payment but risk therein shall remain in SUPPLIER until GOODS are delivered in accordance with Purchase Order.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="46C41443-DA84-4066-8835-692AA1514651">กรรมสิทธิ์และความเสี่ยงภัยในสินค้า จะยังอยู่กับผู้ขายจนกว่าได้มีการส่งมอบสินค้าตามวิธีการที่กำหนดในใบสั่งซื้อ ทั้งนี้ โดยมีเงื่อนไขว่า ถ้าผู้ซื้อจ่ายเงินให้ผู้ขายเป็นงวดๆ สำหรับสินค้าเป็นบางส่วน กรรมสิทธิ์ในสินค้าให้ตกเป็นของผู้ซื้อ เมื่อได้มีการจ่ายเงินนั้นแล้ว แต่ความเสี่ยงภัยในสินค้าดังกล่าว จะยังอยู่กับผู้ขาย จนกระทั่งได้มีการส่งมอบสินค้าครบถ้วนตามวิธีการที่กำหนดในใบสั่งซื้อ</text>
+                  </value>
+                  <font typeface="DokChampa" size="6.7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="B7F5D00C-6A7C-4013-AA0E-8D626217FBD6">7.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="6D58C75E-4D14-4AF1-B802-39BF598A7285">Invoices shall specify the order number, release numbers (if any) and line item number of Purchase Order, otherwise payment will be delayed.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="77E32E52-9502-4E8D-8813-55429CAB5DD9">ใบอินวอยซ์จะต้องระบุเลขที่ใบสั่งซื้อ เลขที่ใบเบิกย่อย (ถ้ามี) และลำดับรายการของตามใบสั่งซื้อ มิฉะนั้น จะทำให้การจ่ายเงินล่าช้า</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="BB727470-1B39-4DC8-A3C0-C5F795C9B78E">8.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="1D2091F3-E8CE-4B17-8662-1418B13BEE08">Any correction in invoices without proper certification shall not be accepted. Invoices written in pencil will not be accepted.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <exData contentType="text/html" xliff:rid="9B9A9919-384B-4D3E-860E-206BC44A25AD">
+                        <body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ผู้ซื้อไม่รับอินวอยซ์ที่เขียนด้วยดินสอ<span style="font-family:Arial"> </span>หรือมีรอยแก้ไขที่มิได้เซ็นรับรองอย่างถูกต้อง</p></body>
+                     </exData>
+                  </value>
+                  <font typeface="DokChampa" size="6.5pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="D4A3AD07-3B4C-4339-A9C0-FA9599266B54">9.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="3BE6AAEC-3249-4271-934E-22BCC8AE8E25">Separate Invoices, original plus 2 copies or more as specified are required for each order and for each partial delivery approved by BUYER. Payment will be made 30 days after submission of invoice unless otherwise specified in the Purchase Order. In case of FOB deliveries, invoices must be accompanied by a signed Bill of Lading.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="570C4A41-7428-4124-ADE4-16EC81CBE587">ผู้ขายจะต้องยื่นอินวอยซ์ที่มีต้นฉบับหนึ่งใบ กับสำเนาสองใบ หรือมากกว่านั้นตามที่ผู้ซื้อต้องการ สำหรับใบสั่งแต่ละฉบับ หรือการส่งมอบบางส่วนแต่ละครั้งตามที่ตกลงกับผู้ซื้อ การชำระเงินจะกระทำใน 30 วัน หลังจากได้รับอินวอยซ์ เว้นแต่จะได้ระบุเป็นอย่างอื่นในใบสั่งซื้อ ในกรณีการส่งมอบ เอฟ โอ บี จะต้องมีใบส่งสินค้า (B/L) ที่ได้ลงนามแล้ว กำกับไปกับใบอินวอยซ์ด้วย</text>
+                  </value>
+                  <font typeface="DokChampa" size="6.7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="7D0E1F93-CE87-44E1-B0A1-9337B30F01C7">10.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="F360B88C-5358-49B1-8635-97D342094C71">In Case Value Added Tax is applicable to this purchase, the SUPPLIER must provide to the BUYER/the Tax Invoice Substantially in the form as required by VAT law.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <exData contentType="text/html" xliff:rid="DA37D310-4CD9-4D16-94A9-24C03D1100FF">
+                        <body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ในกรณีที่ใบสั่งซื้อนี้<span style="font-family:Arial"> </span>ต้องเสียภาษีมูลค่าเพิ่ม<span style="font-family:Arial"> </span>ผู้ขายจะต้องออกใบกำกับภาษีตามแบบที่กฎหมายกำหนดให้แก่ผู้ซื้อ</p></body>
+                     </exData>
+                  </value>
+                  <font typeface="DokChampa" size="6.5pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="82CB54A5-3CBA-4963-AFFB-180A9D6AEDF2">11.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="BB7EA7C5-D1CD-4914-A925-3FA068643B87">SUPPLIER shall notify BUYER at once if order cannot be completely executed immediately stating reasons and dates of completion. BUYER reserves the right to cancel this order wholly or partially if delivery is not effected on the date mentioned in the order, or in case the goods are purchased for export, export permit is not granted.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="8A45AA91-0270-430B-9464-0A07CC927FD3">ผู้ขายจะต้องแจ้งให้ผู้ซื้อทราบทันที ถ้าไม่สามารถจะปฏิบัติตามใบสั่งอย่างสมบูรณ์โดยระบุเหตุผลและวันที่ที่จะปฏิบัติให้ครบถ้วนได้ ผู้ซื้อสงวนสิทธิ์ที่จะบอกเลิกใบสั่งนี้ทั้งหมดหรือบางส่วน ถ้าการส่งมอบมิได้กระทำในวันที่แจ้งไว้ในใบสั่ง หรือในกรณีที่สินค้าสั่งซื้อเพื่อส่งออก แต่ไม่ได้รับอนุญาตให้ทำการส่งออก</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="0904A6E6-8781-432E-BB04-C226178FD267">12.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="C7234EEE-380C-4358-8469-E0674C2F5C0A">If any of the above conditions or instructions cannot be executed by the SUPPLIER the SUPPLIER must notify the BUYER at BUYER’s office immediately or before delivery is made, stating complete details or reason why the conditions and instructions cannot be complied with. If no notification is received before delivery is scheduled, it will be assumed that all the conditions and instructions mentioned on this form will be carried out by the SUPPLIER.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="75E855E6-9641-4982-9B56-211A44D0584B">ถ้าหากผู้ขายไม่สามารถปฏิบัติตามเงื่อนไขหรือคำสั่งข้อหนึ่งข้อใดดังกล่าวข้างต้น ผู้ขายจะต้องมีหนังสือแจ้งไปยังผู้ซื้อทันที หรือก่อนทำการส่งมอบโดยแจ้งรายละเอียดว่า เพราะเหตุใดจึงไม่สามารถปฏิบัติตามเงื่อนไขและคำสั่งได้ ถ้าผู้ซื้อไม่ได้รับหนังสือแจ้งก่อนทำการส่งมอบ จะเป็นที่เข้าใจว่าเงื่อนไขและคำสั่งทั้งมวลตามที่ระบุไว้ในแบบพิมพ์ จะได้รับการปฏิบัติตามโดยผู้ขาย</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="C4671DDD-67B9-425B-AC20-98DB38114299">13.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="8E8DF622-09FC-4D92-90DA-C99121DF4121">All billings submitted to BUYER are to properly reflect the facts concerning the transaction including the nature of any costs incurred for the account by BUYER. SUPPLIER is not expected or authorized to take any action on BUYER’s behalf, which would violate applicable laws.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="01A04BE3-834D-41CD-BBE5-21F305BDED9D">ใบเก็บเงินทุกใบที่ยื่นต่อผู้ซื้อ จะต้องระบุข้อเท็จจริงในเรื่องนั้นอย่างถูกต้องตามความเป็นจริง รวมตลอดถึงประเภทของค่าใช้จ่ายที่เกิดขึ้น เพื่อการลงบัญชีของผู้ซื้อ ผู้ซื้อไม่หวังให้ ผู้ขายทำหรืออนุญาตให้ผู้ขายกระทำการใดๆ ที่เป็นการฝ่าฝืนกฎหมายที่ใช้บังคับอยู่แทนผู้ซื้อ</text>
+                  </value>
+                  <font typeface="DokChampa" size="6.8pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="FF746F4B-1D3D-4761-804A-08690F843BBC">14.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="0395FA6F-48E7-43A7-9B3D-9AAFE011A881">SUPPLIER shall exercise reasonable care and diligence to prevent any actions or conditions, which could result in a conflict with BUYER’s best interest. SUPPLIER efforts shall include but not be limited to establishing precautions to prevent BUYER employees, families or agents from receiving substantial gifts, entertainment, payments, loans or other considerations for the purpose of influencing individuals to act contrary to BUYER’s best interests arising form this Purchase Order or agreement.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <exData contentType="text/html" xliff:rid="5DBC9357-FFA8-463F-A27B-E949B082F983">
+                        <body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">ผู้ขายจะต้องระมัดระวังไม่กระทำสิ่งหนึ่งสิ่งใดที่จะขัดต่อผลประโยชน์ของผู้ซื้อที่พึงจะได้<span style="font-family:Arial"> </span>ผู้ขายจะต้องยึดเป็นหลักปฏิบัติในการไม่มอบ<span style="font-family:Arial"> </span>ของขวัญ<span style="font-family:Arial"> </span>ค่ารับรอง<span style="font-family:Arial"> </span>เงิน<span style="font-family:Arial"> </span>เงินกู้<span style="font-family:Arial"> </span>และสิ่งอื่นๆ<span style="font-family:Arial"> </span>แก่พนักงาน<span style="font-family:Arial"> </span>เครือญาติ<span style="font-family:Arial"> </span>หรือตัวแทนพนักงาน<span style="font-family:Arial"> </span>ของผู้ซื้ออันจะก่อให้บุคคลนั้นกระทำการใดๆ<span style="font-family:Arial"> </span>อันเป็นการขัดกับผลประโยชน์ของผู้ซื้อ</p></body>
+                     </exData>
+                  </value>
+                  <font typeface="DokChampa" size="6.5pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="984A5483-38CC-4945-8B60-B9DBF857BD0E">15.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="B0854115-E0AA-481C-B574-A4D8F2431CBD">BUYER’s method of payment is by crossed checks showing Supplier as Payee. In case of importation, payment shall be made by T/T unless otherwise agreed upon.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <exData contentType="text/html" xliff:rid="A80267CE-DB6E-4BE0-B4A4-DC5CD2700DF3">
+                        <body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="font-family:DokChampa;font-size:6.5pt;text-align:justify;line-height:9.4pt;margin-top:0pt;margin-bottom:0pt">การชำระเงินค่าสินค้า<span style="font-family:Arial"> </span>จะชำระเป็นเช็คขีดคร่อมจ่ายในนามของผู้ขาย<span style="font-family:Arial"> </span>ในกรณีของการนำเข้าจากต่างประเทศ<span style="font-family:Arial"> </span>ผู้ซื้อจะชำระด้วยวิธี<span style="font-family:Arial"> </span>T/T<span style="font-family:Arial"> </span>หากมิได้ระบุเป็นอย่างอื่น</p></body>
+                     </exData>
+                  </value>
+                  <font typeface="DokChampa" size="6.5pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="15F2B5CC-3EA1-4B12-A928-FDEEE2F75DF6">16.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="F9F61DE1-683B-4066-937E-66D01090BBAF">Without specific written consent SUPPLIER agrees NOT to use BUYER’s trademarks or BUYER’s names information about BUYER’s use of the products or facilities in any advertisements, brochures, publicity releases, newsletters, other materials, or oral statements.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <exData contentType="text/html" xliff:rid="6DD5FAA2-E943-4D21-B7FB-92EBCD4EFD42">
+                        <body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="text-decoration:none;letter-spacing:0in">นอกเสียจากจะได้รับความยินยอมเป็นลายลักษณ์อักษรโดยชัดแจ้ง ผู้ขายตกลง ว่าจะไม่นำเอาเครื่องหมายการค้าหรือชื่อของบริษัทของผู้ซื้อ หรือข้อมูลเกี่ยวกับการใช้ผลิตภัณฑ์<span style="xfa-spacerun:yes">     </span><span style="font-size:6.6pt">หรือบริการโดยผู้ซื้อ หรือรูปภาพของเครื่องอุปกรณ์ บุคคล ผลิตภัณฑ์ หรือสถานที่ของผู้ซื้อไปใช้ในการโฆษณา แผ่นใบปลิว การแถลงข่าว จดหมายข่าว หรือสิ่งอื่นใด หรือในการ แถลงด้วยวาจา</span></p></body>
+                     </exData>
+                  </value>
+                  <font typeface="DokChampa" size="6.7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <subform name="Clause" layout="lr-tb" w="179.95mm">
+            <bind match="none"/>
+            <draw name="No" w="5.00mm" minH="3.3mm">
+               <ui>
+                  <textEdit/>
+               </ui>
+               <value>
+                  <text xliff:rid="75608460-C472-41CC-9C8E-AFDBF8E57DD7">17.</text>
+               </value>
+               <font typeface="DokChampa" size="7pt"/>
+               <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+               <para lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+            </draw>
+            <subform name="Body" layout="tb" w="174.95mm">
+               <bind match="none"/>
+               <draw name="En" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="6C1C97F6-EDE6-4FCA-A476-AE4BBDF6549C">SUPPLIER/CONTRACTOR shall permit and cause its subcontractors to permit, at reasonable time during the performance of services and for two(2) years thereafter, authorize BUYER’S representative to review SUPPLIER’S/CONTRACTOR’S and subcontractors’ accounting and cost control systems, and inspect books, records, accounts and other documents, and to make copies thereof, as necessary to audit and verify the completeness and accuracy of costs of GOODS/SERVICES contained in SUPPLIER’S/CONTRACTOR’S invoices. If an audit indicates errors in SUPPLIER’S/CONTRACTOR’S invoices,    SUPPLIER/CONTRACTOR shall make appropriate invoice adjustments or promptly refund BUYER the overpayments.</text>
+                  </value>
+                  <font typeface="DokChampa" size="7pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/>
+               </draw>
+               <draw name="Th" w="174.95mm" minH="3.3mm">
+                  <ui>
+                     <textEdit/>
+                  </ui>
+                  <value>
+                     <text xliff:rid="6C8C3DE1-E4ED-4546-8E21-5D4F07905651">ในระหว่างการให้บริการและหลังจากงานแล้วเสร็จสมบูรณ์อีก 2 (สอง) ปี ผู้ขาย/ผู้รับเหมารวมทั้งผู้รับเหมาช่วงของผู้ขาย/ผู้รับเหมา จะยินดีเก็บหลักฐานและอนุญาตให้ตัวแทนผู้            ได้รับมอบหมายของผู้ซื้อ/ผู้ว่าจ้าง  เข้าตรวจดูหลักฐาน บันทึก เอกสารทางบัญชีของผู้รับจ้าง ซึ่งเกี่ยวข้องกับความถูกต้องของราคาและการเรียกเก็บค่าใช้จ่ายต่าง ๆ ได้ตามสมควร ทั้งนี้ผู้ว่าจ้างมีสิทธิถ่ายภาพ/คัดลอกเอกสารใด ๆ ดังกล่าว หากผู้ว่าจ้างพบหลักฐานความผิดพลาดเกี่ยวกับการชำระเงิน และ/หรือค่าบริการ ผู้รับจ้างยินดีแก้ไขและชำระเงินคืนให้แก่ผู้ว่าจ้างทันที</text>
+                  </value>
+                  <font typeface="DokChampa" size="6.7pt" baselineShift="0pt"/>
+                  <margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>
+                  <para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"/>
+               </draw>
+               <?templateDesigner expand 1?></subform>
+            <?templateDesigner expand 1?></subform>
+         <?templateDesigner expand 1?></subform>
       <subform w="100mm" h="30mm" name="frmHiddenStaticTexts" presence="inactive">
          <bind match="none"/>
       </subform>
@@ -3751,8 +4339,10 @@ this.presence = (cur === total) ? "visible" : "invisible"
       <?templateDesigner expand 1?>
       <?renderCache.subset "Adobe Pi Std" 0 0 UTF-16 2 4 004F?>
       <?renderCache.subset "Arial" 0 0 ISO-8859-1 4 64 16 000300290037003900420044004700480049004C004F0050005200550057005B FTV_adefilmortx?>
+      <?renderCache.subset "Arial" 0 0 UTF-16 2 64 000300290037003900420044004700480049004C004F0050005200550057005B?>
+      <?renderCache.subset "DokChampa" 0 0 UTF-16 2 488 00000003000B000C000F001100120013001400150016001700180019001A001B001C001E002400250026002700280029002A002C002F00310032003300350036003700380039003A003C004400450046004700480049004A004B004C004D004E004F0050005100520053005400550056005700580059005A005B005C005D00A900E100E200E400E600E700E800E900EA00EB00ED00EE00EF00F000F100F300F400F500F600F700F800F900FA00FB00FC00FD00FE00FF01000101010201030105010701080109010A010B010D011001110112011401150116011701180119011C011D011E011F0120012201230124012501280129?>
       <?renderCache.subset "Tahoma" 0 0 ISO-8859-1 4 180 45 0003000F0010001100120013001400150016001700180019001B001C001D0024002600270028002B002C002F00300031003200330035003700380044004600470048004B004C004E004F0050005100520053005600570058005A ,-./012345689:ACDEHILMNOPRTUacdehiklmnopstuw?>
-      <?renderCache.subset "Tahoma" 0 0 UTF-16 2 336 00030006000B000C000F00110012001D002400250027002C0031003200330037003A0042004400450046004700480049004B004C004F005000510052005300550056005700580059005A005C04340435043A043B043D043E044704480449044A044B044C044D044E044F045104530454045504560458045A045C045D045E046004630464046504670468046A046B046C046F0470047104720473047604770478047C049504960499?>
+      <?renderCache.subset "Tahoma" 0 0 UTF-16 2 408 00030006000B000C000F0010001100120013001400150016001700180019001B001C001D00240025002600270028002B002C002F0030003100320033003500370038003A0042004400450046004700480049004B004C004E004F005000510052005300550056005700580059005A005C04340435043A043B043D043E044704480449044A044B044C044D044E044F045104530454045504560458045A045C045D045E046004630464046504670468046A046B046C046F0470047104720473047604770478047C049504960499?>
       <?renderCache.subset "Tahoma" 1 0 UTF-16 2 356 0003001000110012001D00240025002600270028002A002C003100320033003400350036003700380039003C00440046004700480049004A004B004C004F005000510052005300550056005700580059005B005C043404350437043A043B043D043E0440044704480449044A044B044C044D044E044F04530454045504560458045A045C045D045E046004630464046504670468046A046B046C046F047004710472047304750477047C049504960499049F?></subform>
    <?templateDesigner DefaultPreviewDynamic 1?>
    <?templateDesigner WidowOrphanControl 0?>
@@ -3777,7 +4367,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
    <?templateDesigner SaveTaggedPDF 0?>
    <?templateDesigner SavePDFWithEmbeddedFonts 0?>
    <?templateDesigner FormTargetVersion 33?>
-   <?templateDesigner Zoom 153?>
+   <?templateDesigner Zoom 233?>
    <?templateDesigner Rulers horizontal:1, vertical:0, guidelines:0, crosshairs:0?></template>
 <config xmlns="http://www.xfa.org/schema/xci/3.0/">
    <agent name="designer">
@@ -3817,12 +4407,13 @@ this.presence = (cur === total) ? "visible" : "invisible"
    <psMap>
       <font typeface="Segoe UI" psName="SegoeUI" weight="normal" posture="normal"/>
       <font typeface="SOV_Nophanit" psName="SOV_Nophanit" weight="normal" posture="normal"/>
+      <font typeface="DokChampa" psName="DokChampa" weight="normal" posture="normal"/>
    </psMap>
 </config>
 <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.2-c001 63.139439, 2011/06/07-10:39:26        ">
    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
       <rdf:Description xmlns:xmp="http://ns.adobe.com/xap/1.0/" xmlns:pdf="http://ns.adobe.com/pdf/1.3/" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/" xmlns:pdfuaid="http://www.aiim.org/pdfua/ns/id/" xmlns:desc="http://ns.adobe.com/xfa/promoted-desc/" rdf:about="">
-         <xmp:MetadataDate>2026-09-24T17:04:03Z</xmp:MetadataDate>
+         <xmp:MetadataDate>2026-11-26T14:44:01Z</xmp:MetadataDate>
          <xmp:CreatorTool>Adobe LiveCycle Designer 11.0</xmp:CreatorTool>
          <pdf:Producer>Adobe LiveCycle Designer 11.0</pdf:Producer>
          <xmpMM:DocumentID>uuid:74705116-5837-4483-a248-4881e0cc50f3</xmpMM:DocumentID>
@@ -3837,7 +4428,8 @@ this.presence = (cur === total) ? "visible" : "invisible"
 <connectionSet xmlns="http://www.xfa.org/schema/xfa-connection-set/2.8/">
    <xsdConnection name="DataConnection" dataDescription="Form">
       <uri>.\ZPURF002.xsd</uri>
-      <rootElement>Form</rootElement></xsdConnection>
+      <rootElement>Form</rootElement>
+   </xsdConnection>
 </connectionSet>
 <xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/">
    <xfa:data xfa:dataNode="dataGroup"/>
