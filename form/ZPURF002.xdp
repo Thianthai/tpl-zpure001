@@ -10,6 +10,7 @@
          <pageArea name="mstDummy" id="Page1">
             <contentArea x="9.92mm" w="187.325mm" h="122.717mm" name="cntArea" id="cntArea_ID" y="93.763mm"/>
             <medium stock="a4" short="210mm" long="297mm"/>
+            <occur max="-1"/>
             <draw name="TaxID" y="24.692mm" x="10mm" w="72.42mm" h="5.967mm">
                <ui>
                   <textEdit/>
@@ -136,7 +137,7 @@ for (var i = 0; i &lt; aNames.length; i++) {
                </caption>
                <calculate override="error"/>
                <event name="event__layout_ready" activity="ready" ref="$layout">
-                  <script contentType="application/x-javascript">this.rawValue = xfa.layout.pageCount();
+                  <script contentType="application/x-javascript">this.rawValue = (xfa.layout.pageCount() - 1);
 </script>
                </event>
                <?templateDesigner floatingFieldPlaceholder ##?>
@@ -1848,7 +1849,7 @@ Amount</text>
                <bind match="dataRef" ref="$.PurchaseOrderHeader.TotalAmount"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -1881,7 +1882,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <bind match="dataRef" ref="$.PurchaseOrderHeader.DiscountAmount"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -1914,7 +1915,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <bind match="dataRef" ref="$.PurchaseOrderHeader.AmountBeforeTax"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -1947,7 +1948,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <bind match="dataRef" ref="$.PurchaseOrderHeader.TaxAmount"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -1983,7 +1984,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <bind match="dataRef" ref="$.PurchaseOrderHeader.NetAmount"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -2191,7 +2192,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                   <para spaceAbove="0pt" vAlign="middle"/>
                   <event activity="ready" ref="$layout" name="event__layout_ready">
                      <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -2290,6 +2291,11 @@ this.presence = (cur === total) ? "visible" : "invisible"
                </draw>
                <?templateDesigner expand 1?></subform>
             <?templateDesigner expand 1?></pageArea>
+         <pageArea name="mstTerms" id="mstTerms_ID">
+            <contentArea x="15.03mm" y="12.63mm" w="179.95mm" h="274mm" name="cntTerms" id="cntTerms_ID"/>
+            <medium stock="a4" short="210mm" long="297mm"/>
+            <occur min="0" max="-1"/>
+         </pageArea>
          <?templateDesigner expand 1?></pageSet>
       <subform w="187.06mm" name="Main" layout="tb">
          <bind match="none"/>
@@ -2532,7 +2538,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <para spaceAbove="0pt" vAlign="bottom"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -2596,7 +2602,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <bind match="dataRef" ref="$.PurchaseOrderHeader.TotalAmount"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -2632,7 +2638,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <bind match="dataRef" ref="$.PurchaseOrderHeader.DiscountAmount"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -2668,7 +2674,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <bind match="dataRef" ref="$.PurchaseOrderHeader.AmountBeforeTax"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -2704,7 +2710,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <bind match="dataRef" ref="$.PurchaseOrderHeader.TaxAmount"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -2743,7 +2749,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
                <bind match="dataRef" ref="$.PurchaseOrderHeader.NetAmount"/>
                <event activity="ready" ref="$layout" name="event__layout_ready">
                   <script contentType="application/x-javascript">var cur = xfa.layout.page(this);
-var total = xfa.layout.pageCount();
+var total = (xfa.layout.pageCount() - 1);
 this.presence = (cur === total) ? "visible" : "invisible"
 
 </script>
@@ -3057,6 +3063,114 @@ this.presence = (cur === total) ? "visible" : "invisible"
             </field>
             <?templateDesigner expand 0?></subform>
          <?templateDesigner expand 1?></subform>
+      <subform name="Terms" layout="tb" w="179.95mm">
+      <bind match="none"/>
+      <breakBefore targetType="pageArea" target="mstTerms" startNew="1"/>
+      <draw name="Title" w="179.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>GENERAL CONDITIONS</text></value><font typeface="Arial" size="7pt" weight="bold"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Subtitle" w="179.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>คำแปลเงื่อนไขทั่วไป</text></value><font typeface="DokChampa" size="7pt" weight="bold"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="9.4pt"/></draw>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>1.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>All purchase of goods or services over baht 10,000 per order must be on BUYER’s Purchase Order form, BUYER will neither take responsibility nor make payment for any goods/services which are delivered without BUYER’s purchase order form.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>การสั่งซื้อสินค้าที่มีราคาเกิน 10,000 บาท ต้องมีใบสั่งซื้อจากผู้ซื้อเสมอ ผู้ซื้อจะไม่รับผิดชอบ และไม่จ่ายเงินถ้าการสั่งซื้อนั้นไม่มีใบสั่งซื้อของผู้ซื้อ</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>2.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>An order shall not be assigned of subcontracted without consent of the BUYER</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ใบสั่งซื้อนี้จะโอนหรือทำสัญญามอบช่วงให้แก่ผู้อื่นโดยมิได้รับความยินยอมเป็นหนังสือจากผู้ซื้อไม่ได้</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>3.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Goods/services must not be in excess of order and must be of the required quality and fully meet the BUYER’s specifications/drawing; otherwise they may be returned or rejected at SUPPLIER’s expense upon delivery or after receipt.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>สินค้า/บริการ จะต้องมีปริมาณไม่เกินกว่าที่สั่ง และจะต้องมีคุณภาพตามที่ต้องการและตรงตามรายละเอียดในใบสั่งซื้อ มิฉะนั้น สินค้า/บริการดังกล่าว อาจถูกส่งคืน หรือปฏิเสธการรับทั้งขณะส่งมอบหรือหลังจากส่งมอบแล้ว โดยที่ผู้ขายจะต้องเสียค่าใช้จ่ายเอง</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>4.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Charges and expenses related to packing and transporting the goods to the place of delivery of the BUYER shall be borne by the SUPPLIER. Unless otherwise specified in the Purchase Order, no other extra charges are allowed without specific approval from BUYER.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ค่าใช้จ่ายต่างๆ เกี่ยวกับการบรรจุหีบห่อ และขนส่งถึงสถานที่รับมอบของผู้ซื้อ ผู้ขายจะเป็นผู้ออกเองทั้งหมด เว้นแต่จะได้กำหนดเป็นอย่างอื่นในใบสั่งซื้อ ผู้ซื้อจะไม่ชำระค่าใช้จ่ายอื่นใดที่ผู้ซื้อมิได้เห็นชอบเป็นการเฉพาะเรื่อง</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>5.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Goods must be delivered in good condition and it packing is necessary it must be strong enough to prevent damage during transport. Damage to goods caused by insufficient or improper packing shall be for account of SUPPLIER.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>สินค้าจะต้องส่งมอบในสภาพที่ดีและถ้าจำเป็นต้องบรรจุหีบห่อจะต้องเป็นหีบห่อที่แข็งแรงพอที่จะป้องกันการเสียหายระหว่างขนส่ง ผู้ขายจะต้องเป็นผู้รับผิดชอบในความเสียหายที่เกิดขึ้นแก่สินค้าเนื่องจากการบรรจุหีบห่อไม่ดีพอ</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>6.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>The property and risk in GOODS shall remain in SUPPLIER until they are deliverd in accordance with Purchase Order, provided that where progress payments are made by BUYER to SUPPLIER in respect of part of GOODS then title therein shall pass to BUYER upon such payment but risk therein shall remain in SUPPLIER until GOODS are delivered in accordance with Purchase Order.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>กรรมสิทธิ์และความเสี่ยงภัยในสินค้า จะยังอยู่กับผู้ขายจนกว่าได้มีการส่งมอบสินค้าตามวิธีการที่กำหนดในใบสั่งซื้อ ทั้งนี้ โดยมีเงื่อนไขว่า ถ้าผู้ซื้อจ่ายเงินให้ผู้ขายเป็นงวดๆ สำหรับสินค้าเป็นบางส่วน กรรมสิทธิ์ในสินค้าให้ตกเป็นของผู้ซื้อ เมื่อได้มีการจ่ายเงินนั้นแล้ว แต่ความเสี่ยงภัยในสินค้าดังกล่าว จะยังอยู่กับผู้ขาย จนกระทั่งได้มีการส่งมอบสินค้าครบถ้วนตามวิธีการที่กำหนดในใบสั่งซื้อ</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>7.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Invoices shall specify the order number, release numbers (if any) and line item number of Purchase Order, otherwise payment will be delayed.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ใบอินวอยซ์จะต้องระบุเลขที่ใบสั่งซื้อ เลขที่ใบเบิกย่อย (ถ้ามี) และลำดับรายการของตามใบสั่งซื้อ มิฉะนั้น จะทำให้การจ่ายเงินล่าช้า</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>8.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Any correction in invoices without proper certification shall not be accepted. Invoices written in pencil will not be accepted.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ผู้ซื้อไม่รับอินวอยซ์ที่เขียนด้วยดินสอ หรือมีรอยแก้ไขที่มิได้เซ็นรับรองอย่างถูกต้อง</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>9.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Separate Invoices, original plus 2 copies or more as specified are required for each order and for each partial delivery approved by BUYER. Payment will be made 30 days after submission of invoice unless otherwise specified in the Purchase Order. In case of FOB deliveries, invoices must be accompanied by a signed Bill of Lading.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ผู้ขายจะต้องยื่นอินวอยซ์ที่มีต้นฉบับหนึ่งใบ กับสำเนาสองใบ หรือมากกว่านั้นตามที่ผู้ซื้อต้องการ สำหรับใบสั่งแต่ละฉบับ หรือการส่งมอบบางส่วนแต่ละครั้งตามที่ตกลงกับผู้ซื้อ การชำระเงินจะกระทำใน 30 วัน หลังจากได้รับอินวอยซ์ เว้นแต่จะได้ระบุเป็นอย่างอื่นในใบสั่งซื้อ ในกรณีการส่งมอบ เอฟ โอ บี จะต้องมีใบส่งสินค้า (B/L) ที่ได้ลงนามแล้ว กำกับไปกับใบอินวอยซ์ด้วย</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>10.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>In Case Value Added Tax is applicable to this purchase, the SUPPLIER must provide to the BUYER/the Tax Invoice Substantially in the form as required by VAT law.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ในกรณีที่ใบสั่งซื้อนี้ ต้องเสียภาษีมูลค่าเพิ่ม ผู้ขายจะต้องออกใบกำกับภาษีตามแบบที่กฎหมายกำหนดให้แก่ผู้ซื้อ</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>11.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>SUPPLIER shall notify BUYER at once if order cannot be completely executed immediately stating reasons and dates of completion. BUYER reserves the right to cancel this order wholly or partially if delivery is not effected on the date mentioned in the order, or in case the goods are purchased for export, export permit is not granted.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ผู้ขายจะต้องแจ้งให้ผู้ซื้อทราบทันที ถ้าไม่สามารถจะปฏิบัติตามใบสั่งอย่างสมบูรณ์โดยระบุเหตุผลและวันที่ที่จะปฏิบัติให้ครบถ้วนได้ ผู้ซื้อสงวนสิทธิ์ที่จะบอกเลิกใบสั่งนี้ทั้งหมดหรือบางส่วน ถ้าการส่งมอบมิได้กระทำในวันที่แจ้งไว้ในใบสั่ง หรือในกรณีที่สินค้าสั่งซื้อเพื่อส่งออก แต่ไม่ได้รับอนุญาตให้ทำการส่งออก</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>12.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>If any of the above conditions or instructions cannot be executed by the SUPPLIER the SUPPLIER must notify the BUYER at BUYER’s office immediately or before delivery is made, stating complete details or reason why the conditions and instructions cannot be complied with. If no notification is received before delivery is scheduled, it will be assumed that all the conditions and instructions mentioned on this form will be carried out by the SUPPLIER.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ถ้าหากผู้ขายไม่สามารถปฏิบัติตามเงื่อนไขหรือคำสั่งข้อหนึ่งข้อใดดังกล่าวข้างต้น ผู้ขายจะต้องมีหนังสือแจ้งไปยังผู้ซื้อทันที หรือก่อนทำการส่งมอบโดยแจ้งรายละเอียดว่า เพราะเหตุใดจึงไม่สามารถปฏิบัติตามเงื่อนไขและคำสั่งได้ ถ้าผู้ซื้อไม่ได้รับหนังสือแจ้งก่อนทำการส่งมอบ จะเป็นที่เข้าใจว่าเงื่อนไขและคำสั่งทั้งมวลตามที่ระบุไว้ในแบบพิมพ์ จะได้รับการปฏิบัติตามโดยผู้ขาย</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>13.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>All billings submitted to BUYER are to properly reflect the facts concerning the transaction including the nature of any costs incurred for the account by BUYER. SUPPLIER is not expected or authorized to take any action on BUYER’s behalf, which would violate applicable laws.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ใบเก็บเงินทุกใบที่ยื่นต่อผู้ซื้อ จะต้องระบุข้อเท็จจริงในเรื่องนั้นอย่างถูกต้องตามความเป็นจริง รวมตลอดถึงประเภทของค่าใช้จ่ายที่เกิดขึ้น เพื่อการลงบัญชีของผู้ซื้อ ผู้ซื้อไม่หวังให้ผู้ขายทำหรืออนุญาตให้ผู้ขายกระทำการใดๆ ที่เป็นการฝ่าฝืนกฎหมายที่ใช้บังคับอยู่แทนผู้ซื้อ</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>14.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>SUPPLIER shall exercise reasonable care and diligence to prevent any actions or conditions, which could result in a conflict with BUYER’s best interest. SUPPLIER efforts shall include but not be limited to establishing precautions to prevent BUYER employees, families or agents from receiving substantial gifts, entertainment, payments, loans or other considerations for the purpose of influencing individuals to act contrary to BUYER’s best interests arising form this Purchase Order or agreement.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ผู้ขายจะต้องระมัดระวังไม่กระทำสิ่งหนึ่งสิ่งใดที่จะขัดต่อผลประโยชน์ของผู้ซื้อที่พึงจะได้ ผู้ขายจะต้องยึดเป็นหลักปฏิบัติในการไม่มอบ ของขวัญ ค่ารับรอง เงิน เงินกู้ และสิ่งอื่นๆ แก่พนักงาน เครือญาติ หรือตัวแทนพนักงาน ของผู้ซื้ออันจะก่อให้บุคคลนั้นกระทำการใดๆ อันเป็นการขัดกับผลประโยชน์ของผู้ซื้อ</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>15.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>BUYER’s method of payment is by crossed checks showing Supplier as Payee. In case of importation, payment shall be made by T/T unless otherwise agreed upon.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>การชำระเงินค่าสินค้า จะชำระเป็นเช็คขีดคร่อมจ่ายในนามของผู้ขาย ในกรณีของการนำเข้าจากต่างประเทศ ผู้ซื้อจะชำระด้วยวิธี T/T หากมิได้ระบุเป็นอย่างอื่น</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>16.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>Without specific written consent SUPPLIER agrees NOT to use BUYER’s trademarks or BUYER’s names information about BUYER’s use of the products or facilities in any advertisements, brochures, publicity releases, newsletters, other materials, or oral statements.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>นอกเสียจากจะได้รับความยินยอมเป็นลายลักษณ์อักษรโดยชัดแจ้ง ผู้ขายตกลง ว่าจะไม่นำเอาเครื่องหมายการค้าหรือชื่อของบริษัทของผู้ซื้อ หรือข้อมูลเกี่ยวกับการใช้ผลิตภัณฑ์ หรือบริการโดยผู้ซื้อ หรือรูปภาพของเครื่องอุปกรณ์ บุคคล ผลิตภัณฑ์ หรือสถานที่ของผู้ซื้อไปใช้ในการโฆษณา แผ่นใบปลิว การแถลงข่าว จดหมายข่าว หรือสิ่งอื่นใด หรือในการแถลงด้วยวาจา</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
+      <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>17.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <subform name="Body" layout="tb" w="174.95mm"><bind match="none"/>
+      <draw name="En" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>SUPPLIER/CONTRACTOR shall permit and cause its subcontractors to permit, at reasonable time during the performance of services and for two(2) years thereafter, authorize BUYER’S representative to review SUPPLIER’S/CONTRACTOR’S and subcontractors’ accounting and cost control systems, and inspect books, records, accounts and other documents, and to make copies thereof, as necessary to audit and verify the completeness and accuracy of costs of GOODS/SERVICES contained in SUPPLIER’S/CONTRACTOR’S invoices. If an audit indicates errors in SUPPLIER’S/CONTRACTOR’S invoices, SUPPLIER/CONTRACTOR shall make appropriate invoice adjustments or promptly refund BUYER the overpayments.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Th" w="174.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>ในระหว่างการให้บริการและหลังจากงานแล้วเสร็จสมบูรณ์อีก 2 (สอง) ปี ผู้ขาย/ผู้รับเหมารวมทั้งผู้รับเหมาช่วงของผู้ขาย/ผู้รับเหมา จะยินดีเก็บหลักฐานและอนุญาตให้ตัวแทนผู้ได้รับมอบหมายของผู้ซื้อ/ผู้ว่าจ้าง เข้าตรวจดูหลักฐาน บันทึก เอกสารทางบัญชีของผู้รับจ้าง ซึ่งเกี่ยวข้องกับความถูกต้องของราคาและการเรียกเก็บค่าใช้จ่ายต่าง ๆ ได้ตามสมควร ทั้งนี้ผู้ว่าจ้างมีสิทธิถ่ายภาพ/คัดลอกเอกสารใด ๆ ดังกล่าว หากผู้ว่าจ้างพบหลักฐานความผิดพลาดเกี่ยวกับการชำระเงิน และ/หรือค่าบริการ ผู้รับจ้างยินดีแก้ไขและชำระเงินคืนให้แก่ผู้ว่าจ้างทันที</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="justify" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      </subform></subform>
+      </subform>
       <subform w="100mm" h="30mm" name="frmHiddenStaticTexts" presence="inactive">
          <bind match="none"/>
       </subform>

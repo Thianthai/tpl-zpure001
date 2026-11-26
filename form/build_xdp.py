@@ -308,3 +308,79 @@ else:
     s = s[:pa_start] + pa + s[pa_end:]
     open('ZPURF002.xdp','w',encoding='utf-8').write(s)
     print("step 12 applied: footer grows upwards by %.1fmm, amount in words on two lines" % DELTA)
+
+
+# ---------- 13. general conditions page at the end of every order (2026-11-26, D23) ----------
+# Text master = ZPURF002_general_conditions.docx (checked by the user, spelling kept as production).
+# Layout copies the production page of PO 99690990: no logo, header or footer, DokChampa 7pt,
+# heading Arial bold, number at 15mm, text at 20mm, line pitch 9.4pt, justified.
+# The page is not counted: every pageCount() becomes pageCount() - 1.
+import zipfile, html
+s=open('ZPURF002.xdp',encoding='utf-8').read()
+if 'name="mstTerms"' in s:
+    print("step 13 already applied")
+else:
+    dx = zipfile.ZipFile('ZPURF002_general_conditions.docx').read('word/document.xml').decode('utf-8')
+    paras = []
+    for p in re.findall(r'<w:p[ >].*?</w:p>', dx, re.S):
+        t = html.unescape(''.join(re.findall(r'<w:t[^>]*>([^<]*)</w:t>', p)))
+        if t.strip():
+            paras.append(t)
+    assert len(paras) == 36, len(paras)
+    title, subtitle, body = paras[0], paras[1], paras[2:]
+
+    LINE = 'lineHeight="9.4pt"'
+    W_ALL, W_NO = 179.95, 5.0
+    W_TXT = W_ALL - W_NO
+    def esc(t): return t.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    def draw(name, text, w, typeface, bold=False, align='justify', below='0pt'):
+        weight = ' weight="bold"' if bold else ''
+        return ('<draw name="%s" w="%.2fmm" minH="3.3mm"><ui><textEdit/></ui>'
+                '<value><text>%s</text></value>'
+                '<font typeface="%s" size="7pt"%s/>'
+                '<margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/>'
+                '<para hAlign="%s" %s spaceAbove="0pt" spaceBelow="%s"/></draw>'
+                % (name, w, esc(text), typeface, weight, align, LINE, below))
+
+    parts = ['<subform name="Terms" layout="tb" w="%.2fmm">' % W_ALL,
+             '<bind match="none"/>',
+             '<breakBefore targetType="pageArea" target="mstTerms" startNew="1"/>',
+             draw('Title', title, W_ALL, 'Arial', bold=True, align='left'),
+             draw('Subtitle', subtitle, W_ALL, 'DokChampa', bold=True, align='left', below='9.4pt')]
+    for i in range(0, len(body), 2):
+        en, th = body[i], body[i + 1]
+        m = re.match(r'^(\d+)\.\s+(.*)$', en)
+        assert m, en[:30]
+        parts += ['<subform name="Clause" layout="lr-tb" w="%.2fmm"><bind match="none"/>' % W_ALL,
+                  draw('No', m.group(1) + '.', W_NO, 'DokChampa', align='left'),
+                  '<subform name="Body" layout="tb" w="%.2fmm"><bind match="none"/>' % W_TXT,
+                  draw('En', m.group(2), W_TXT, 'DokChampa'),
+                  draw('Th', th, W_TXT, 'DokChampa'),
+                  '</subform></subform>']
+    parts.append('</subform>')
+    terms = '\n      '.join(parts) + '\n      '
+
+    # new page area without any master-page content; the order pages repeat on mstDummy
+    medium = '<medium stock="a4" short="210mm" long="297mm"/>'
+    pa_start = s.index('<pageArea name="mstDummy"'); pa_end = s.index('</pageArea>', pa_start)
+    pa = s[pa_start:pa_end]
+    assert pa.count(medium) == 1
+    pa = pa.replace(medium, medium + '\n            <occur max="-1"/>')
+    s = s[:pa_start] + pa + s[pa_end:]
+    close_pa = s.index('</pageArea>', pa_start) + len('</pageArea>')
+    s = s[:close_pa] + ('\n         <pageArea name="mstTerms" id="mstTerms_ID">'
+                        '\n            <contentArea x="15.03mm" y="12.63mm" w="179.95mm" h="274mm" name="cntTerms" id="cntTerms_ID"/>'
+                        '\n            ' + medium +
+                        '\n            <occur min="0" max="-1"/>'
+                        '\n         </pageArea>') + s[close_pa:]
+
+    # terms subform after Main, before the hidden static texts
+    anchor = '<subform w="100mm" h="30mm" name="frmHiddenStaticTexts"'
+    assert s.count(anchor) == 1
+    s = s.replace(anchor, terms + anchor)
+
+    # page numbers and last-page checks ignore the terms page
+    n = s.count('xfa.layout.pageCount()')
+    s = s.replace('xfa.layout.pageCount()', '(xfa.layout.pageCount() - 1)')
+    open('ZPURF002.xdp','w',encoding='utf-8').write(s)
+    print("step 13 applied: general conditions page, %d clauses, %d pageCount() calls adjusted" % (len(body)//2, n))
