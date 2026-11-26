@@ -385,3 +385,26 @@ else:
     s = s.replace('xfa.layout.pageCount()', '(xfa.layout.pageCount() - 1)')
     open('ZPURF002.xdp','w',encoding='utf-8').write(s)
     print("step 13 applied: general conditions page, %d clauses, %d pageCount() calls adjusted" % (len(body)//2, n))
+
+
+# ---------- 13b. Thai lines of the general conditions: spaces in Arial (2026-11-26) ----------
+# Preview showed the spaces between Thai words much wider than production (DokChampa's space
+# in a Thai run). Each Thai line becomes rich text where only the spaces use Arial.
+s=open('ZPURF002.xdp',encoding='utf-8').read()
+th_draws = list(re.finditer(r'<draw name="Th" [^>]*>.*?</draw>', s, re.S))
+assert len(th_draws) == 17, len(th_draws)
+if 'exData' in th_draws[0].group(0):
+    print("step 13b already applied")
+else:
+    def to_rich(m):
+        d = m.group(0)
+        t = re.search(r'<value><text>(.*?)</text></value>', d, re.S)
+        body = re.sub(r' +', lambda sp: '<span style="font-family:Arial">%s</span>' % sp.group(0), t.group(1))
+        rich = ('<value><exData contentType="text/html"><body xmlns="http://www.w3.org/1999/xhtml" '
+                'xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/">'
+                '<p style="font-family:DokChampa;font-size:7pt;text-align:justify;line-height:9.4pt;'
+                'margin-top:0pt;margin-bottom:0pt">%s</p></body></exData></value>' % body)
+        return d[:t.start()] + rich + d[t.end():]
+    s = re.sub(r'<draw name="Th" [^>]*>.*?</draw>', to_rich, s, flags=re.S)
+    open('ZPURF002.xdp','w',encoding='utf-8').write(s)
+    print("step 13b applied: 17 Thai lines with Arial spaces")
