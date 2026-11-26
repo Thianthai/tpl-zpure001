@@ -453,25 +453,25 @@ CLASS ZCL_PURE001_FDP IMPLEMENTATION.
           <lfs_out>-WBSElement = <lfs_aa>-WBSElement.
         ENDIF.
 
-        " รูปแบบคือ PR No.: <เลข>  Acc.Code: <เลข>  Order No.: <เลข>
+        " รูปแบบตามใบสั่งซื้อบน production คือ PR No.:<เลข> / Acc. Code:<เลข> / Order No.:<เลข>
         " ข้ามส่วนที่ว่าง
         " ALPHA = OUT ตัดศูนย์นำหน้า แล้ว condense ตัดช่องว่างท้ายที่เหลือ
         DATA lt_part TYPE string_table.
 
         CLEAR lt_part.
         IF <lfs_out>-PurchaseRequisition IS NOT INITIAL.
-          APPEND |PR No.: { condense( |{ <lfs_out>-PurchaseRequisition ALPHA = OUT }| ) }| TO lt_part.
+          APPEND |PR No.:{ condense( |{ <lfs_out>-PurchaseRequisition ALPHA = OUT }| ) }| TO lt_part.
         ENDIF.
 
         IF <lfs_out>-GLAccount IS NOT INITIAL.
-          APPEND |Acc.Code: { condense( |{ <lfs_out>-GLAccount ALPHA = OUT }| ) }| TO lt_part.
+          APPEND |Acc. Code:{ condense( |{ <lfs_out>-GLAccount ALPHA = OUT }| ) }| TO lt_part.
         ENDIF.
 
         IF <lfs_out>-OrderID IS NOT INITIAL.
-          APPEND |Order No.: { condense( |{ <lfs_out>-OrderID ALPHA = OUT }| ) }| TO lt_part.
+          APPEND |Order No.:{ condense( |{ <lfs_out>-OrderID ALPHA = OUT }| ) }| TO lt_part.
         ENDIF.
 
-        <lfs_out>-AccountAssignmentText = concat_lines_of( table = lt_part sep = `  ` ).
+        <lfs_out>-AccountAssignmentText = concat_lines_of( table = lt_part sep = ` / ` ).
 
         " item บริการที่ไม่มีจำนวนพิมพ์เป็น 1 AU ตามฟอร์มมาตรฐาน
         " field Quantity ยังคงเป็น 0 ตามข้อมูลจริง
