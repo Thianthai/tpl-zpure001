@@ -408,3 +408,23 @@ else:
     s = re.sub(r'<draw name="Th" [^>]*>.*?</draw>', to_rich, s, flags=re.S)
     open('ZPURF002.xdp','w',encoding='utf-8').write(s)
     print("step 13b applied: 17 Thai lines with Arial spaces")
+
+
+# ---------- 13c. preview round 2 fixes (2026-11-26) ----------
+# (a) clause 17: "SUPPLIER/" must start the last line like production. A word joiner (U+2060)
+#     after the slash keeps SUPPLIER/CONTRACTOR together, so the whole word moves down.
+# (b) Thai lines: font size is tuned step by step against production (TH_SIZE, re-runnable).
+TH_SIZE = '6.5pt'
+s=open('ZPURF002.xdp',encoding='utf-8').read()
+old17 = 'invoices, SUPPLIER/CONTRACTOR shall make'
+new17 = 'invoices, SUPPLIER/⁠CONTRACTOR shall make'
+if new17 not in s:
+    assert s.count(old17) == 1
+    s = s.replace(old17, new17)
+def th_size(m):
+    d = m.group(0)
+    d = re.sub(r'(<font typeface="DokChampa" size=")[0-9.]+pt(")', r'\g<1>%s\2' % TH_SIZE, d)
+    return re.sub(r'(font-size:)[0-9.]+pt', r'\g<1>%s' % TH_SIZE, d)
+s = re.sub(r'<draw name="Th" [^>]*>.*?</draw>', th_size, s, flags=re.S)
+open('ZPURF002.xdp','w',encoding='utf-8').write(s)
+print("step 13c applied: clause 17 word joiner, Thai lines %s" % TH_SIZE)
