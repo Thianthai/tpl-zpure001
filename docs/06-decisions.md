@@ -434,7 +434,7 @@ functional แจ้ง 2 เรื่องจากใบ 99680351 (SGD)
 | ตัวสะกด | คงตาม production ทั้งหมด รวมคำที่น่าจะผิด (`assigned of`, `it packing`, `deliverd`, `BUYER/the`, `arising form`, `names information`, `faclilitate` บนหน้า 1) **ยกเว้น** `ปฎิบัติ` 3 จุดในข้อ 11–12 ที่ผู้ใช้แก้เป็น `ปฏิบัติ` และเว้นวรรค `ได้ตามสมควร ทั้งนี้` ในข้อ 17 |
 | หน้าตา | แบบ production — ไม่มีโลโก้ หัวฟอร์ม และที่อยู่บริษัทด้านล่าง |
 | เลขหน้า | ไม่นับหน้าเงื่อนไข หน้า 1 ยังพิมพ์ `Page: 1/1` |
-| บรรทัด account assignment | เปลี่ยนจากรูปแบบใน spec เป็นแบบ production `PR No.:x / Acc. Code:y / Order No.:z` (แก้ใน `ZCL_PURE001_FDP`) |
+| บรรทัด account assignment | เปลี่ยนจากรูปแบบใน spec เป็นแบบ production `PR No.:x / Acc. Code:y / Order No.:z` (แก้ใน `ZCL_PURE001_FDP` — implement แล้ว `6846f68`) |
 
 ส่วนที่ต่างจาก production โดยตั้งใจ: แถว "เลขที่อ้างอิงภายใน/Our Reference" และ "วันที่ส่งสินค้า/Delivery Date" บนหัวฟอร์ม (spec ZPURF002 ข้อ 1)
 

@@ -261,11 +261,11 @@ ZAPI_PURE001_FDP (service def)
 | `DeliveryDateText` | `abap.char(40)` | 🔧 | `Delivery Date : 26/06/2025` — dd/mm/yyyy ค.ศ. (ต่างจาก header ที่เป็นไทย) |
 | `PerformancePeriodStartDate` / `EndDate` | `abap.dats` | ✅ | schedule line — สำหรับ service item (`16 January 2025 - 16 January 2026`) |
 | `PurchaseRequisition` | `banfn` | ✅ | `I_PurchaseOrderItemAPI01.PurchaseRequisition` — `PR No.` |
-| `GLAccount` | `saknr` | ✅ | `I_PurOrdAccountAssignmentTP_2.GLAccount` (account assignment `01`) — `Acc.Code` |
+| `GLAccount` | `saknr` | ✅ | `I_PurOrdAccountAssignmentTP_2.GLAccount` (account assignment `01`) — `Acc. Code` |
 | `CostCenter` | `kostl` | ✅ | `CostCenter` |
 | `OrderID` | `aufnr` | ✅ | `OrderID` — `Order No.` |
 | `WBSElement` | `abap.char(24)` | ✅ | `WBSElementExternalID` — `WBS: C-19-OPD13-00CO-ME` |
-| `AccountAssignmentText` | `abap.char(120)` | 🔧 | `PR No.: 168999  Acc.Code: 820000  Order No.: 1600000001` — ตัดศูนย์นำหน้าและ condense ข้ามส่วนที่ว่าง |
+| `AccountAssignmentText` | `abap.char(120)` | ✅ | `PR No.:168999 / Acc. Code:820000 / Order No.:1600000001` — รูปแบบตาม production (D23, `6846f68`) · ตัดศูนย์นำหน้าและ condense ข้ามส่วนที่ว่าง |
 | `Plant` | `werks_d` | ✅ | `Plant` |
 
 ---
@@ -285,7 +285,7 @@ Material PO Text XXXXXXXXXXXXXXXXXX 2                     ┘
 Item Text XXXXXXXXXXXXXXXXXXXX 1                          ┐ §4 node TextObjectType = F01
 Item Text XXXXXXXXXXXXXXXXXXXX 2                          ┘
 Delivery Time : 26/06/2025                                ← §3 DeliveryDateText (มี label มาให้แล้ว)
-PR No.: 168999  Acc.Code: 820000  Order No.: 1600000001   ← §3 AccountAssignmentText (หรือแยก field + label ในฟอร์ม)
+PR No.: 168999  Acc.Code: 820000  Order No.: 1600000001   ← §3 AccountAssignmentText (ตัวอย่างใน spec · ใช้จริงตาม production: PR No.:168999 / Acc. Code:820000 / Order No.:1600000001 — D23)
 WBS: C-19-OPD13-00CO-ME                                   ← §3 WBSElement (ฟอร์มใส่ label "WBS:")
 ```
 
