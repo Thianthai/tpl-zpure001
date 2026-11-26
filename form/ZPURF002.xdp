@@ -3066,7 +3066,7 @@ this.presence = (cur === total) ? "visible" : "invisible"
       <subform name="Terms" layout="tb" w="179.95mm">
       <bind match="none"/>
       <breakBefore targetType="pageArea" target="mstTerms" startNew="1"/>
-      <draw name="Title" w="179.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>GENERAL CONDITIONS</text></value><font typeface="Arial" size="7pt" weight="bold"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
+      <draw name="Title" w="179.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>GENERAL CONDITIONS</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>
       <draw name="Subtitle" w="179.95mm" minH="3.3mm"><ui><textEdit/></ui><value><text>คำแปลเงื่อนไขทั่วไป</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="9.4pt"/></draw>
       <subform name="Clause" layout="lr-tb" w="179.95mm"><bind match="none"/>
       <draw name="No" w="5.00mm" minH="3.3mm"><ui><textEdit/></ui><value><text>1.</text></value><font typeface="DokChampa" size="7pt"/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"/><para hAlign="left" lineHeight="9.4pt" spaceAbove="0pt" spaceBelow="0pt"/></draw>

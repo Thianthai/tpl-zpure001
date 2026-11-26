@@ -313,7 +313,7 @@ else:
 # ---------- 13. general conditions page at the end of every order (2026-11-26, D23) ----------
 # Text master = ZPURF002_general_conditions.docx (checked by the user, spelling kept as production).
 # Layout copies the production page of PO 99690990: no logo, header or footer, DokChampa 7pt,
-# heading Arial bold (DokChampa has no bold face: the production page only looks bolder
+# every line in DokChampa regular, the heading too (the production page only looks bold
 # because the whole page is drawn with a 0.2pt text stroke), number at 15mm, text at 20mm, line pitch 9.4pt, justified.
 # The page is not counted: every pageCount() becomes pageCount() - 1.
 import zipfile, html
@@ -346,7 +346,7 @@ else:
     parts = ['<subform name="Terms" layout="tb" w="%.2fmm">' % W_ALL,
              '<bind match="none"/>',
              '<breakBefore targetType="pageArea" target="mstTerms" startNew="1"/>',
-             draw('Title', title, W_ALL, 'Arial', bold=True, align='left'),
+             draw('Title', title, W_ALL, 'DokChampa', align='left'),
              draw('Subtitle', subtitle, W_ALL, 'DokChampa', align='left', below='9.4pt')]
     for i in range(0, len(body), 2):
         en, th = body[i], body[i + 1]
