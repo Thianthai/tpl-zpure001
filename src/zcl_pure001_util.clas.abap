@@ -300,7 +300,7 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
 
   METHOD get_currency_name.
 
-    " เพิ่มสกุลใหม่ตามรายการที่ functional ส่งมาได้ที่นี่
+    " ชื่อสกุลเงินตามรายการที่ functional ยืนยัน สกุลอื่นใช้รหัสสกุลเงินแทนชื่อ
     CASE iv_currency.
 
       WHEN 'USD'.
@@ -314,6 +314,18 @@ CLASS ZCL_PURE001_UTIL IMPLEMENTATION.
                            major_plural   = `Singapore dollars`
                            minor_singular = `cent`
                            minor_plural   = `cents` ).
+
+      WHEN 'EUR'.
+        rs_name = VALUE #( major_singular = `euro`
+                           major_plural   = `euros`
+                           minor_singular = `cent`
+                           minor_plural   = `cents` ).
+
+      WHEN 'GBP'.
+        rs_name = VALUE #( major_singular = `pound`
+                           major_plural   = `pounds`
+                           minor_singular = `penny`
+                           minor_plural   = `pence` ).
 
       WHEN OTHERS.
         " ยังไม่มีชื่อสกุลเงิน จึงใช้รหัสสกุลเงินแทน
